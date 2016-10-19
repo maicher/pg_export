@@ -1,0 +1,50 @@
+AllCops:
+  TargetRubyVersion: 2.1
+  Exclude:
+    - 'spec/spec_helper.rb'
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Max: 20
+  Exclude:
+    - 'lib/pg_export.rb'
+
+Lint/NestedMethodDefinition:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'spec/actions/create_dump_spec.rb'
+
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'lib/pg_export/actions/compress_dump.rb'
+
+Lint/AmbiguousOperator:
+  Exclude:
+    - 'lib/pg_export/configuration.rb'
+
+Style/AlignArray:
+  Exclude:
+    - 'spec/configuration_spec.rb'
+
+Style/GuardClause:
+  Exclude:
+    - '*.gemspec'
+
+Style/AndOr:
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+CaseIndentation:
+  Enabled: false

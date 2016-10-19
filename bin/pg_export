@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'ostruct'
+require 'pg_export'
+
+LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }
+LOGS_NORMAL = ->(_, _, _, message) { "#{message}\n" }
+
+options = OpenStruct.new
+option_parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: pg_export [options]'
+
+  opts.on('-d', '--database DATABASE', '[Required] Name of the database to export') do |database|
+    options.database = database
+  end
+
+  opts.on('-k', '--keep [KEEP]', Integer, '[Optional] Number of dump files to keep locally and on FTP (default: 10)') do |keep|
+    options.keep = keep
+  end
+
+  opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
+    options.timestamped = true
+  end
+
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
+end
+
+begin
+  option_parser.parse!
+
+  PgExport::Logging.logger.formatter = options.timestamped ? LOGS_TIMESTAMPED : LOGS_NORMAL
+
+  PgExport.new do |config|
+    config.database = options.database if options.database
+    config.keep_dumps = options.keep if options.keep
+    config.keep_ftp_dumps = options.keep if options.keep
+  end.call
+rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
+  puts "Error: #{e}"
+  puts option_parser
+end
