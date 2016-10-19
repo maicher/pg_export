@@ -3,8 +3,8 @@ class PgExport
     DEFAULTS = {
       database: nil,
       dumpfile_dir: ENV['DUMPFILE_DIR'] || 'tmp/dumps',
-      keep_dumps: ENV['KEEP_DUMPS'] || 10,
-      keep_ftp_dumps: ENV['KEEP_FTP_DUMPS'] || 10,
+      keep_dumps: ENV['KEEP_DUMPS'].to_i || 10,
+      keep_ftp_dumps: ENV['KEEP_FTP_DUMPS'].to_i || 10,
       ftp_host: ENV['BACKUP_FTP_HOST'],
       ftp_user: ENV['BACKUP_FTP_USER'],
       ftp_password: ENV['BACKUP_FTP_PASSWORD']
