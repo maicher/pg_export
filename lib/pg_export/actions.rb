@@ -1,0 +1,5 @@
+require 'pg_export/actions/create_dump'
+require 'pg_export/actions/compress_dump'
+require 'pg_export/actions/remove_old_dumps'
+require 'pg_export/actions/send_dump_to_ftp'
+require 'pg_export/actions/remove_old_dumps_from_ftp'
