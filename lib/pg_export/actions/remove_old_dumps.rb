@@ -4,7 +4,7 @@ class PgExport
 
     def initialize(dump, keep_dumps_count)
       @dump = dump
-      @keep_dumps_count = keep_dumps_count
+      @keep_dumps_count = keep_dumps_count.to_i
     end
 
     def call

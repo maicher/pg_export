@@ -5,7 +5,7 @@ class PgExport
     def initialize(dump, ftp_service, keep_dumps)
       @dump = dump
       @ftp_service = ftp_service
-      @keep_dumps = keep_dumps
+      @keep_dumps = keep_dumps.to_i
     end
 
     def call
