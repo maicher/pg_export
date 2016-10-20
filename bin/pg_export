@@ -42,4 +42,6 @@ begin
 rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
   puts "Error: #{e}"
   puts option_parser
+rescue PgExport::DatabaseDoesNotExistError, PgExport::DependencyRequiredError => e
+  puts e
 end

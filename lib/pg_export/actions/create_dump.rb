@@ -19,13 +19,13 @@ class PgExport
 
     def validate_pg_dump_exists
       out = `pg_dump -V`
-      /pg_dump \(PostgreSQL\)/ =~ out or raise DependencyRequiredError, 'pg_dump is required'
+      /pg_dump \(PostgreSQL\)/ =~ out or raise DependencyRequiredError, 'Shell command "pg_dump" is required. Pleas install "pg_dump" and try again.'
     end
 
     def validate_db_exists(database)
       PG.connect(dbname: database)
     rescue PG::ConnectionBad => e
-      raise DatabaseDoesNotExistError, e.to_s
+      raise DatabaseDoesNotExistError, e
     end
 
     def execute_dump_command

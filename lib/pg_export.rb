@@ -22,26 +22,36 @@ class PgExport
     @config = Configuration.new
     yield config if block_given?
     config.validate
-    @dump = Dump.new(config.database, config.dumpfile_dir)
-  end
-
-  def initialize_ftp_service
-    self.ftp_service = FtpService.new(config.ftp_params)
   end
 
   def call
-    t = []
-    t << Thread.new { perform_local_job }
-    t << Thread.new { initialize_ftp_service }
-    t.each(&:join)
+    initialize_dump
+    concurrently do |job|
+      job << Thread.new { perform_local_job }
+      job << Thread.new { initialize_ftp_service }
+    end
     perform_ftp_job
     self
   end
 
   private
 
-  attr_reader :config, :dump
-  attr_accessor :ftp_service
+  attr_reader :config
+  attr_accessor :ftp_service, :dump
+
+  def initialize_dump
+    self.dump = Dump.new(config.database, config.dumpfile_dir)
+  end
+
+  def initialize_ftp_service
+    self.ftp_service = FtpService.new(config.ftp_params)
+  end
+
+  def concurrently
+    t = []
+    yield t
+    t.each(&:join)
+  end
 
   def perform_local_job
     CreateDump.new(dump).call
