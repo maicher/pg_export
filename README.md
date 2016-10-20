@@ -1,8 +1,10 @@
 # PgExport
 
-CLI for exporting Rails Postgres database dump to FTP.
+CLI for creating PostgreSQL dumps and exporting them to FTP.
 
 Can be used for backups or synchronizing databases between production and development environments.
+
+Configurable by env variables and (partially) by command line options.
 
 ## Dependencies
 
@@ -35,6 +37,54 @@ Or install it yourself as:
         -k, --keep [KEEP]                [Optional] Number of dump files to keep locally and on FTP (default: 10)
         -t, --timestamped                [Optional] Enables log messages with timestamps
         -h, --help                       Show this message
+    
+    Setting can be verified by running following commands:
+        -c, --configuration              Prints the configuration
+        -f, --ftp                        Tries connecting to FTP to verify the connection
+
+## How to start
+
+__Step 1.__ Prepare FTP account and put configuration into env variables.
+
+    # /etc/enviranment
+    BACKUP_FTP_HOST="yourftp.example.com"
+    BACKUP_FTP_USER="user"
+    BACKUP_FTP_PASSWORD="password"
+    
+Password cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
+
+__Step 2.__ Configure other variables (optional).
+
+    # /etc/environment
+    DUMPFILE_DIR="/var/dumps"  # default: "tmp/dumps"
+    KEEP_DUMPS=3               # default: 10
+    KEEP_FTP_DUMPS=5           # default: 10
+
+__Step 3.__ Print the configuration to verify whether env variables has been loaded.
+
+    $ pg_export --configuration
+    => database: 
+       dumpfile_dir: /var/dumps
+       keep_dumps: 3
+       keep_ftp_dumps: 5
+       ftp_host: yourftp.example.com
+       ftp_user: user
+       ftp_password: pass***
+       
+__Step 4.__ Try connecting to FTP to verify the connection.
+
+    $ pg_export --ftp
+    => Connect to yourftp.example.com
+       Close FTP
+    
+__Step 5.__ Perform database export.
+
+    $ pg_export -d your_database
+    => Dump your_database to /var/dumps/your_database_20161020_125747 (892.38kB)
+       Zip dump your_database_20161020_125747.gz (874.61kB)
+       Connect to yourftp.example.com
+       Export your_database_20161020_125747.gz to FTP
+       Close FTP
 
 ## Development
 

@@ -23,8 +23,21 @@ option_parser = OptionParser.new do |opts|
     options.timestamped = true
   end
 
-  opts.on_tail('-h', '--help', 'Show this message') do
+  opts.on('-h', '--help', 'Show this message') do
     puts opts
+    exit
+  end
+
+  opts.separator "\nSetting can be verified by running following commands:"
+
+  opts.on('-c', '--configuration', 'Prints the configuration') do
+    puts PgExport::Configuration.new.to_s
+    exit
+  end
+
+  opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
+    PgExport::Logging.logger.formatter = LOGS_NORMAL
+    PgExport::FtpService.new(PgExport::Configuration.new.ftp_params)
     exit
   end
 end

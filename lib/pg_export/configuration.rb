@@ -31,5 +31,23 @@ class PgExport
         password: ftp_password
       }
     end
+
+    def to_s
+      DEFAULTS.keys.map(&method(:print_attr))
+    end
+
+    private
+
+    def print_attr(key)
+      if key == :ftp_password
+        if send(key)
+          "#{key}: #{send(key)[0..2]}***\n"
+        else
+          "#{key}:\n"
+        end
+      else
+        "#{key}: #{send(key)}\n"
+      end
+    end
   end
 end
