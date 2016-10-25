@@ -25,8 +25,9 @@ RSpec.describe PgExport::Utils do
   describe '.compress' do
     let(:sql_dump) { PgExport::SqlDump.new }
     before(:each) do
-      sql_dump.write('abc')
-      sql_dump.rewind
+      sql_dump.open(:write) do |f|
+        f.write('abc')
+      end
     end
 
     it { expect(subject.compress(sql_dump)).to be_a PgExport::CompressedDump }

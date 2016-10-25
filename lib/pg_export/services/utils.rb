@@ -12,8 +12,10 @@ class PgExport
 
     def self.compress(dump)
       dump_gz = CompressedDump.new
-      dump_gz.open(:write) do |gz|
-        gz.write(dump.read_chunk) until dump.eof?
+      dump.open(:read) do |f|
+        dump_gz.open(:write) do |gz|
+          gz.write(f.read(Dump::Base::CHUNK_SIZE)) until f.eof?
+        end
       end
 
       logger.info "Create #{dump_gz}"
@@ -23,9 +25,10 @@ class PgExport
     def self.decompress(dump_gz)
       dump = SqlDump.new
       dump_gz.open(:read) do |gz|
-        dump.write(gz.readpartial(Dump::Base::CHUNK_SIZE)) until gz.eof?
+        dump.open(:write) do |f|
+          f.write(gz.readpartial(Dump::Base::CHUNK_SIZE)) until gz.eof?
+        end
       end
-      dump.rewind
 
       logger.info "Create #{dump}"
       dump

@@ -16,7 +16,7 @@ class PgExport
         raise 'Overwrite it'
       end
 
-      def read_chunk
+      def open
         raise 'Overwrite it'
       end
 
