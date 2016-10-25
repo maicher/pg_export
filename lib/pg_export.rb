@@ -1,22 +1,24 @@
 require 'logger'
-require 'pathname'
-require 'fileutils'
+require 'tempfile'
 require 'zlib'
 require 'net/ftp'
 
-require 'pg'
-
 require 'pg_export/version'
 require 'pg_export/logging'
-require 'pg_export/configuration'
 require 'pg_export/errors'
-require 'pg_export/dump'
-require 'pg_export/actions'
-require 'pg_export/ftp_service'
-require 'pg_export/ftp_service/connection'
+require 'pg_export/configuration'
+require 'pg_export/concurrency'
+require 'pg_export/entities/dump/size_human'
+require 'pg_export/entities/dump/base'
+require 'pg_export/entities/sql_dump'
+require 'pg_export/entities/compressed_dump'
+require 'pg_export/services/ftp_service'
+require 'pg_export/services/ftp_service/connection'
+require 'pg_export/services/utils'
+require 'pg_export/services/dump_storage'
 
 class PgExport
-  include Logging
+  include Concurrency
 
   def initialize
     @config = Configuration.new
@@ -25,42 +27,28 @@ class PgExport
   end
 
   def call
-    initialize_dump
     concurrently do |job|
-      job << Thread.new { perform_local_job }
-      job << Thread.new { initialize_ftp_service }
+      job << create_dump
+      job << initialize_dump_storage
     end
-    perform_ftp_job
+    dump_storage.upload(dump)
+    dump_storage.remove_old(keep: config.keep_dumps)
     self
   end
 
   private
 
   attr_reader :config
-  attr_accessor :ftp_service, :dump
+  attr_accessor :dump, :dump_storage
 
-  def initialize_dump
-    self.dump = Dump.new(config.database, config.dumpfile_dir)
+  def initialize_dump_storage
+    ftp_service = FtpService.new(config.ftp_params)
+    self.dump_storage = DumpStorage.new(ftp_service, config.database)
   end
 
-  def initialize_ftp_service
-    self.ftp_service = FtpService.new(config.ftp_params)
-  end
-
-  def concurrently
-    t = []
-    yield t
-    t.each(&:join)
-  end
-
-  def perform_local_job
-    CreateDump.new(dump).call
-    CompressDump.new(dump).call
-    RemoveOldDumps.new(dump, config.keep_dumps).call
-  end
-
-  def perform_ftp_job
-    SendDumpToFtp.new(dump, ftp_service).call
-    RemoveOldDumpsFromFtp.new(dump, ftp_service, config.keep_ftp_dumps).call
+  def create_dump
+    sql_dump = Utils.create_dump(config.database)
+    compressed_dump = Utils.compress(sql_dump)
+    self.dump = compressed_dump
   end
 end

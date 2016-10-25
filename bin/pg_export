@@ -15,7 +15,7 @@ option_parser = OptionParser.new do |opts|
     options.database = database
   end
 
-  opts.on('-k', '--keep [KEEP]', Integer, '[Optional] Number of dump files to keep locally and on FTP (default: 10)') do |keep|
+  opts.on('-k', '--keep [KEEP]', Integer, '[Optional] Number of dump files to keep on FTP (default: 10)') do |keep|
     options.keep = keep
   end
 
@@ -50,11 +50,10 @@ begin
   PgExport.new do |config|
     config.database = options.database if options.database
     config.keep_dumps = options.keep if options.keep
-    config.keep_ftp_dumps = options.keep if options.keep
   end.call
 rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
   puts "Error: #{e}"
   puts option_parser
-rescue PgExport::DatabaseDoesNotExistError, PgExport::DependencyRequiredError => e
+rescue PgExport::PgDumpError => e
   puts e
 end

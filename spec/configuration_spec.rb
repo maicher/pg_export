@@ -3,10 +3,8 @@ require 'spec_helper'
 describe PgExport::Configuration do
   let(:configuration) do
     c = PgExport::Configuration.new
-    c.dumpfile_dir = 'tmp/dumps',
-    c.keep_dumps = 10,
-    c.keep_ftp_dumps = 10,
     c.database = 'test',
+    c.keep_dumps = 10,
     c.ftp_host = 'host'
     c.ftp_user = 'user'
     c.ftp_password = 'password'

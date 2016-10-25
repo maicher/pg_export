@@ -1,15 +1,26 @@
 # PgExport
 
-CLI for creating PostgreSQL dumps and exporting them to FTP.
+CLI for creating and exporting PostgreSQL dumps to FTP.
 
 Can be used for backups or synchronizing databases between production and development environments.
 
-Configurable by env variables and (partially) by command line options.
+Example:
+
+    pg_export --database database_name -keep 5
+    
+Above command will perform database dump, gzip it, upload it to FTP and remove old dumps from FTP, keeping newest 5.
+
+FTP connection params are configured by env variables.
+
+Features:
+
+- uses shell command pg_dump
+- no external gem dependencies
+- uses ruby tempfiles, so local dumps are garbage collected automatically
 
 ## Dependencies
 
   * Ruby >= 2.1
-  * PostgreSQL >= 9.1
   * $ pg_dump
 
 ## Installation
@@ -34,7 +45,7 @@ Or install it yourself as:
 
     Usage: pg_export [options]
         -d, --database DATABASE          [Required] Name of the database to export
-        -k, --keep [KEEP]                [Optional] Number of dump files to keep locally and on FTP (default: 10)
+        -k, --keep [KEEP]                [Optional] Number of dump files to keep on FTP (default: 10)
         -t, --timestamped                [Optional] Enables log messages with timestamps
         -h, --help                       Show this message
     
@@ -56,17 +67,13 @@ Password cannot include `#` sign, [more info](http://serverfault.com/questions/5
 __Step 2.__ Configure other variables (optional).
 
     # /etc/environment
-    DUMPFILE_DIR="/var/dumps"  # default: "tmp/dumps"
-    KEEP_DUMPS=3               # default: 10
-    KEEP_FTP_DUMPS=5           # default: 10
+    KEEP_DUMPS=5   # default: 10
 
 __Step 3.__ Print the configuration to verify whether env variables has been loaded.
 
     $ pg_export --configuration
     => database: 
-       dumpfile_dir: /var/dumps
-       keep_dumps: 3
-       keep_ftp_dumps: 5
+       keep_dumps: 5
        ftp_host: yourftp.example.com
        ftp_user: user
        ftp_password: pass***
@@ -80,10 +87,10 @@ __Step 4.__ Try connecting to FTP to verify the connection.
 __Step 5.__ Perform database export.
 
     $ pg_export -d your_database
-    => Dump your_database to /var/dumps/your_database_20161020_125747 (892.38kB)
-       Zip dump your_database_20161020_125747.gz (874.61kB)
+    => Create Dump Tempfile (1.36MB)
+       Create Compressed Dump Tempfile (1.34MB)
        Connect to yourftp.example.com
-       Export your_database_20161020_125747.gz to FTP
+       Export Compressed Dump Tempfile (1.34MB) your_database_20161020_125747.gz to yourftp.example.com
        Close FTP
 
 ## Development

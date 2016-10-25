@@ -19,11 +19,7 @@ Lint/NestedMethodDefinition:
 
 Lint/HandleExceptions:
   Exclude:
-    - 'spec/actions/create_dump_spec.rb'
-
-Lint/AssignmentInCondition:
-  Exclude:
-    - 'lib/pg_export/actions/compress_dump.rb'
+    - 'spec/services/utils_spec.rb'
 
 Lint/AmbiguousOperator:
   Exclude:

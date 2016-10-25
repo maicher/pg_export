@@ -1,10 +1,13 @@
 require 'spec_helper'
 
 describe PgExport do
+  let(:database) { 'some_database' }
+  let(:keep) { 10 }
+
   subject do
     PgExport.new do |config|
-      config.database = 'some_database'
-      config.dumpfile_dir = 'spec/tmp/dumps'
+      config.database = database
+      config.keep_dumps = keep
       config.ftp_host = 'ftp.example.com'
       config.ftp_user = 'user'
       config.ftp_password = 'pass'
@@ -17,13 +20,15 @@ describe PgExport do
 
   describe '#call' do
     let(:mock) { FtpMock.new }
+    let(:sql_dump) { Object.new }
+    let(:gz_dump) { Object.new }
+
     before(:each) do
       allow(Net::FTP).to receive(:new).and_return(mock)
-      allow_any_instance_of(PgExport::CreateDump).to receive(:call)
-      allow_any_instance_of(PgExport::CompressDump).to receive(:call)
-      allow_any_instance_of(PgExport::RemoveOldDumps).to receive(:call)
-      allow_any_instance_of(PgExport::SendDumpToFtp).to receive(:call)
-      allow_any_instance_of(PgExport::RemoveOldDumpsFromFtp).to receive(:call)
+      allow(PgExport::Utils).to receive(:create_dump).with(database).and_return(sql_dump)
+      allow(PgExport::Utils).to receive(:compress).with(sql_dump).and_return(gz_dump)
+      allow_any_instance_of(PgExport::DumpStorage).to receive(:upload).with(gz_dump)
+      allow_any_instance_of(PgExport::DumpStorage).to receive(:remove_old).with(keep: keep)
     end
     it { subject.call }
   end
