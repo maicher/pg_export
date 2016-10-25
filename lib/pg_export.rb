@@ -2,6 +2,7 @@ require 'logger'
 require 'tempfile'
 require 'zlib'
 require 'net/ftp'
+require 'forwardable'
 
 require 'pg_export/version'
 require 'pg_export/logging'
