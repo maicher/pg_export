@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe PgExport::SqlDump do
-  subject { PgExport::SqlDump.new }
+describe PgExport::PlainDump do
+  subject { PgExport::PlainDump.new }
 
   it { expect(subject).to be_a(PgExport::Dump::Base) }
 end

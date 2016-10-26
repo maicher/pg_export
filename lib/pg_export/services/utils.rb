@@ -7,7 +7,7 @@ class PgExport
     end
 
     def create_dump(database_name)
-      dump = SqlDump.new
+      dump = PlainDump.new
       out = `pg_dump -Fc --file #{dump.path} #{database_name} 2>&1`
       raise PgDumpError, out if /FATAL/ =~ out
       logger.info "Create #{dump}"
@@ -28,7 +28,7 @@ class PgExport
     end
 
     def decrypt(enc_dump)
-      dump = SqlDump.new
+      dump = PlainDump.new
       enc_dump.open(:read) do |enc|
         dump.open(:write) do |f|
           f << decryptor.update(enc.read(Dump::Base::CHUNK_SIZE)) until enc.eof?

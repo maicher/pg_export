@@ -1,5 +1,5 @@
 class PgExport
-  class SqlDump < Dump::Base
+  class PlainDump < Dump::Base
     def name
       'Dump'
     end

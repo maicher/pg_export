@@ -19,22 +19,22 @@ RSpec.describe PgExport::Utils do
 
     context 'when specified database exists' do
       it { expect { subject.create_dump(database) }.not_to raise_error }
-      it { expect(subject.create_dump(database)).to be_a PgExport::SqlDump }
+      it { expect(subject.create_dump(database)).to be_a PgExport::PlainDump }
     end
   end
 
   describe '.encrypt' do
-    let(:sql_dump) { d = PgExport::SqlDump.new; d.open(:write) { |f| f << 'abc' }; d }
+    let(:sql_dump) { d = PgExport::PlainDump.new; d.open(:write) { |f| f << 'abc' }; d }
 
     it { expect(subject.encrypt(sql_dump)).to be_a PgExport::EncryptedDump }
     it { expect(subject.encrypt(sql_dump).read).not_to eq('abc') }
   end
 
   describe '.decrypt' do
-    let(:sql_dump) { d = PgExport::SqlDump.new; d.open(:write) { |f| f << 'abc' }; d }
+    let(:sql_dump) { d = PgExport::PlainDump.new; d.open(:write) { |f| f << 'abc' }; d }
     let(:enc_dump) { subject.encrypt(sql_dump) }
 
-    it { expect(subject.decrypt(enc_dump)).to be_a PgExport::SqlDump }
+    it { expect(subject.decrypt(enc_dump)).to be_a PgExport::PlainDump }
     it { expect(subject.decrypt(enc_dump).read).to eq('abc') }
   end
 end
