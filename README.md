@@ -1,5 +1,7 @@
 # PgExport
 
+[![Build Status](https://travis-ci.org/maicher/pg_export.svg?branch=master)](https://travis-ci.org/maicher/pg_export)
+
 CLI for creating and exporting PostgreSQL dumps to FTP.
 
 Can be used for backups or synchronizing databases between production and development environments.

@@ -21,7 +21,7 @@ class PgExport
       DEFAULTS.keys.each do |field|
         raise InvalidConfigurationError, "Field #{field} is required" if send(field).nil?
       end
-      raise InvalidConfigurationError, "Dump password is to short. It should have at least 16 characters" if dump_encryption_key.length < 16
+      raise InvalidConfigurationError, 'Dump password is to short. It should have at least 16 characters' if dump_encryption_key.length < 16
     end
 
     def ftp_params

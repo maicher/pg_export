@@ -24,15 +24,23 @@ RSpec.describe PgExport::Utils do
   end
 
   describe '.encrypt' do
-    let(:sql_dump) { d = PgExport::PlainDump.new; d.open(:write) { |f| f << 'abc' }; d }
+    let(:plain_dump) do
+      d = PgExport::PlainDump.new
+      d.open(:write) { |f| f << 'abc' }
+      d
+    end
 
-    it { expect(subject.encrypt(sql_dump)).to be_a PgExport::EncryptedDump }
-    it { expect(subject.encrypt(sql_dump).read).not_to eq('abc') }
+    it { expect(subject.encrypt(plain_dump)).to be_a PgExport::EncryptedDump }
+    it { expect(subject.encrypt(plain_dump).read).not_to eq('abc') }
   end
 
   describe '.decrypt' do
-    let(:sql_dump) { d = PgExport::PlainDump.new; d.open(:write) { |f| f << 'abc' }; d }
-    let(:enc_dump) { subject.encrypt(sql_dump) }
+    let(:plain_dump) do
+      d = PgExport::PlainDump.new
+      d.open(:write) { |f| f << 'abc' }
+      d
+    end
+    let(:enc_dump) { subject.encrypt(plain_dump) }
 
     it { expect(subject.decrypt(enc_dump)).to be_a PgExport::PlainDump }
     it { expect(subject.decrypt(enc_dump).read).to eq('abc') }
