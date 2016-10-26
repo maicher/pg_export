@@ -9,6 +9,7 @@ describe PgExport::Dump::Base do
   it { expect(subject).to respond_to(:rewind) }
   it { expect(subject).to respond_to(:size) }
   it { expect(subject).to respond_to(:eof?) }
+  it { expect(subject).to respond_to(:ext) }
 
   describe '#read #write' do
     before(:each) do

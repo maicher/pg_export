@@ -8,6 +8,7 @@ describe PgExport do
     PgExport.new do |config|
       config.database = database
       config.keep_dumps = keep
+      config.dump_encryption_key = '1234567890abcdef'
       config.ftp_host = 'ftp.example.com'
       config.ftp_user = 'user'
       config.ftp_password = 'pass'
@@ -21,13 +22,13 @@ describe PgExport do
   describe '#call' do
     let(:mock) { FtpMock.new }
     let(:sql_dump) { Object.new }
-    let(:gz_dump) { Object.new }
+    let(:enc_dump) { Object.new }
 
     before(:each) do
       allow(Net::FTP).to receive(:new).and_return(mock)
-      allow(PgExport::Utils).to receive(:create_dump).with(database).and_return(sql_dump)
-      allow(PgExport::Utils).to receive(:compress).with(sql_dump).and_return(gz_dump)
-      allow_any_instance_of(PgExport::DumpStorage).to receive(:upload).with(gz_dump)
+      allow_any_instance_of(PgExport::Utils).to receive(:create_dump).with(database).and_return(sql_dump)
+      allow_any_instance_of(PgExport::Utils).to receive(:encrypt).with(sql_dump).and_return(enc_dump)
+      allow_any_instance_of(PgExport::DumpStorage).to receive(:upload).with(enc_dump)
       allow_any_instance_of(PgExport::DumpStorage).to receive(:remove_old).with(keep: keep)
     end
     it { subject.call }

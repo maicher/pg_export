@@ -3,6 +3,7 @@ class PgExport
     DEFAULTS = {
       database: nil,
       keep_dumps: ENV['KEEP_DUMPS'] || 10,
+      dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
       ftp_host: ENV['BACKUP_FTP_HOST'],
       ftp_user: ENV['BACKUP_FTP_USER'],
       ftp_password: ENV['BACKUP_FTP_PASSWORD']
@@ -20,6 +21,7 @@ class PgExport
       DEFAULTS.keys.each do |field|
         raise InvalidConfigurationError, "Field #{field} is required" if send(field).nil?
       end
+      raise InvalidConfigurationError, "Dump password is to short. It should have at least 16 characters" if dump_encryption_key.length < 16
     end
 
     def ftp_params
@@ -37,7 +39,7 @@ class PgExport
     private
 
     def print_attr(key)
-      if key == :ftp_password
+      if %i(ftp_password dump_encryption_key).include?(key)
         if send(key)
           "#{key}: #{send(key)[0..2]}***\n"
         else

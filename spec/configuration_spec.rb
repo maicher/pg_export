@@ -5,6 +5,7 @@ describe PgExport::Configuration do
     c = PgExport::Configuration.new
     c.database = 'test',
     c.keep_dumps = 10,
+    c.dump_encryption_key = '1234567890abcdef',
     c.ftp_host = 'host'
     c.ftp_user = 'user'
     c.ftp_password = 'password'

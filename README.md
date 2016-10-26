@@ -8,9 +8,9 @@ Example:
 
     pg_export --database database_name -keep 5
     
-Above command will perform database dump, gzip it, upload it to FTP and remove old dumps from FTP, keeping newest 5.
+Above command will perform database dump, encrypt it, upload it to FTP and remove old dumps from FTP, keeping newest 5.
 
-FTP connection params are configured by env variables.
+FTP connection params and encryption key are configured by env variables.
 
 Features:
 
@@ -55,42 +55,48 @@ Or install it yourself as:
 
 ## How to start
 
-__Step 1.__ Prepare FTP account and put configuration into env variables.
+__Step 1.__ Prepare FTP account and put configuration into env variables. Dumps will be exported into that location.
 
-    # /etc/enviranment
+    # /etc/environment
     BACKUP_FTP_HOST="yourftp.example.com"
     BACKUP_FTP_USER="user"
     BACKUP_FTP_PASSWORD="password"
     
-Password cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
+__Step 2.__ Put dump encryption key into env variable (at least 16 characters). Dumps will be SSL(AES-128-CBC) encrypted using that key.
+ 
+    # /etc/environment
+    DUMP_ENCRYPTION_KEY="1234567890abcdef"
+    
+Variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
 
-__Step 2.__ Configure other variables (optional).
+__Step 3.__ Configure how many dumps should be kept in FTP (optional).
 
     # /etc/environment
     KEEP_DUMPS=5   # default: 10
 
-__Step 3.__ Print the configuration to verify whether env variables has been loaded.
+__Step 4.__ Print the configuration to verify whether env variables has been loaded.
 
     $ pg_export --configuration
     => database: 
        keep_dumps: 5
+       dump_password: k40***
        ftp_host: yourftp.example.com
        ftp_user: user
        ftp_password: pass***
        
-__Step 4.__ Try connecting to FTP to verify the connection.
+__Step 5.__ Try connecting to FTP to verify the connection.
 
     $ pg_export --ftp
     => Connect to yourftp.example.com
        Close FTP
     
-__Step 5.__ Perform database export.
+__Step 6.__ Perform database export.
 
     $ pg_export -d your_database
     => Create Dump Tempfile (1.36MB)
-       Create Compressed Dump Tempfile (1.34MB)
+       Create Encrypted Dump Tempfile (1.34MB)
        Connect to yourftp.example.com
-       Export Compressed Dump Tempfile (1.34MB) your_database_20161020_125747.gz to yourftp.example.com
+       Export Encrypted Dump Tempfile (1.34MB) your_database_20161020_125747 to yourftp.example.com
        Close FTP
 
 ## Development

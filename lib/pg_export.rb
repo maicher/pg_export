@@ -2,6 +2,7 @@ require 'logger'
 require 'tempfile'
 require 'zlib'
 require 'net/ftp'
+require 'openssl'
 require 'forwardable'
 
 require 'pg_export/version'
@@ -12,11 +13,12 @@ require 'pg_export/concurrency'
 require 'pg_export/entities/dump/size_human'
 require 'pg_export/entities/dump/base'
 require 'pg_export/entities/sql_dump'
-require 'pg_export/entities/compressed_dump'
+require 'pg_export/entities/encrypted_dump'
 require 'pg_export/services/ftp_service'
 require 'pg_export/services/ftp_service/connection'
 require 'pg_export/services/utils'
 require 'pg_export/services/dump_storage'
+require 'pg_export/services/aes'
 
 class PgExport
   include Concurrency
@@ -48,8 +50,15 @@ class PgExport
   end
 
   def create_dump
-    sql_dump = Utils.create_dump(config.database)
-    compressed_dump = Utils.compress(sql_dump)
-    self.dump = compressed_dump
+    sql_dump = utils.create_dump(config.database)
+    enc_dump = utils.encrypt(sql_dump)
+    self.dump = enc_dump
+  end
+
+  def utils
+    @utils ||= Utils.new(
+      Aes.encryptor(config.dump_encryption_key),
+      Aes.decryptor(config.dump_encryption_key)
+    )
   end
 end

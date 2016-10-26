@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe PgExport::Utils do
-  subject { PgExport::Utils }
+  let(:dump_encryption_key) { '1234567890abcdef' }
+  subject { PgExport::Utils.new(PgExport::Aes.encryptor(dump_encryption_key), PgExport::Aes.decryptor(dump_encryption_key)) }
 
   describe '.create_dump' do
     let(:database) { 'pg_export_database_test' }
@@ -22,27 +23,18 @@ RSpec.describe PgExport::Utils do
     end
   end
 
-  describe '.compress' do
-    let(:sql_dump) { PgExport::SqlDump.new }
-    before(:each) do
-      sql_dump.open(:write) do |f|
-        f.write('abc')
-      end
-    end
+  describe '.encrypt' do
+    let(:sql_dump) { d = PgExport::SqlDump.new; d.open(:write) { |f| f << 'abc' }; d }
 
-    it { expect(subject.compress(sql_dump)).to be_a PgExport::CompressedDump }
-    it { expect(subject.compress(sql_dump).read).not_to eq('abc') }
+    it { expect(subject.encrypt(sql_dump)).to be_a PgExport::EncryptedDump }
+    it { expect(subject.encrypt(sql_dump).read).not_to eq('abc') }
   end
 
-  describe '.decompress' do
-    let(:gz_dump) { PgExport::CompressedDump.new }
-    before(:each) do
-      gz_dump.open(:write) do |gz|
-        gz.write('abc')
-      end
-    end
+  describe '.decrypt' do
+    let(:sql_dump) { d = PgExport::SqlDump.new; d.open(:write) { |f| f << 'abc' }; d }
+    let(:enc_dump) { subject.encrypt(sql_dump) }
 
-    it { expect(subject.decompress(gz_dump)).to be_a PgExport::SqlDump }
-    it { expect(subject.decompress(gz_dump).read).to eq('abc') }
+    it { expect(subject.decrypt(enc_dump)).to be_a PgExport::SqlDump }
+    it { expect(subject.decrypt(enc_dump).read).to eq('abc') }
   end
 end

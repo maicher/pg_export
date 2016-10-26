@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe PgExport::CompressedDump do
-  subject { PgExport::CompressedDump.new }
+describe PgExport::EncryptedDump do
+  subject { PgExport::EncryptedDump.new }
 
   it { expect(subject).to be_a(PgExport::Dump::Base) }
 end
