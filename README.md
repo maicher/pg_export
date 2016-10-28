@@ -24,6 +24,7 @@ Features:
 
   * Ruby >= 2.1
   * $ pg_dump
+  * $ pg_restore
 
 ## Installation
 

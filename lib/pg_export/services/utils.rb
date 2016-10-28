@@ -14,6 +14,13 @@ class PgExport
       dump
     end
 
+    def restore_dump(dump, database_name)
+      out = `pg_restore -c -d #{database_name} #{dump.path} 2>&1`
+      raise PgRestoreError, out if /FATAL/ =~ out
+      logger.info "Restore #{dump}"
+      self
+    end
+
     def encrypt(dump)
       enc_dump = EncryptedDump.new
       copy_using(encryptor, from: dump, to: enc_dump)
