@@ -16,26 +16,14 @@ class PgExport
 
     def encrypt(dump)
       enc_dump = EncryptedDump.new
-      dump.open(:read) do |f|
-        enc_dump.open(:write) do |enc|
-          enc << encryptor.update(f.read(Dump::Base::CHUNK_SIZE)) until f.eof?
-          enc << encryptor.final
-        end
-      end
-
+      copy_using(encryptor, from: dump, to: enc_dump)
       logger.info "Create #{enc_dump}"
       enc_dump
     end
 
     def decrypt(enc_dump)
       dump = PlainDump.new
-      enc_dump.open(:read) do |enc|
-        dump.open(:write) do |f|
-          f << decryptor.update(enc.read(Dump::Base::CHUNK_SIZE)) until enc.eof?
-          f << decryptor.final
-        end
-      end
-
+      copy_using(decryptor, from: enc_dump, to: dump)
       logger.info "Create #{dump}"
       dump
     end
@@ -43,5 +31,15 @@ class PgExport
     private
 
     attr_reader :encryptor, :decryptor
+
+    def copy_using(aes, from:, to:)
+      from.each_chunk do |chunk|
+        to.open(:write) do |f|
+          f << aes.update(chunk)
+          f << aes.final
+        end
+      end
+      self
+    end
   end
 end

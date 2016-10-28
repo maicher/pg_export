@@ -24,6 +24,12 @@ class PgExport
         end
       end
 
+      def each_chunk
+        open(:read) do |file|
+          yield file.read(CHUNK_SIZE) until file.eof?
+        end
+      end
+
       def to_s
         "#{name || self.class} #{file.class} (#{size_human})"
       end
