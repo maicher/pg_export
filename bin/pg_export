@@ -4,12 +4,38 @@ require 'optparse'
 require 'ostruct'
 require 'pg_export'
 
+require 'pry'
+
+using PgExport::ColourableString
+
 LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }
 LOGS_NORMAL = ->(_, _, _, message) { "#{message}\n" }
+LOGS_NORMAL_GREY = ->(_, _, _, message) { "#{message}\n".gray }
 
 options = OpenStruct.new
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
+
+  opts.on('-i', '--interactive', 'Interactive mode, for restoring dumps into databases') do
+    PgExport::Logging.logger.formatter = LOGS_NORMAL_GREY
+    puts 'Interactive mode, for restoring dumps into databases'
+    pg_export = PgExport.new { |c| c.database = 'xxx' }
+    storage = pg_export.initialize_dump_storage
+    utils = pg_export.utils
+
+    dumps = storage.all
+    dumps.each.with_index(0) do |name, i|
+      print "(#{i}) "
+      puts "#{name}".gray
+    end
+    puts 'Which dump would you like to import?'
+    print "Type from 1 to #{dumps.count - 1} (0): "
+    name = dumps.fetch(gets.chomp.to_i)
+    print 'Downloading..'.gray
+    encrypted_dump = storage.download(name)
+    dump = utils.decrypt(encrypted_dump)
+    exit
+  end
 
   opts.on('-d', '--database DATABASE', '[Required] Name of the database to export') do |database|
     options.database = database

@@ -19,6 +19,7 @@ class PgExport
       dump = EncryptedDump.new
       ftp_service.download_file(dump.path, name)
       logger.info "Download #{dump} #{name} from #{ftp_service}"
+      dump
     end
 
     def remove_old(keep:)

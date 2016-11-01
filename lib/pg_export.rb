@@ -19,6 +19,7 @@ require 'pg_export/services/ftp_service/connection'
 require 'pg_export/services/utils'
 require 'pg_export/services/dump_storage'
 require 'pg_export/services/aes'
+require 'pg_export/refinements/colourable_string'
 
 class PgExport
   include Concurrency
@@ -39,26 +40,26 @@ class PgExport
     self
   end
 
-  private
-
-  attr_reader :config
-  attr_accessor :dump, :dump_storage
-
   def initialize_dump_storage
     ftp_service = FtpService.new(config.ftp_params)
     self.dump_storage = DumpStorage.new(ftp_service, config.database)
   end
 
+  def utils
+    @utils ||= Utils.new(
+        Aes.encryptor(config.dump_encryption_key),
+        Aes.decryptor(config.dump_encryption_key)
+    )
+  end
+
+  private
+
+  attr_reader :config
+  attr_accessor :dump, :dump_storage
+
   def create_dump
     sql_dump = utils.create_dump(config.database)
     enc_dump = utils.encrypt(sql_dump)
     self.dump = enc_dump
-  end
-
-  def utils
-    @utils ||= Utils.new(
-      Aes.encryptor(config.dump_encryption_key),
-      Aes.decryptor(config.dump_encryption_key)
-    )
   end
 end
