@@ -16,10 +16,18 @@ class PgExport
     end
 
     def remove_old(keep:)
-      ftp_service.list(ftp_regex).drop(keep.to_i).each do |filename|
+      find_by_name(name).drop(keep.to_i).each do |filename|
         ftp_service.delete(filename)
         logger.info "Remove #{filename} from FTP"
       end
+    end
+
+    def find_by_name(s)
+      ftp_service.list(s + '_*')
+    end
+
+    def all
+      ftp_service.list('*')
     end
 
     private
@@ -28,10 +36,6 @@ class PgExport
 
     def timestamped_name(dump)
       name + Time.now.strftime(TIMESTAMP) + dump.ext
-    end
-
-    def ftp_regex
-      name + '_*'
     end
   end
 end
