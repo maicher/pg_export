@@ -12,13 +12,19 @@ class PgExport
     def upload(dump)
       dump_name = timestamped_name(dump)
       ftp_service.upload_file(dump.path, dump_name)
-      logger.info "Export #{dump} #{dump_name} to #{ftp_service}"
+      logger.info "Upload #{dump} #{dump_name} to #{ftp_service}"
+    end
+
+    def download(name)
+      dump = EncryptedDump.new
+      ftp_service.download_file(dump.path, name)
+      logger.info "Download #{dump} #{name} from #{ftp_service}"
     end
 
     def remove_old(keep:)
       find_by_name(name).drop(keep.to_i).each do |filename|
         ftp_service.delete(filename)
-        logger.info "Remove #{filename} from FTP"
+        logger.info "Remove #{filename} from #{ftp_service}"
       end
     end
 

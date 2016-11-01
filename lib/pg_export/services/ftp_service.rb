@@ -21,6 +21,10 @@ class PgExport
       ftp.putbinaryfile(path.to_s, name, CHUNK_SIZE)
     end
 
+    def download_file(path, name)
+      ftp.getbinaryfile(name, path.to_s, CHUNK_SIZE)
+    end
+
     def to_s
       host
     end

@@ -35,7 +35,7 @@ RSpec.describe PgExport::Utils do
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
-      database_from_conn.exec("CREATE TABLE IF NOT EXISTS a_table (a_column VARCHAR)")
+      database_from_conn.exec('CREATE TABLE IF NOT EXISTS a_table (a_column VARCHAR)')
     end
     after(:each) do
       database_from_conn.close
@@ -45,18 +45,18 @@ RSpec.describe PgExport::Utils do
     end
 
     context 'when specified database does not exist' do
-      subject{ utils.restore_dump(dump, 'pg_export_not_existing_database') }
+      subject { utils.restore_dump(dump, 'pg_export_not_existing_database') }
       it { expect { subject }.to raise_error(PgExport::PgRestoreError) }
     end
 
     context 'when specified database exists' do
-      subject{ utils.restore_dump(dump, database_to) }
+      subject { utils.restore_dump(dump, database_to) }
       it { expect { subject }.not_to raise_error }
 
-      it { expect{subject; database_from_conn.exec("SELECT * FROM not_existing_table")}.to raise_error(PG::UndefinedTable) }
-      it { expect{subject; database_from_conn.exec("SELECT * FROM a_table")}.not_to raise_error }
-      it { expect{subject; database_to_conn.exec("SELECT * FROM not_existing_table")}.to raise_error(PG::UndefinedTable) }
-      it { expect{subject; database_to_conn.exec("SELECT * FROM a_table")}.not_to raise_error }
+      it { expect { subject; database_from_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable) }
+      it { expect { subject; database_from_conn.exec('SELECT * FROM a_table') }.not_to raise_error }
+      it { expect { subject; database_to_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable) }
+      it { expect { subject; database_to_conn.exec('SELECT * FROM a_table') }.not_to raise_error }
     end
   end
 
