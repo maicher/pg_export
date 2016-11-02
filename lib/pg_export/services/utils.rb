@@ -40,6 +40,7 @@ class PgExport
     attr_reader :encryptor, :decryptor
 
     def copy_using(aes, from:, to:)
+      aes.reset
       to.open(:write) do |f|
         from.each_chunk do |chunk|
           f << aes.update(chunk)
