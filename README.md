@@ -1,6 +1,8 @@
 # PgExport
 
+[![Gem Version](https://badge.fury.io/rb/pg_export.svg)](https://badge.fury.io/rb/pg_export)
 [![Build Status](https://travis-ci.org/maicher/pg_export.svg?branch=master)](https://travis-ci.org/maicher/pg_export)
+[![Code Climate](https://codeclimate.com/github/maicher/pg_export/badges/gpa.svg)](https://codeclimate.com/github/maicher/pg_export)
 
 CLI for creating and exporting PostgreSQL dumps to FTP.
 

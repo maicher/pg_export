@@ -3,23 +3,11 @@ AllCops:
   Exclude:
     - 'spec/spec_helper.rb'
 
-Style/ClassAndModuleChildren:
-  Enabled: false
-
 Metrics/LineLength:
   Max: 200
 
 Metrics/AbcSize:
   Max: 20
-  Exclude:
-    - 'lib/pg_export.rb'
-
-Lint/NestedMethodDefinition:
-  Enabled: false
-
-Lint/HandleExceptions:
-  Exclude:
-    - 'spec/services/utils_spec.rb'
 
 Lint/AmbiguousOperator:
   Exclude:
@@ -29,18 +17,8 @@ Style/AlignArray:
   Exclude:
     - 'spec/configuration_spec.rb'
 
-Style/GuardClause:
-  Exclude:
-    - '*.gemspec'
-
-Style/AndOr:
-  Enabled: false
-
 Style/ParallelAssignment:
   Enabled: false
 
 Documentation:
-  Enabled: false
-
-CaseIndentation:
   Enabled: false
