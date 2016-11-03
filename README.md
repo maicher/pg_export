@@ -18,9 +18,11 @@ FTP connection params and encryption key are configured by env variables.
 
 Features:
 
-- uses shell command pg_dump
+- uses shell command `pg_dump` and `pg_restore`
 - no external gem dependencies
+- encrypts dumps by OpenSSL
 - uses ruby tempfiles, so local dumps are garbage collected automatically
+- easy restoring dumps through interactive mode
 
 ## Dependencies
 
@@ -104,6 +106,12 @@ __Step 6.__ Perform database export.
        Connect to yourftp.example.com
        Export Encrypted Dump Tempfile (1.34MB) your_database_20161020_125747 to yourftp.example.com
        Close FTP
+       
+## How to restore a dump?
+
+Go to interactive mode and follow the instructions:
+
+    pg_export -i
 
 ## Development
 
