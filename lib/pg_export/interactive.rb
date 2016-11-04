@@ -30,8 +30,12 @@ class PgExport
       puts 'Which dump would you like to import?'
       print "Type from 1 to #{dumps.count - 1} (0): "
       name = dumps.fetch(gets.chomp.to_i)
+      print 'Downloading dump..'
       encrypted_dump = dump_storage.download(name)
+      puts 'done'.green + " #{encrypted_dump.size_human}"
+      print 'Decrypting dump..'
       self.dump = utils.decrypt(encrypted_dump)
+      puts 'done'.green + " #{dump.size_human}"
       self
     rescue OpenSSL::Cipher::CipherError => e
       puts "Problem decrypting dump file: #{e}".red
@@ -46,7 +50,9 @@ class PgExport
         print "Enter a local database name (#{config.database}): "
       end
       database = gets.chomp
+      print 'Restoring..'
       utils.restore_dump(dump, database.empty? ? config.database : database)
+      puts 'done'.green
       puts 'Success'.green
       self
     rescue PgRestoreError => e

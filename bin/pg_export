@@ -5,11 +5,9 @@ require 'ostruct'
 require 'pg_export'
 require 'pg_export/interactive'
 
-using PgExport::Interactive::ColourableString
-
 LOGS_DEFAULT = ->(_, _, _, message) { "#{message}\n" }
 LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }
-LOGS_GREY = ->(_, _, _, message) { "#{message}\n".gray }
+LOGS_MUTED = ->(_, _, _, _) {}
 
 PgExport::Logging.logger.formatter = LOGS_DEFAULT
 
@@ -56,7 +54,7 @@ begin
 
   options.database ||= 'undefined' if options.interactive
   PgExport::Logging.logger.formatter = LOGS_TIMESTAMPED if options.timestamped
-  PgExport::Logging.logger.formatter = LOGS_GREY if options.interactive
+  PgExport::Logging.logger.formatter = LOGS_MUTED if options.interactive
 
   pg_export = PgExport.new do |config|
     config.database = options.database if options.database

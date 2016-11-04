@@ -7,7 +7,7 @@ class PgExport
         end
 
         def green
-          "\e[38;5;34m#{self}\e[0m"
+          "\e[0;32;49m#{self}\e[0m"
         end
 
         def gray
