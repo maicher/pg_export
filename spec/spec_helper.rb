@@ -1,6 +1,8 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'pg_export'
 require 'pg'
+require 'simplecov'
+SimpleCov.start
 
 PgExport::Logging.logger.formatter = ->(*) {}
 
