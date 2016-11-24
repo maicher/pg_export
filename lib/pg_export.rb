@@ -4,6 +4,9 @@ require 'zlib'
 require 'net/ftp'
 require 'openssl'
 require 'forwardable'
+require 'open3'
+
+require 'cli_spinnable'
 
 require 'pg_export/version'
 require 'pg_export/logging'

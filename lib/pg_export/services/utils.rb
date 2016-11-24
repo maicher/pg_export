@@ -8,17 +8,29 @@ class PgExport
 
     def create_dump(database_name)
       dump = PlainDump.new
-      out = `pg_dump -Fc --file #{dump.path} #{database_name} 2>&1`
-      raise PgDumpError, out if /FATAL/ =~ out
+      Open3.popen3("pg_dump -Fc --file #{dump.path} #{database_name}") do |_, _, err|
+        error = err.read
+        raise PgDumpError, error unless error.empty?
+      end
       logger.info "Create #{dump}"
       dump
     end
 
     def restore_dump(dump, database_name)
-      out = `pg_restore -c -d #{database_name} #{dump.path} 2>&1`
-      raise PgRestoreError, out if /FATAL/ =~ out
+      Open3.popen3("pg_restore -c -d #{database_name} #{dump.path}") do |_, _, err|
+        error = err.read
+        raise PgRestoreError, error unless error.empty?
+      end
       logger.info "Restore #{dump}"
       self
+    rescue PgRestoreError => e
+      if @second_attempt
+        @second_attempt = false
+        raise e
+      else
+        @second_attempt = true
+        retry
+      end
     end
 
     def encrypt(dump)

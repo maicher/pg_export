@@ -2,10 +2,11 @@ require 'pg_export/interactive/refinements/colourable_string'
 
 class PgExport
   module Interactive
+    include CliSpinnable
     using ColourableString
 
     def self.extended(_)
-      puts 'Starting interactive mode, for restoring dumps into databases'.green
+      puts 'Interactive mode, for restoring dump into database.'.green
     end
 
     def call
@@ -13,10 +14,19 @@ class PgExport
       print_all_dumps
       download_selected_dump
       restore_downloaded_dump
+      puts 'Success'.green
       self
     end
 
     private
+
+    def initialize_dump_storage
+      with_spinner do |cli|
+        cli.print 'Connecting to FTP'
+        super
+        cli.tick
+      end
+    end
 
     def print_all_dumps
       dumps.each.with_index(0) do |name, i|
@@ -30,15 +40,19 @@ class PgExport
       puts 'Which dump would you like to import?'
       print "Type from 1 to #{dumps.count - 1} (0): "
       name = dumps.fetch(gets.chomp.to_i)
-      print 'Downloading dump..'
-      encrypted_dump = dump_storage.download(name)
-      puts 'done'.green + " #{encrypted_dump.size_human}"
-      print 'Decrypting dump..'
-      self.dump = utils.decrypt(encrypted_dump)
-      puts 'done'.green + " #{dump.size_human}"
+      with_spinner do |cli|
+        cli.print 'Downloading dump'
+        encrypted_dump = dump_storage.download(name)
+        cli.print " (#{encrypted_dump.size_human})"
+        cli.tick
+        cli.print 'Decrypting dump'
+        self.dump = utils.decrypt(encrypted_dump)
+        cli.print " (#{dump.size_human})"
+        cli.tick
+      end
       self
     rescue OpenSSL::Cipher::CipherError => e
-      puts "Problem decrypting dump file: #{e}".red
+      puts "Problem decrypting dump file: #{e}. Try again.".red
       retry
     end
 
@@ -50,10 +64,12 @@ class PgExport
         print "Enter a local database name (#{config.database}): "
       end
       database = gets.chomp
-      print 'Restoring..'
-      utils.restore_dump(dump, database.empty? ? config.database : database)
-      puts 'done'.green
-      puts 'Success'.green
+      database = database.empty? ? config.database : database
+      with_spinner do |cli|
+        cli.print "Restoring dump to #{database} database"
+        utils.restore_dump(dump, database)
+        cli.tick
+      end
       self
     rescue PgRestoreError => e
       puts e.to_s.red
