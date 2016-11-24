@@ -19,18 +19,10 @@ class PgExport
     def restore_dump(dump, database_name)
       Open3.popen3("pg_restore -c -d #{database_name} #{dump.path}") do |_, _, err|
         error = err.read
-        raise PgRestoreError, error unless error.empty?
+        raise PgRestoreError, error if /FATAL/ =~ error
       end
       logger.info "Restore #{dump}"
       self
-    rescue PgRestoreError => e
-      if @second_attempt
-        @second_attempt = false
-        raise e
-      else
-        @second_attempt = true
-        retry
-      end
     end
 
     def encrypt(dump)

@@ -35,7 +35,9 @@ RSpec.describe PgExport::Utils do
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
-      database_from_conn.exec('CREATE TABLE IF NOT EXISTS a_table (a_column VARCHAR)')
+      c = PG.connect(dbname: database_from)
+      c.exec('CREATE TABLE IF NOT EXISTS a_table (a_column VARCHAR)')
+      c.close
     end
     after(:each) do
       database_from_conn.close
