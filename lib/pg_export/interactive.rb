@@ -12,7 +12,8 @@ class PgExport
     def call
       initialize_dump_storage
       print_all_dumps
-      download_selected_dump
+      selected_dump = select_dump
+      download_dump(selected_dump)
       restore_downloaded_dump
       puts 'Success'.green
       self
@@ -29,23 +30,32 @@ class PgExport
     end
 
     def print_all_dumps
-      dumps.each.with_index(0) do |name, i|
+      dumps.each.with_index(1) do |name, i|
         print "(#{i}) "
         puts name.to_s.gray
       end
       self
     end
 
-    def download_selected_dump
+    def select_dump
       puts 'Which dump would you like to import?'
-      print "Type from 0 to #{dumps.count - 1} (0): "
-      name = dumps.fetch(gets.chomp.to_i)
+      number = loop do
+        print "Type from 1 to #{dumps.count} (1): "
+        number = gets.chomp.to_i
+        break number if (1..dumps.count).cover?(number)
+        puts 'Invalid number. Please try again.'.red
+      end
+
+      dumps.fetch(number - 1)
+    end
+
+    def download_dump(name)
       with_spinner do |cli|
-        cli.print 'Downloading dump'
+        cli.print "Downloading dump #{name}"
         encrypted_dump = dump_storage.download(name)
         cli.print " (#{encrypted_dump.size_human})"
         cli.tick
-        cli.print 'Decrypting dump'
+        cli.print "Decrypting dump #{name}"
         self.dump = utils.decrypt(encrypted_dump)
         cli.print " (#{dump.size_human})"
         cli.tick
