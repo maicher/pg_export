@@ -12,7 +12,7 @@ class PgExport
 
     def self.initialize_aes(mode, key)
       raise ArgumentError, 'Only :encrypt or :decrypt are allowed' unless %i(encrypt decrypt).include?(mode)
-      aes = OpenSSL::Cipher::Cipher.new(ALG)
+      aes = OpenSSL::Cipher.new(ALG)
       aes.public_send(mode.to_sym)
       aes.key = key
       aes
