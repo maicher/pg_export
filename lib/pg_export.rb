@@ -12,7 +12,6 @@ require 'pg_export/version'
 require 'pg_export/logging'
 require 'pg_export/errors'
 require 'pg_export/configuration'
-require 'pg_export/concurrency'
 require 'pg_export/entities/dump/size_human'
 require 'pg_export/entities/dump/base'
 require 'pg_export/entities/plain_dump'
@@ -24,8 +23,6 @@ require 'pg_export/services/dump_storage'
 require 'pg_export/services/aes'
 
 class PgExport
-  include Concurrency
-
   def initialize
     @config = Configuration.new
     yield config if block_given?
@@ -33,10 +30,11 @@ class PgExport
   end
 
   def call
-    concurrently do |job|
-      job << create_dump
-      job << initialize_dump_storage
-    end
+    [].tap do |arr|
+      arr << Thread.new { create_dump }
+      arr << Thread.new { initialize_dump_storage }
+    end.each(&:join)
+
     dump_storage.upload(dump)
     dump_storage.remove_old(keep: config.keep_dumps)
     self

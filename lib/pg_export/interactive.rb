@@ -14,7 +14,11 @@ class PgExport
       print_all_dumps
       selected_dump = select_dump
       download_dump(selected_dump)
-      restore_downloaded_dump
+      [].tap do |arr|
+        arr << Thread.new { restore_downloaded_dump }
+        arr << Thread.new { close_connection }
+      end.each(&:join)
+
       puts 'Success'.green
       self
     end
@@ -84,6 +88,10 @@ class PgExport
     rescue PgRestoreError => e
       puts e.to_s.red
       retry
+    end
+
+    def close_connection
+      dump_storage.close_connection
     end
 
     def dumps

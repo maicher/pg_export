@@ -4,7 +4,7 @@ class PgExport
 
     def initialize(params)
       @host = params.fetch(:host)
-      connection = Connection.new(params)
+      @connection = Connection.new(params)
       @ftp = connection.ftp
       ObjectSpace.define_finalizer(self, proc { connection.close })
     end
@@ -25,12 +25,16 @@ class PgExport
       ftp.getbinaryfile(name, path.to_s, CHUNK_SIZE)
     end
 
+    def close_connection
+      connection.close
+    end
+
     def to_s
       host
     end
 
     private
 
-    attr_reader :ftp, :host
+    attr_reader :ftp, :host, :connection
   end
 end
