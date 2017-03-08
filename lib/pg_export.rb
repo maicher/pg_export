@@ -11,6 +11,7 @@ require 'cli_spinnable'
 require 'pg_export/version'
 require 'pg_export/logging'
 require 'pg_export/errors'
+require 'pg_export/services_container'
 require 'pg_export/configuration'
 require 'pg_export/entities/dump/size_human'
 require 'pg_export/entities/dump/base'
@@ -23,8 +24,12 @@ require 'pg_export/services/dump_storage'
 require 'pg_export/services/aes'
 
 class PgExport
+  extend Forwardable
+
+  def_delegators :services_container, :config, :utils, :ftp_service, :dump_storage, :connection_initializer, :connection_closer
+
   def initialize
-    @config = Configuration.new
+    @services_container = ServicesContainer
     yield config if block_given?
     config.validate
   end
@@ -32,7 +37,7 @@ class PgExport
   def call
     [].tap do |arr|
       arr << Thread.new { create_dump }
-      arr << Thread.new { initialize_dump_storage }
+      arr << Thread.new { initialize_connection }
     end.each(&:join)
 
     dump_storage.upload(dump)
@@ -42,8 +47,8 @@ class PgExport
 
   private
 
-  attr_reader :config
-  attr_accessor :dump, :dump_storage
+  attr_reader :services_container
+  attr_accessor :dump
 
   def create_dump
     sql_dump = utils.create_dump(config.database)
@@ -51,16 +56,8 @@ class PgExport
     self.dump = enc_dump
   end
 
-  def initialize_dump_storage
-    ftp_service = FtpService.new(config.ftp_params)
-    self.dump_storage = DumpStorage.new(ftp_service, config.database)
+  def initialize_connection
+    connection_initializer.call
     self
-  end
-
-  def utils
-    @utils ||= Utils.new(
-      Aes.encryptor(config.dump_encryption_key),
-      Aes.decryptor(config.dump_encryption_key)
-    )
   end
 end

@@ -1,11 +1,13 @@
 class PgExport
   class FtpService
+    extend Forwardable
+
     CHUNK_SIZE = (2**16).freeze
 
-    def initialize(params)
-      @host = params.fetch(:host)
-      @connection = Connection.new(params)
-      @ftp = connection.ftp
+    def_delegators :connection, :ftp, :host
+
+    def initialize(connection)
+      @connection = connection
       ObjectSpace.define_finalizer(self, proc { connection.close })
     end
 
@@ -25,16 +27,12 @@ class PgExport
       ftp.getbinaryfile(name, path.to_s, CHUNK_SIZE)
     end
 
-    def close_connection
-      connection.close
-    end
-
     def to_s
       host
     end
 
     private
 
-    attr_reader :ftp, :host, :connection
+    attr_reader :connection
   end
 end

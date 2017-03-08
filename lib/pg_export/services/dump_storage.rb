@@ -37,10 +37,6 @@ class PgExport
       ftp_service.list('*')
     end
 
-    def close_connection
-      ftp_service.close_connection
-    end
-
     private
 
     attr_reader :ftp_service, :name

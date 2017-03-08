@@ -10,7 +10,7 @@ class PgExport
     end
 
     def call
-      initialize_dump_storage
+      initialize_connection
       print_all_dumps
       selected_dump = select_dump
       download_dump(selected_dump)
@@ -25,7 +25,7 @@ class PgExport
 
     private
 
-    def initialize_dump_storage
+    def initialize_connection
       with_spinner do |cli|
         cli.print 'Connecting to FTP'
         super
@@ -91,7 +91,7 @@ class PgExport
     end
 
     def close_connection
-      dump_storage.close_connection
+      connection_closer.call
     end
 
     def dumps
