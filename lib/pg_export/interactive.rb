@@ -38,7 +38,7 @@ class PgExport
 
     def download_selected_dump
       puts 'Which dump would you like to import?'
-      print "Type from 1 to #{dumps.count - 1} (0): "
+      print "Type from 0 to #{dumps.count - 1} (0): "
       name = dumps.fetch(gets.chomp.to_i)
       with_spinner do |cli|
         cli.print 'Downloading dump'

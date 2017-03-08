@@ -11,7 +11,7 @@ Can be used for backups or synchronizing databases between production and develo
 
 Example:
 
-    pg_export --database database_name -keep 5
+    pg_export --database database_name --keep 5
     
 Above command will perform database dump, encrypt it, upload it to FTP and remove old dumps from FTP, keeping newest 5.
 
