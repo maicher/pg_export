@@ -5,20 +5,16 @@ class PgExport
         @config ||= Configuration.new
       end
 
+      def aes
+        @aes ||= Aes.new(config.dump_encryption_key)
+      end
+
       def encryptor
-        Aes.encryptor(config.dump_encryption_key)
+        @encryptor ||= aes.build_encryptor
       end
 
       def decryptor
-        Aes.decryptor(config.dump_encryption_key)
-      end
-
-      def encrypt
-        @encrypt ||= Encrypt.new(encryptor)
-      end
-
-      def decrypt
-        @decrypt ||= Decrypt.new(decryptor)
+        @decryptor ||= aes.build_decryptor
       end
 
       def utils

@@ -1,24 +1,27 @@
 class PgExport
   class Aes
-    ALG = 'AES-128-CBC'.freeze
+    ALGORITHM = 'AES-128-CBC'.freeze
 
-    class << self
-      def encryptor(key)
-        initialize_aes(:encrypt, key)
-      end
+    def initialize(key)
+      @key = key
+    end
 
-      def decryptor(key)
-        initialize_aes(:decrypt, key)
-      end
+    def build_encryptor
+      Aes::Encryptor.new(cipher(:encrypt))
+    end
 
-      private
+    def build_decryptor
+      Aes::Decryptor.new(cipher(:decrypt))
+    end
 
-      def initialize_aes(mode, key)
-        raise ArgumentError, 'Only :encrypt or :decrypt are allowed' unless %i(encrypt decrypt).include?(mode)
-        aes = OpenSSL::Cipher.new(ALG)
-        aes.public_send(mode.to_sym)
-        aes.key = key
-        aes
+    private
+
+    attr_reader :key
+
+    def cipher(mode)
+      OpenSSL::Cipher.new(ALGORITHM).tap do |cipher|
+        cipher.public_send(mode.to_sym)
+        cipher.key = key
       end
     end
   end

@@ -22,8 +22,9 @@ require 'pg_export/services/ftp_connection'
 require 'pg_export/services/utils'
 require 'pg_export/services/dump_storage'
 require 'pg_export/services/aes'
-require 'pg_export/services/encrypt'
-require 'pg_export/services/decrypt'
+require 'pg_export/services/aes/base'
+require 'pg_export/services/aes/encryptor'
+require 'pg_export/services/aes/decryptor'
 
 class PgExport
   extend Forwardable
@@ -37,7 +38,7 @@ class PgExport
   def call
     dump = nil
     [].tap do |arr|
-      arr << Thread.new { dump = encrypt.call(utils.create_dump) }
+      arr << Thread.new { dump = encryptor.call(utils.create_dump) }
       arr << Thread.new { connection_initializer.call }
     end.each(&:join)
 
@@ -50,5 +51,5 @@ class PgExport
 
   attr_reader :services_container
 
-  def_delegators :services_container, :config, :utils, :dump_storage, :connection_initializer, :connection_closer, :encrypt, :decrypt
+  def_delegators :services_container, :config, :utils, :dump_storage, :connection_initializer, :connection_closer, :encryptor, :decryptor
 end
