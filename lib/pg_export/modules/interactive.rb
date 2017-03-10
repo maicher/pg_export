@@ -1,5 +1,3 @@
-require 'pg_export/interactive/refinements/colourable_string'
-
 class PgExport
   module Interactive
     include CliSpinnable

@@ -9,11 +9,11 @@ require 'open3'
 require 'cli_spinnable'
 
 require 'pg_export/version'
-require 'pg_export/logging'
+require 'pg_export/modules/logging'
+require 'pg_export/modules/dump/size_human'
 require 'pg_export/errors'
 require 'pg_export/services_container'
 require 'pg_export/configuration'
-require 'pg_export/entities/dump/size_human'
 require 'pg_export/entities/dump/base'
 require 'pg_export/entities/plain_dump'
 require 'pg_export/entities/encrypted_dump'
@@ -27,8 +27,6 @@ require 'pg_export/services/decrypt'
 
 class PgExport
   extend Forwardable
-
-  def_delegators :services_container, :config, :utils, :dump_storage, :connection_initializer, :connection_closer, :encrypt, :decrypt
 
   def initialize
     @services_container = ServicesContainer
@@ -51,4 +49,6 @@ class PgExport
   private
 
   attr_reader :services_container
+
+  def_delegators :services_container, :config, :utils, :dump_storage, :connection_initializer, :connection_closer, :encrypt, :decrypt
 end

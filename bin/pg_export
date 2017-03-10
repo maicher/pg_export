@@ -3,7 +3,8 @@
 require 'optparse'
 require 'ostruct'
 require 'pg_export'
-require 'pg_export/interactive'
+require 'pg_export/modules/interactive/colourable_string'
+require 'pg_export/modules/interactive'
 
 LOGS_DEFAULT = ->(_, _, _, message) { "#{message}\n" }
 LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }

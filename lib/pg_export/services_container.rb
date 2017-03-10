@@ -26,11 +26,11 @@ class PgExport
       end
 
       def connection_initializer
-        proc { ftp_connection }
+        @connection_initializer ||= proc { ftp_connection }
       end
 
       def connection_closer
-        proc { ftp_connection.close }
+        @connection_closer ||= proc { ftp_connection.close }
       end
 
       def ftp_connection
