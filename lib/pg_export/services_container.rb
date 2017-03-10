@@ -26,19 +26,19 @@ class PgExport
       end
 
       def connection_initializer
-        proc { connection }
+        proc { ftp_connection }
       end
 
       def connection_closer
-        proc { connection.close }
+        proc { ftp_connection.close }
       end
 
-      def connection
-        @connection ||= FtpService::Connection.new(config.ftp_params)
+      def ftp_connection
+        @connection ||= FtpConnection.new(config.ftp_params)
       end
 
       def ftp_service
-        @ftp_service ||= FtpService.new(connection)
+        @ftp_service ||= FtpService.new(ftp_connection)
       end
 
       def dump_storage

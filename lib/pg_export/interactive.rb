@@ -28,7 +28,7 @@ class PgExport
     def initialize_connection
       with_spinner do |cli|
         cli.print 'Connecting to FTP'
-        super
+        connection_initializer.call
         cli.tick
       end
     end
