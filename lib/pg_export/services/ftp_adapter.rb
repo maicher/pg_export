@@ -1,5 +1,5 @@
 class PgExport
-  class FtpService
+  class FtpAdapter
     extend Forwardable
 
     CHUNK_SIZE = (2**16).freeze

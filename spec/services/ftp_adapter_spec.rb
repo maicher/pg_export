@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-RSpec.describe PgExport::FtpService do
+RSpec.describe PgExport::FtpAdapter do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }
   let(:mock) { FtpMock.new }
 
   before(:each) { allow(Net::FTP).to receive(:new).with(*params.values).and_return(mock) }
 
-  subject { PgExport::FtpService.new(params) }
+  subject { PgExport::FtpAdapter.new(params) }
 
   it { expect(subject).to respond_to(:list) }
   it { expect(subject).to respond_to(:delete) }

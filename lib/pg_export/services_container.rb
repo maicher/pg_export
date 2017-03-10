@@ -37,12 +37,12 @@ class PgExport
         @connection ||= FtpConnection.new(config.ftp_params)
       end
 
-      def ftp_service
-        @ftp_service ||= FtpService.new(ftp_connection)
+      def ftp_adapter
+        @ftp_adapter ||= FtpAdapter.new(ftp_connection)
       end
 
       def dump_storage
-        @dump_storage ||= DumpStorage.new(ftp_service, config.database, config.keep_dumps)
+        @dump_storage ||= DumpStorage.new(ftp_adapter, config.database, config.keep_dumps)
       end
     end
   end
