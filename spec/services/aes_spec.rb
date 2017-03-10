@@ -1,13 +1,22 @@
 require 'spec_helper'
 
-RSpec.describe 'Aes' do
+RSpec.describe PgExport::Aes do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
-  let(:dump_encryption_key) { '1234567890abcdef' }
-  let(:aes) { PgExport::Aes.new(dump_encryption_key) }
-  let!(:encryptor) { aes.build_encryptor }
-  let!(:decryptor) { aes.build_decryptor }
+  let(:encryption_key) { '1234567890abcdef' }
+  let(:aes) { PgExport::Aes.new(encryption_key) }
 
-  describe 'encryptor' do
+  describe '#build_encryptor' do
+    subject { aes.build_encryptor }
+    it { is_expected.to be_a(PgExport::Aes::Encryptor) }
+  end
+
+  describe '#build_decryptor' do
+    subject { aes.build_decryptor }
+    it { is_expected.to be_a(PgExport::Aes::Decryptor) }
+  end
+
+  describe PgExport::Aes::Encryptor do
+    let(:encryptor) { aes.build_encryptor }
     let(:plain_dump) do
       d = PgExport::PlainDump.new
       d.open(:write) { |f| f << 'abc' }
@@ -19,7 +28,9 @@ RSpec.describe 'Aes' do
     it { expect(subject.read).not_to eq('abc') }
   end
 
-  describe 'decryptor' do
+  describe PgExport::Aes::Decryptor do
+    let(:encryptor) { aes.build_encryptor }
+    let(:decryptor) { aes.build_decryptor }
     let(:plain_dump) do
       d = PgExport::PlainDump.new
       d.open(:write) { |f| f << 'abc' }
