@@ -2,7 +2,11 @@ class PgExport
   class Utils
     include Logging
 
-    def create_dump(database_name)
+    def initialize(database_name)
+      @database_name = database_name
+    end
+
+    def create_dump
       dump = PlainDump.new
       Open3.popen3("pg_dump -Fc --file #{dump.path} #{database_name}") do |_, _, err|
         error = err.read
@@ -12,13 +16,17 @@ class PgExport
       dump
     end
 
-    def restore_dump(dump, database_name)
-      Open3.popen3("pg_restore -c -d #{database_name} #{dump.path}") do |_, _, err|
+    def restore_dump(dump, restore_database_name)
+      Open3.popen3("pg_restore -c -d #{restore_database_name} #{dump.path}") do |_, _, err|
         error = err.read
         raise PgRestoreError, error if /FATAL/ =~ error
       end
       logger.info "Restore #{dump}"
       self
     end
+
+    private
+
+    attr_reader :database_name
   end
 end

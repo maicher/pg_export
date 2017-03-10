@@ -13,9 +13,9 @@ class PgExport
       initialize_connection
       print_all_dumps
       selected_dump = select_dump
-      download_dump(selected_dump)
+      dump = download_dump(selected_dump)
       [].tap do |arr|
-        arr << Thread.new { restore_downloaded_dump }
+        arr << Thread.new { restore_downloaded_dump(dump) }
         arr << Thread.new { close_connection }
       end.each(&:join)
 
@@ -54,23 +54,26 @@ class PgExport
     end
 
     def download_dump(name)
+      dump = nil
+
       with_spinner do |cli|
         cli.print "Downloading dump #{name}"
         encrypted_dump = dump_storage.download(name)
         cli.print " (#{encrypted_dump.size_human})"
         cli.tick
         cli.print "Decrypting dump #{name}"
-        self.dump = decrypt.call(encrypted_dump)
+        dump = decrypt.call(encrypted_dump)
         cli.print " (#{dump.size_human})"
         cli.tick
       end
-      self
+
+      dump
     rescue OpenSSL::Cipher::CipherError => e
       puts "Problem decrypting dump file: #{e}. Try again.".red
       retry
     end
 
-    def restore_downloaded_dump
+    def restore_downloaded_dump(dump)
       puts 'To which database you would like to restore the downloaded dump?'
       if config.database == 'undefined'
         print 'Enter a local database name: '

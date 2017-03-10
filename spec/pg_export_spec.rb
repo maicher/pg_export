@@ -26,10 +26,10 @@ describe PgExport do
 
     before(:each) do
       allow(Net::FTP).to receive(:new).and_return(mock)
-      allow_any_instance_of(PgExport::Utils).to receive(:create_dump).with(database).and_return(sql_dump)
-      allow_any_instance_of(PgExport::Utils).to receive(:encrypt).with(sql_dump).and_return(enc_dump)
+      allow_any_instance_of(PgExport::Utils).to receive(:create_dump).and_return(sql_dump)
+      allow_any_instance_of(PgExport::Encrypt).to receive(:call).with(sql_dump).and_return(enc_dump)
       allow_any_instance_of(PgExport::DumpStorage).to receive(:upload).with(enc_dump)
-      allow_any_instance_of(PgExport::DumpStorage).to receive(:remove_old).with(keep: keep)
+      allow_any_instance_of(PgExport::DumpStorage).to receive(:remove_old)
     end
     it { subject.call }
   end

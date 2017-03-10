@@ -37,25 +37,23 @@ class PgExport
   end
 
   def call
+    dump = nil
     [].tap do |arr|
-      arr << Thread.new { create_dump }
+      arr << Thread.new { dump = create_dump }
       arr << Thread.new { initialize_connection }
     end.each(&:join)
 
     dump_storage.upload(dump)
-    dump_storage.remove_old(keep: config.keep_dumps)
+    dump_storage.remove_old
     self
   end
 
   private
 
   attr_reader :services_container
-  attr_accessor :dump
 
   def create_dump
-    sql_dump = utils.create_dump(config.database)
-    enc_dump = encrypt.call(sql_dump)
-    self.dump = enc_dump
+    encrypt.call(utils.create_dump)
   end
 
   def initialize_connection

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe PgExport::Utils do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
   let(:dump_encryption_key) { '1234567890abcdef' }
-  let!(:utils) { PgExport::Utils.new(PgExport::Aes.encryptor(dump_encryption_key), PgExport::Aes.decryptor(dump_encryption_key)) }
+  let(:utils) { PgExport::Utils.new(database) }
 
   describe '.create_dump' do
     let(:database) { 'pg_export_database_test' }
@@ -15,12 +15,13 @@ RSpec.describe PgExport::Utils do
     end
 
     context 'when specified database does not exist' do
-      subject { utils.create_dump('pg_export_not_existing_database') }
+      let(:utils) { PgExport::Utils.new('pg_export_not_existing_database') }
+      subject { utils.create_dump }
       it { expect { subject }.to raise_error(PgExport::PgDumpError) }
     end
 
     context 'when specified database exists' do
-      subject { utils.create_dump(database) }
+      subject { utils.create_dump }
       it { expect { subject }.not_to raise_error }
       it { expect(subject).to be_a PgExport::PlainDump }
     end
@@ -31,7 +32,8 @@ RSpec.describe PgExport::Utils do
     let(:database_to) { 'pg_export_database_test_2' }
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
-    let(:dump) { utils.create_dump(database_from) }
+    let(:database) { database_from }
+    let(:dump) { utils.create_dump }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
@@ -60,30 +62,5 @@ RSpec.describe PgExport::Utils do
       it { expect { subject; database_to_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable) }
       it { expect { subject; database_to_conn.exec('SELECT * FROM a_table') }.not_to raise_error }
     end
-  end
-
-  describe '.encrypt' do
-    let(:plain_dump) do
-      d = PgExport::PlainDump.new
-      d.open(:write) { |f| f << 'abc' }
-      d
-    end
-    subject { utils.encrypt(plain_dump) }
-
-    it { expect(subject).to be_a PgExport::EncryptedDump }
-    it { expect(subject.read).not_to eq('abc') }
-  end
-
-  describe '.decrypt' do
-    let(:plain_dump) do
-      d = PgExport::PlainDump.new
-      d.open(:write) { |f| f << 'abc' }
-      d
-    end
-    let(:enc_dump) { utils.encrypt(plain_dump) }
-    subject { utils.decrypt(enc_dump) }
-
-    it { expect(subject).to be_a PgExport::PlainDump }
-    it { expect(subject.read).to eq('abc') }
   end
 end

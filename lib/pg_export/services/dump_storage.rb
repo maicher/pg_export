@@ -5,8 +5,8 @@ class PgExport
     TIMESTAMP = '_%Y%m%d_%H%M%S'.freeze
     TIMESTAMP_REGEX = '[0-9]{8}_[0-9]{6}'.freeze
 
-    def initialize(ftp_service, name)
-      @ftp_service, @name = ftp_service, name
+    def initialize(ftp_service, name, keep)
+      @ftp_service, @name, @keep = ftp_service, name, keep
     end
 
     def upload(dump)
@@ -22,7 +22,7 @@ class PgExport
       dump
     end
 
-    def remove_old(keep:)
+    def remove_old
       find_by_name(name).drop(keep.to_i).each do |filename|
         ftp_service.delete(filename)
         logger.info "Remove #{filename} from #{ftp_service}"
@@ -39,7 +39,7 @@ class PgExport
 
     private
 
-    attr_reader :ftp_service, :name
+    attr_reader :ftp_service, :name, :keep
 
     def timestamped_name(dump)
       name + Time.now.strftime(TIMESTAMP) + dump.ext

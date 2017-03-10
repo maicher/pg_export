@@ -22,7 +22,7 @@ class PgExport
       end
 
       def utils
-        @utils ||= Utils.new
+        @utils ||= Utils.new(config.database)
       end
 
       def connection_initializer
@@ -42,7 +42,7 @@ class PgExport
       end
 
       def dump_storage
-        @dump_storage ||= DumpStorage.new(ftp_service, config.database)
+        @dump_storage ||= DumpStorage.new(ftp_service, config.database, config.keep_dumps)
       end
     end
   end
