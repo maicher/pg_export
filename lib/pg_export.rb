@@ -22,11 +22,13 @@ require 'pg_export/services/ftp_service/connection'
 require 'pg_export/services/utils'
 require 'pg_export/services/dump_storage'
 require 'pg_export/services/aes'
+require 'pg_export/services/encrypt'
+require 'pg_export/services/decrypt'
 
 class PgExport
   extend Forwardable
 
-  def_delegators :services_container, :config, :utils, :ftp_service, :dump_storage, :connection_initializer, :connection_closer
+  def_delegators :services_container, :config, :utils, :ftp_service, :dump_storage, :connection_initializer, :connection_closer, :encrypt, :decrypt
 
   def initialize
     @services_container = ServicesContainer
@@ -52,7 +54,7 @@ class PgExport
 
   def create_dump
     sql_dump = utils.create_dump(config.database)
-    enc_dump = utils.encrypt(sql_dump)
+    enc_dump = encrypt.call(sql_dump)
     self.dump = enc_dump
   end
 

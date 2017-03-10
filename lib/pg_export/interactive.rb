@@ -60,7 +60,7 @@ class PgExport
         cli.print " (#{encrypted_dump.size_human})"
         cli.tick
         cli.print "Decrypting dump #{name}"
-        self.dump = utils.decrypt(encrypted_dump)
+        self.dump = decrypt.call(encrypted_dump)
         cli.print " (#{dump.size_human})"
         cli.tick
       end
