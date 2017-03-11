@@ -1,5 +1,8 @@
 class PgExport
   class Configuration
+    FIELD_REQUIRED = 'Field %s is required'.freeze
+    INVALID_ENCRYPTION_KEY_LENGTH = 'Dump encryption key should have exact 16 characters. Edit your DUMP_ENCRYPTION_KEY env variable.'.freeze
+
     DEFAULTS = {
       database: nil,
       keep_dumps: ENV['KEEP_DUMPS'] || 10,
@@ -19,9 +22,9 @@ class PgExport
 
     def validate
       DEFAULTS.keys.each do |field|
-        raise InvalidConfigurationError, "Field #{field} is required" if send(field).nil?
+        raise InvalidConfigurationError, FIELD_REQUIRED % field if public_send(field).nil?
       end
-      raise InvalidConfigurationError, 'Dump password is to short. It should have at least 16 characters' if dump_encryption_key.length < 16
+      raise InvalidConfigurationError, INVALID_ENCRYPTION_KEY_LENGTH unless dump_encryption_key.length == 16
     end
 
     def ftp_params
@@ -40,13 +43,13 @@ class PgExport
 
     def print_attr(key)
       if %i(ftp_password dump_encryption_key).include?(key)
-        if send(key)
-          "#{key}: #{send(key)[0..2]}***\n"
+        if public_send(key)
+          "#{key}: #{public_send(key)[0..2]}***\n"
         else
           "#{key}:\n"
         end
       else
-        "#{key}: #{send(key)}\n"
+        "#{key}: #{public_send(key)}\n"
       end
     end
   end

@@ -20,8 +20,8 @@ FTP connection params and encryption key are configured by env variables.
 Features:
 
 - uses shell command `pg_dump` and `pg_restore`
-- no external gem dependencies
-- encrypts dumps by OpenSSL
+- encrypts dumps by OpenSSL AES-128-CBC
+- configurable through env variables
 - uses ruby tempfiles, so local dumps are garbage collected automatically
 - easy restoring dumps through interactive mode
 
