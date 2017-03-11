@@ -12,11 +12,10 @@ class PgExport
       print_all_dumps
       selected_dump = select_dump
       dump = download_dump(selected_dump)
-      [].tap do |arr|
-        arr << Thread.new { restore_downloaded_dump(dump) }
-        arr << Thread.new { ftp_connection.close }
-      end.each(&:join)
-
+      concurrently do |threads|
+        threads << Thread.new(dump) { restore_downloaded_dump(dump) }
+        threads << Thread.new { ftp_connection.close }
+      end
       puts 'Success'.green
       self
     end
@@ -82,7 +81,7 @@ class PgExport
       database = database.empty? ? config.database : database
       with_spinner do |cli|
         cli.print "Restoring dump to #{database} database"
-        utils.restore_dump(dump, database)
+        bash_utils.restore_dump(dump, database)
         cli.tick
       end
       self

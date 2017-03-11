@@ -1,5 +1,5 @@
 class PgExport
-  class ServicesContainer
+  module ServicesContainer
     class << self
       def config
         @config ||= Configuration.new
@@ -17,8 +17,8 @@ class PgExport
         @decryptor ||= aes.build_decryptor
       end
 
-      def utils
-        @utils ||= Utils.new(config.database)
+      def bash_utils
+        @bash_utils ||= BashUtils.new(config.database)
       end
 
       def ftp_connection
@@ -32,6 +32,10 @@ class PgExport
       def dump_storage
         @dump_storage ||= DumpStorage.new(ftp_adapter, config.database, config.keep_dumps)
       end
+    end
+
+    def services_container
+      @services_container ||= ServicesContainer
     end
   end
 end

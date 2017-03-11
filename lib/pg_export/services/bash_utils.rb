@@ -1,5 +1,5 @@
 class PgExport
-  class Utils
+  class BashUtils
     include Logging
 
     def initialize(database_name)
