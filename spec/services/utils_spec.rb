@@ -5,7 +5,7 @@ RSpec.describe PgExport::Utils do
   let(:dump_encryption_key) { '1234567890abcdef' }
   let(:utils) { PgExport::Utils.new(database) }
 
-  describe '.create_dump' do
+  describe '#create_dump' do
     let(:database) { 'pg_export_database_test' }
     let(:database_conn) { PG.connect(dbname: database) }
     before(:each) { postgres_conn.exec("CREATE DATABASE #{database}") }
@@ -27,7 +27,7 @@ RSpec.describe PgExport::Utils do
     end
   end
 
-  describe '.restore_dump' do
+  describe '#restore_dump' do
     let(:database_from) { 'pg_export_database_test_1' }
     let(:database_to) { 'pg_export_database_test_2' }
     let(:database_from_conn) { PG.connect(dbname: database_from) }
@@ -54,13 +54,20 @@ RSpec.describe PgExport::Utils do
     end
 
     context 'when specified database exists' do
-      subject { utils.restore_dump(dump, database_to) }
+      subject! { utils.restore_dump(dump, database_to) }
       it { expect { subject }.not_to raise_error }
 
-      it { expect { subject; database_from_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable) }
-      it { expect { subject; database_from_conn.exec('SELECT * FROM a_table') }.not_to raise_error }
-      it { expect { subject; database_to_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable) }
-      it { expect { subject; database_to_conn.exec('SELECT * FROM a_table') }.not_to raise_error }
+      it 'doesn\'t copy not existing table' do
+        expect { database_from_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable)
+        expect { database_to_conn.exec('SELECT * FROM not_existing_table') }.to raise_error(PG::UndefinedTable)
+        subject
+      end
+
+      it 'copies existing table' do
+        expect { database_from_conn.exec('SELECT * FROM a_table') }.not_to raise_error
+        expect { database_to_conn.exec('SELECT * FROM a_table') }.not_to raise_error
+        subject
+      end
     end
   end
 end
