@@ -14,25 +14,28 @@ LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Pr
 LOGS_MUTED = ->(_, _, _, _) {}
 
 PgExport::Logging.logger.formatter = LOGS_DEFAULT
+config = PgExport::ServicesContainer.config
+pg_export = PgExport.new
 
-options = OpenStruct.new
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
 
   opts.on('-d', '--database DATABASE', '[Required] Name of the database to export') do |database|
-    options.database = database
+    config.database = database
   end
 
-  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{PgExport::Configuration.new.keep_dumps})") do |keep|
-    options.keep = keep
+  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{config.keep_dumps})") do |keep|
+    config.keep_dumps = keep
   end
 
   opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
-    options.timestamped = true
+    PgExport::Logging.logger.formatter = LOGS_TIMESTAMPED
   end
 
   opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
-    options.interactive = true
+    PgExport::Logging.logger.formatter = LOGS_MUTED
+    config.database ||= 'undefined'
+    pg_export.extend(PgExport::Interactive)
   end
 
   opts.on('-h', '--help', 'Show this message') do
@@ -43,33 +46,22 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nSetting can be verified by running following commands:"
 
   opts.on('-c', '--configuration', 'Prints the configuration') do
-    puts PgExport::Configuration.new.to_s
+    puts config.to_s
     exit
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::FtpConnection.new(PgExport::Configuration.new.ftp_params).open
+    PgExport::FtpConnection.new(config.ftp_params).open
     exit
   end
 end
 
 begin
   option_parser.parse!
-
-  options.database ||= 'undefined' if options.interactive
-  PgExport::Logging.logger.formatter = LOGS_TIMESTAMPED if options.timestamped
-  PgExport::Logging.logger.formatter = LOGS_MUTED if options.interactive
-
-  pg_export = PgExport.new do |config|
-    config.database = options.database if options.database
-    config.keep_dumps = options.keep if options.keep
-  end
-  pg_export.extend(PgExport::Interactive) if options.interactive
-
   pg_export.call
-
 rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
-  puts "Error: #{e}"
+  using PgExport::Interactive::ColourableString
+  puts "Error: #{e}".red
   puts option_parser
 rescue PgExport::PgDumpError => e
   puts e

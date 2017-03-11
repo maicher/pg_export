@@ -30,10 +30,10 @@ class PgExport
   def initialize
     @services_container = ServicesContainer
     yield config if block_given?
-    config.validate
   end
 
   def call
+    config.validate
     dump = nil
     [].tap do |arr|
       arr << Thread.new { dump = encryptor.call(utils.create_dump) }
