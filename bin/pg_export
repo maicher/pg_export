@@ -6,7 +6,7 @@ require 'ostruct'
 require 'cli_spinnable'
 
 require 'pg_export'
-require 'pg_export/includable_modules/interactive/colourable_string'
+require 'pg_export/includable_modules/colourable_string'
 require 'pg_export/includable_modules/interactive'
 
 config = PgExport::ServicesContainer.config
@@ -55,7 +55,7 @@ begin
   option_parser.parse!
   pg_export.call
 rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
-  using PgExport::Interactive::ColourableString
+  using PgExport::ColourableString
   puts "Error: #{e}".red
   puts option_parser
 rescue PgExport::PgDumpError => e

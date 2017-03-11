@@ -14,7 +14,7 @@ class PgExport
       dump = download_dump(selected_dump)
       [].tap do |arr|
         arr << Thread.new { restore_downloaded_dump(dump) }
-        arr << Thread.new { close_ftp_connection.call }
+        arr << Thread.new { ftp_connection.close }
       end.each(&:join)
 
       puts 'Success'.green
@@ -26,7 +26,7 @@ class PgExport
     def initialize_connection
       with_spinner do |cli|
         cli.print 'Connecting to FTP'
-        open_ftp_connection.call
+        ftp_connection.open
         cli.tick
       end
     end
