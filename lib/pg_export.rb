@@ -36,7 +36,7 @@ class PgExport
     config.validate
     dump = nil
     [].tap do |arr|
-      arr << Thread.new { dump = encryptor.call(utils.create_dump) }
+      arr << Thread.new(dump) { dump = encryptor.call(utils.create_dump) }
       arr << Thread.new { open_ftp_connection.call }
     end.each(&:join)
 

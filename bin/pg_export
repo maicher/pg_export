@@ -9,11 +9,6 @@ require 'pg_export'
 require 'pg_export/includable_modules/interactive/colourable_string'
 require 'pg_export/includable_modules/interactive'
 
-LOGS_DEFAULT = ->(_, _, _, message) { "#{message}\n" }
-LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }
-LOGS_MUTED = ->(_, _, _, _) {}
-
-PgExport::Logging.logger.formatter = LOGS_DEFAULT
 config = PgExport::ServicesContainer.config
 pg_export = PgExport.new
 
@@ -29,11 +24,11 @@ option_parser = OptionParser.new do |opts|
   end
 
   opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
-    PgExport::Logging.logger.formatter = LOGS_TIMESTAMPED
+    PgExport::Logging.format_timestamped
   end
 
   opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
-    PgExport::Logging.logger.formatter = LOGS_MUTED
+    PgExport::Logging.mute
     config.database ||= 'undefined'
     pg_export.extend(PgExport::Interactive)
   end
@@ -51,7 +46,7 @@ option_parser = OptionParser.new do |opts|
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::FtpConnection.new(config.ftp_params).open
+    PgExport::ServicesContainer.ftp_connection.open
     exit
   end
 end
