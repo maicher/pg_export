@@ -6,11 +6,9 @@ require 'openssl'
 require 'forwardable'
 require 'open3'
 
-require 'cli_spinnable'
-
 require 'pg_export/version'
-require 'pg_export/modules/logging'
-require 'pg_export/modules/dump/size_human'
+require 'pg_export/includable_modules/logging'
+require 'pg_export/includable_modules/dump/size_human'
 require 'pg_export/errors'
 require 'pg_export/services_container'
 require 'pg_export/configuration'

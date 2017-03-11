@@ -2,9 +2,12 @@
 
 require 'optparse'
 require 'ostruct'
+
+require 'cli_spinnable'
+
 require 'pg_export'
-require 'pg_export/modules/interactive/colourable_string'
-require 'pg_export/modules/interactive'
+require 'pg_export/includable_modules/interactive/colourable_string'
+require 'pg_export/includable_modules/interactive'
 
 LOGS_DEFAULT = ->(_, _, _, message) { "#{message}\n" }
 LOGS_TIMESTAMPED = ->(severity, datetime, progname, message) { "#{datetime} #{Process.pid} TID-#{Thread.current.object_id.to_s(36)}#{progname} #{severity}: #{message}\n" }
@@ -20,7 +23,7 @@ option_parser = OptionParser.new do |opts|
     options.database = database
   end
 
-  opts.on('-k', '--keep [KEEP]', Integer, '[Optional] Number of dump files to keep on FTP (default: 10)') do |keep|
+  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{PgExport::Configuration.new.keep_dumps})") do |keep|
     options.keep = keep
   end
 
@@ -45,7 +48,7 @@ option_parser = OptionParser.new do |opts|
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::FtpService.new(PgExport::Configuration.new.ftp_params)
+    PgExport::FtpConnection.new(PgExport::Configuration.new.ftp_params).open
     exit
   end
 end
