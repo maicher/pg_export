@@ -3,11 +3,13 @@ AllCops:
   Exclude:
     - 'spec/spec_helper.rb'
 
+Style/BlockLength:
+  Exclude:
+    - 'bin/pg_export'
+    - 'spec/**/*.rb'
+
 Metrics/LineLength:
   Max: 200
-
-Metrics/AbcSize:
-  Max: 20
 
 Lint/AmbiguousOperator:
   Exclude:
