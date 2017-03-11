@@ -6,7 +6,6 @@ class PgExport
 
     def initialize(host:, user:, password:)
       @host, @user, @password = host, user, password
-      open
     end
 
     def open

@@ -23,6 +23,13 @@ RSpec.describe PgExport::FtpConnection do
   end
 
   describe '#ftp' do
-    it { expect(subject.ftp).to eq(mock) }
+    context 'when connection is not open' do
+      it { expect(subject.ftp).to be_nil }
+    end
+
+    context 'when connection is open' do
+      before(:each) { subject.open }
+      it { expect(subject.ftp).to eq(mock) }
+    end
   end
 end

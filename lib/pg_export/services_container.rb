@@ -21,12 +21,12 @@ class PgExport
         @utils ||= Utils.new(config.database)
       end
 
-      def connection_initializer
-        @connection_initializer ||= proc { ftp_connection }
+      def open_ftp_connection
+        @open_ftp_connection ||= proc { ftp_connection.open }
       end
 
-      def connection_closer
-        @connection_closer ||= proc { ftp_connection.close }
+      def close_ftp_connection
+        @close_ftp_connection ||= proc { ftp_connection.close }
       end
 
       def ftp_connection

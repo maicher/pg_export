@@ -39,7 +39,7 @@ class PgExport
     dump = nil
     [].tap do |arr|
       arr << Thread.new { dump = encryptor.call(utils.create_dump) }
-      arr << Thread.new { connection_initializer.call }
+      arr << Thread.new { open_ftp_connection.call }
     end.each(&:join)
 
     dump_storage.upload(dump)
@@ -51,5 +51,5 @@ class PgExport
 
   attr_reader :services_container
 
-  def_delegators :services_container, :config, :utils, :dump_storage, :connection_initializer, :connection_closer, :encryptor, :decryptor
+  def_delegators :services_container, :config, :utils, :dump_storage, :open_ftp_connection, :close_ftp_connection, :encryptor, :decryptor
 end
