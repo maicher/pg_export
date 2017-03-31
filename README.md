@@ -71,7 +71,7 @@ __Step 1.__ Prepare FTP account and put configuration into env variables. Dumps 
     BACKUP_FTP_USER="user"
     BACKUP_FTP_PASSWORD="password"
     
-__Step 2.__ Put dump encryption key into env variable (at least 16 characters). Dumps will be SSL(AES-128-CBC) encrypted using that key.
+__Step 2.__ Put dump encryption key into env variable (exactly 16 characters). Dumps will be SSL(AES-128-CBC) encrypted using that key.
  
     # /etc/environment
     DUMP_ENCRYPTION_KEY="1234567890abcdef"

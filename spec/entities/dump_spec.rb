@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe PgExport::Dump::Base do
-  subject { PgExport::Dump::Base.new }
+describe PgExport::Dump do
+  subject { PgExport::Dump.new('Name') }
 
   it { expect(subject).to respond_to(:path) }
   it { expect(subject).to respond_to(:read) }

@@ -7,7 +7,7 @@ class PgExport
     end
 
     def create_dump
-      dump = PlainDump.new
+      dump = Dump.new('Dump')
       Open3.popen3("pg_dump -Fc --file #{dump.path} #{database_name}") do |_, _, err|
         error = err.read
         raise PgDumpError, error unless error.empty?

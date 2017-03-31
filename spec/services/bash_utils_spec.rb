@@ -23,7 +23,8 @@ RSpec.describe PgExport::BashUtils do
     context 'when specified database exists' do
       subject { utils.create_dump }
       it { expect { subject }.not_to raise_error }
-      it { expect(subject).to be_a PgExport::PlainDump }
+      it { expect(subject).to be_a PgExport::Dump }
+      it { expect(subject.name).to eq('Dump') }
     end
   end
 

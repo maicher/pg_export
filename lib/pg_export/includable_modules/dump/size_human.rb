@@ -1,5 +1,5 @@
 class PgExport
-  module Dump
+  class Dump
     module SizeHuman
       def size_human
         {

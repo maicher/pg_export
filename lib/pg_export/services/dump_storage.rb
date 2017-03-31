@@ -16,7 +16,7 @@ class PgExport
     end
 
     def download(name)
-      dump = EncryptedDump.new
+      dump = Dump.new('Encrypted Dump')
       ftp_adapter.download_file(dump.path, name)
       logger.info "Download #{dump} #{name} from #{ftp_adapter}"
       dump
