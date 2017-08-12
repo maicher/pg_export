@@ -9,18 +9,26 @@ require 'pg_export'
 require 'pg_export/includable_modules/colourable_string'
 require 'pg_export/includable_modules/interactive'
 
-config = PgExport::ServicesContainer.config
-pg_export = PgExport.new
+config = {
+  database: 'undefined',
+  keep_dumps: ENV['KEEP_DUMPS'] || 10,
+  dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
+  ftp_host: ENV['BACKUP_FTP_HOST'],
+  ftp_user: ENV['BACKUP_FTP_USER'],
+  ftp_password: ENV['BACKUP_FTP_PASSWORD']
+}
+
+interactive = false
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
 
   opts.on('-d', '--database DATABASE', '[Required] Name of the database to export') do |database|
-    config.database = database
+    config[:database] = database
   end
 
-  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{config.keep_dumps})") do |keep|
-    config.keep_dumps = keep
+  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{config[:keep_dumps]})") do |keep|
+    config[:keep_dumps] = keep
   end
 
   opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
@@ -29,8 +37,7 @@ option_parser = OptionParser.new do |opts|
 
   opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
     PgExport::Logging.mute
-    config.database ||= 'undefined'
-    pg_export.extend(PgExport::Interactive)
+    interactive = true
   end
 
   opts.on('-h', '--help', 'Show this message') do
@@ -41,20 +48,26 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nSetting can be verified by running following commands:"
 
   opts.on('-c', '--configuration', 'Prints the configuration') do
-    puts config.to_s
+    puts config
     exit
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::ServicesContainer.ftp_connection.open
+    PgExport::FtpConnection.new(
+      host: config[:ftp_host],
+      user: config[:ftp_user],
+      password: config[:ftp_password]
+    ).open
     exit
   end
 end
 
 begin
   option_parser.parse!
+  pg_export = PgExport.new(**config)
+  pg_export.extend(PgExport::Interactive) if interactive
   pg_export.call
-rescue OptionParser::MissingArgument, PgExport::InvalidConfigurationError => e
+rescue OptionParser::MissingArgument, Dry::Struct::Error => e
   using PgExport::ColourableString
   puts "Error: #{e}".red
   puts option_parser

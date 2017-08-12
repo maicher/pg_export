@@ -14,7 +14,7 @@ class PgExport
       dump = download_dump(selected_dump)
       concurrently do |threads|
         threads << Thread.new(dump) { restore_downloaded_dump(dump) }
-        threads << Thread.new { ftp_connection.close }
+        threads << Thread.new { container[:ftp_connection].close }
       end
       puts 'Success'.green
       self
@@ -25,7 +25,7 @@ class PgExport
     def initialize_connection
       with_spinner do |cli|
         cli.print 'Connecting to FTP'
-        ftp_connection.open
+        container[:ftp_connection].open
         cli.tick
       end
     end
@@ -55,11 +55,11 @@ class PgExport
 
       with_spinner do |cli|
         cli.print "Downloading dump #{name}"
-        encrypted_dump = dump_storage.download(name)
+        encrypted_dump = container[:dump_storage].download(name)
         cli.print " (#{encrypted_dump.size_human})"
         cli.tick
         cli.print "Decrypting dump #{name}"
-        dump = decryptor.call(encrypted_dump)
+        dump = container[:decryptor].call(encrypted_dump)
         cli.print " (#{dump.size_human})"
         cli.tick
       end
@@ -72,16 +72,16 @@ class PgExport
 
     def restore_downloaded_dump(dump)
       puts 'To which database you would like to restore the downloaded dump?'
-      if config.database == 'undefined'
+      if container[:database] == 'undefined'
         print 'Enter a local database name: '
       else
-        print "Enter a local database name (#{config.database}): "
+        print "Enter a local database name (#{container[:database]}): "
       end
       database = gets.chomp
-      database = database.empty? ? config.database : database
+      database = database.empty? ? container[:database] : database
       with_spinner do |cli|
         cli.print "Restoring dump to #{database} database"
-        bash_utils.restore_dump(dump, database)
+        container[:bash_utils].restore_dump(dump, database)
         cli.tick
       end
       self
@@ -91,7 +91,7 @@ class PgExport
     end
 
     def dumps
-      @dumps ||= dump_storage.all
+      @dumps ||= container[:dump_storage].all
     end
   end
 end
