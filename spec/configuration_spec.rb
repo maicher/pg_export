@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'pg_export/configuration'
 
 describe PgExport::Configuration do
   subject { PgExport::Configuration.new(**params) }

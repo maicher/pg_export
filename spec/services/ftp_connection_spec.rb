@@ -1,4 +1,6 @@
-require 'spec_helper'
+require 'null_logger'
+require 'ftp_mock'
+require 'pg_export/services/ftp_connection'
 
 RSpec.describe PgExport::FtpConnection do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }

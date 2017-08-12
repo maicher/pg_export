@@ -1,4 +1,5 @@
-require 'spec_helper'
+require 'pg_export/services/ftp_adapter'
+require 'ftp_mock'
 
 RSpec.describe PgExport::FtpAdapter do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }

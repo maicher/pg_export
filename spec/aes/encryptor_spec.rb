@@ -1,7 +1,8 @@
-require 'spec_helper'
+require 'null_logger'
+require 'pg_export/aes'
 
 RSpec.describe PgExport::Aes::Encryptor do
-  let(:encryptor) { PgExport::Aes::Encryptor.new(key: encryption_key, logger: NullLogger) }
+  let(:encryptor) { PgExport::Aes::Encryptor.new(key: encryption_key, logger: NullLogger }
   let(:encryption_key) { '1234567890abcdef' }
 
   let(:plain_dump) do

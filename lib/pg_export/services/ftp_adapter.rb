@@ -1,3 +1,6 @@
+require 'forwardable'
+require 'net/ftp'
+
 class PgExport
   class FtpAdapter
     extend Forwardable

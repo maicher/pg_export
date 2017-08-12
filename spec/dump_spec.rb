@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'pg_export/dump'
 
 describe PgExport::Dump do
   subject { PgExport::Dump.new('Name') }

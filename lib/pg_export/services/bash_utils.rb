@@ -1,4 +1,10 @@
+require 'open3'
+require 'pg_export/dump'
+
 class PgExport
+  class PgDumpError < StandardError; end
+  class PgRestoreError < StandardError; end
+
   class BashUtils
     def initialize(database_name:, logger:)
       @database_name = database_name

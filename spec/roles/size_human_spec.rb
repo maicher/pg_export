@@ -1,9 +1,9 @@
-require 'spec_helper'
+require 'pg_export/roles/human_readable'
 
-describe PgExport::Dump::SizeHuman do
+describe PgExport::Roles::HumanReadable do
   let(:klass) do
     Class.new do
-      include PgExport::Dump::SizeHuman
+      include PgExport::Roles::HumanReadable
       def size
         1024
       end

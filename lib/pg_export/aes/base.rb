@@ -1,4 +1,5 @@
 require 'openssl'
+require 'pg_export/dump'
 
 class PgExport
   module Aes

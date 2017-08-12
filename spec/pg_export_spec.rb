@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'ftp_mock'
 
 describe PgExport do
   let(:database) { 'some_database' }

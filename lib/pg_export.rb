@@ -1,21 +1,6 @@
-require 'logger'
-require 'tempfile'
-require 'zlib'
-require 'net/ftp'
-require 'forwardable'
-require 'open3'
-
 require 'pg_export/version'
-require 'pg_export/includable_modules/dump/size_human'
-require 'pg_export/errors'
 require 'pg_export/configuration'
-require 'pg_export/dump'
-require 'pg_export/services/build_container'
-require 'pg_export/services/ftp_adapter'
-require 'pg_export/services/ftp_connection'
-require 'pg_export/services/bash_utils'
-require 'pg_export/repository'
-require 'pg_export/aes'
+require 'pg_export/boot_container'
 require 'pry'
 
 class PgExport
@@ -36,7 +21,7 @@ class PgExport
   end
 
   def container
-    @container ||= Services::BuildContainer.call(config.to_h)
+    @container ||= BootContainer.call(config.to_h)
   end
 
   private

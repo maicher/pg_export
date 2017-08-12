@@ -1,7 +1,12 @@
+require 'forwardable'
+require 'tempfile'
+
+require_relative 'roles/human_readable'
+
 class PgExport
   class Dump
     extend Forwardable
-    include SizeHuman
+    include Roles::HumanReadable
 
     CHUNK_SIZE = (2**16).freeze
 

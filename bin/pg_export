@@ -3,11 +3,9 @@
 require 'optparse'
 require 'ostruct'
 
-require 'cli_spinnable'
-
 require 'pg_export'
-require 'pg_export/includable_modules/colourable_string'
-require 'pg_export/includable_modules/interactive'
+require 'pg_export/roles/colourable_string'
+require 'pg_export/roles/interactive'
 
 config = {
   database: 'undefined',
@@ -66,10 +64,10 @@ end
 begin
   option_parser.parse!
   pg_export = PgExport.new(**config)
-  pg_export.extend(PgExport::Interactive) if interactive
+  pg_export.extend(PgExport::Roles::Interactive) if interactive
   pg_export.call
 rescue OptionParser::MissingArgument, Dry::Struct::Error => e
-  using PgExport::ColourableString
+  using PgExport::Roles::ColourableString
   puts "Error: #{e}".red
   puts option_parser
 rescue PgExport::PgDumpError => e

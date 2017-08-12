@@ -1,4 +1,6 @@
-require 'spec_helper'
+require 'pg'
+require 'null_logger'
+require 'pg_export/services/bash_utils'
 
 RSpec.describe PgExport::BashUtils do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }

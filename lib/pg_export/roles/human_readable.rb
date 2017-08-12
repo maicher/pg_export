@@ -1,6 +1,6 @@
 class PgExport
-  class Dump
-    module SizeHuman
+  module Roles
+    module HumanReadable
       def size_human
         {
           'B'  => 1024,
