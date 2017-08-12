@@ -1,12 +1,12 @@
 require 'null_logger'
 require 'ftp_mock'
-require 'pg_export/services/ftp_connection'
+require 'pg_export/ftp/connection'
 
-RSpec.describe PgExport::FtpConnection do
+RSpec.describe PgExport::Ftp::Connection do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }
   let(:mock) { FtpMock.new }
 
-  let(:subject) { PgExport::FtpConnection.new(**params, logger: NullLogger) }
+  let(:subject) { PgExport::Ftp::Connection.new(**params, logger: NullLogger) }
 
   before(:each) do
     allow(Net::FTP).to receive(:new).with(params[:host], params[:user], params[:password]).and_return(mock)
