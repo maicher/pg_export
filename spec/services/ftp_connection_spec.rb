@@ -4,7 +4,7 @@ RSpec.describe PgExport::FtpConnection do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }
   let(:mock) { FtpMock.new }
 
-  let(:subject) { PgExport::FtpConnection.new(params) }
+  let(:subject) { PgExport::FtpConnection.new(**params, logger: NullLogger) }
 
   before(:each) do
     allow(Net::FTP).to receive(:new).with(params[:host], params[:user], params[:password]).and_return(mock)

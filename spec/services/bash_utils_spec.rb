@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe PgExport::BashUtils do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
   let(:dump_encryption_key) { '1234567890abcdef' }
-  let(:utils) { PgExport::BashUtils.new(database) }
+  let(:utils) { PgExport::BashUtils.new(database_name: database, logger: NullLogger) }
 
   describe '#create_dump' do
     let(:database) { 'pg_export_database_test' }
@@ -15,7 +15,7 @@ RSpec.describe PgExport::BashUtils do
     end
 
     context 'when specified database does not exist' do
-      let(:utils) { PgExport::BashUtils.new('pg_export_not_existing_database') }
+      let(:utils) { PgExport::BashUtils.new(database_name: 'pg_export_not_existing_database', logger: NullLogger) }
       subject { utils.create_dump }
       it { expect { subject }.to raise_error(PgExport::PgDumpError) }
     end

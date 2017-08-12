@@ -1,9 +1,8 @@
 class PgExport
   class BashUtils
-    include Logging
-
-    def initialize(database_name:)
+    def initialize(database_name:, logger:)
       @database_name = database_name
+      @logger = logger
     end
 
     def create_dump
@@ -27,6 +26,6 @@ class PgExport
 
     private
 
-    attr_reader :database_name
+    attr_reader :database_name, :logger
   end
 end

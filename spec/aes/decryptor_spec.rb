@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe PgExport::Aes::Decryptor do
-  let(:decryptor) { PgExport::Aes::Decryptor.new(key: encryption_key) }
+  let(:decryptor) { PgExport::Aes::Decryptor.new(key: encryption_key, logger: NullLogger) }
   let(:encryption_key) { '1234567890abcdef' }
 
   let(:encrypted_dump) do

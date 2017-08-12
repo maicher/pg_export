@@ -4,7 +4,7 @@ require 'pg'
 require 'simplecov'
 SimpleCov.start
 
-PgExport::Logging.logger.formatter = ->(*) {}
+NullLogger = Logger.new(nil)
 
 class FtpMock
   def passive=(*) end

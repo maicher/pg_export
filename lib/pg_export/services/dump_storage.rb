@@ -1,12 +1,10 @@
 class PgExport
   class DumpStorage
-    include Logging
-
     TIMESTAMP = '_%Y%m%d_%H%M%S'.freeze
     TIMESTAMP_REGEX = '[0-9]{8}_[0-9]{6}'.freeze
 
-    def initialize(ftp_adapter:, name:, keep:)
-      @ftp_adapter, @name, @keep = ftp_adapter, name, keep
+    def initialize(ftp_adapter:, name:, keep:, logger:)
+      @ftp_adapter, @name, @keep, @logger = ftp_adapter, name, keep, logger
     end
 
     def upload(dump)
@@ -39,7 +37,7 @@ class PgExport
 
     private
 
-    attr_reader :ftp_adapter, :name, :keep
+    attr_reader :ftp_adapter, :name, :keep, :logger
 
     def timestamped_name(dump)
       name + Time.now.strftime(TIMESTAMP) + dump.ext

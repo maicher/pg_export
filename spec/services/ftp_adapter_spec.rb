@@ -6,7 +6,7 @@ RSpec.describe PgExport::FtpAdapter do
 
   before(:each) { allow(Net::FTP).to receive(:new).with(*params.values).and_return(mock) }
 
-  subject { PgExport::FtpAdapter.new(params) }
+  subject { PgExport::FtpAdapter.new(connection: mock) }
 
   it { expect(subject).to respond_to(:list) }
   it { expect(subject).to respond_to(:delete) }

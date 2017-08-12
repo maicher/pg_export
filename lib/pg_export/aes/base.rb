@@ -5,10 +5,8 @@ class PgExport
     class Base
       ALGORITHM = 'AES-128-CBC'.freeze
 
-      include Logging
-
-      def initialize(key:)
-        @key = key
+      def initialize(key:, logger:)
+        @key, @logger = key, logger
       end
 
       def call(source_dump)
@@ -20,7 +18,7 @@ class PgExport
 
       private
 
-      attr_reader :key
+      attr_reader :key, :logger
 
       def copy(from:, to:)
         cipher.reset

@@ -13,7 +13,8 @@ describe PgExport do
       dump_encryption_key: '1234567890abcdef',
       ftp_host: 'ftp.example.com',
       ftp_user: 'user',
-      ftp_password: 'pass'
+      ftp_password: 'pass',
+      logger_format: :muted
     }
   end
 

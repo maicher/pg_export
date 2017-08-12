@@ -1,11 +1,9 @@
 class PgExport
   class FtpConnection
-    include Logging
-
     attr_reader :ftp, :host
 
-    def initialize(host:, user:, password:)
-      @host, @user, @password = host, user, password
+    def initialize(host:, user:, password:, logger:)
+      @host, @user, @password, @logger = host, user, password, logger
     end
 
     def open
@@ -23,6 +21,6 @@ class PgExport
 
     private
 
-    attr_reader :user, :password
+    attr_reader :user, :password, :logger
   end
 end
