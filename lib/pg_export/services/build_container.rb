@@ -4,9 +4,8 @@ class PgExport
       class << self
         def call(config)
           container = {}
-          aes = Aes.new(config[:dump_encryption_key])
-          container[:encryptor] = aes.build_encryptor
-          container[:decryptor] = aes.build_decryptor
+          container[:encryptor] = Aes::Encryptor.new(key: config[:dump_encryption_key])
+          container[:decryptor] = Aes::Decryptor.new(key: config[:dump_encryption_key])
           container[:bash_utils] = BashUtils.new(config[:database])
           container[:ftp_connection] = FtpConnection.new(
             host: config[:ftp_host],
