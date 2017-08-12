@@ -17,8 +17,8 @@ class PgExport
             logger: container[:logger]
           )
           container[:ftp_adapter] = FtpAdapter.new(connection: container[:ftp_connection])
-          container[:dump_storage] = DumpStorage.new(
-            ftp_adapter: container[:ftp_adapter],
+          container[:repository] = Repository.new(
+            adapter: container[:ftp_adapter],
             name: config[:database],
             keep: config[:keep_dumps],
             logger: container[:logger]

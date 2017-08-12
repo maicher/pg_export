@@ -55,7 +55,7 @@ class PgExport
 
       with_spinner do |cli|
         cli.print "Downloading dump #{name}"
-        encrypted_dump = container[:dump_storage].download(name)
+        encrypted_dump = container[:repository].download(name)
         cli.print " (#{encrypted_dump.size_human})"
         cli.tick
         cli.print "Decrypting dump #{name}"
@@ -91,7 +91,7 @@ class PgExport
     end
 
     def dumps
-      @dumps ||= container[:dump_storage].all
+      @dumps ||= container[:repository].all
     end
   end
 end

@@ -14,7 +14,7 @@ require 'pg_export/services/build_container'
 require 'pg_export/services/ftp_adapter'
 require 'pg_export/services/ftp_connection'
 require 'pg_export/services/bash_utils'
-require 'pg_export/services/dump_storage'
+require 'pg_export/repository'
 require 'pg_export/aes'
 require 'pry'
 
@@ -30,8 +30,8 @@ class PgExport
       threads << create_dump
       threads << open_ftp_connection
     end
-    container[:dump_storage].upload(dump)
-    container[:dump_storage].remove_old
+    container[:repository].upload(dump)
+    container[:repository].remove_old
     self
   end
 
