@@ -6,7 +6,7 @@ class PgExport
 
     def_delegators :connection, :ftp, :host
 
-    def initialize(connection)
+    def initialize(connection:)
       @connection = connection
       ObjectSpace.define_finalizer(self, proc { connection.close })
     end

@@ -2,7 +2,7 @@ class PgExport
   class BashUtils
     include Logging
 
-    def initialize(database_name)
+    def initialize(database_name:)
       @database_name = database_name
     end
 

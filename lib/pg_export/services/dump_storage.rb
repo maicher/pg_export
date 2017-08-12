@@ -5,7 +5,7 @@ class PgExport
     TIMESTAMP = '_%Y%m%d_%H%M%S'.freeze
     TIMESTAMP_REGEX = '[0-9]{8}_[0-9]{6}'.freeze
 
-    def initialize(ftp_adapter, name, keep)
+    def initialize(ftp_adapter:, name:, keep:)
       @ftp_adapter, @name, @keep = ftp_adapter, name, keep
     end
 
