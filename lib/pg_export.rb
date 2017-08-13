@@ -15,16 +15,17 @@ class PgExport
       threads << create_dump
       threads << open_ftp_connection
     end
-    container[:repository].upload(dump)
-    container[:repository].remove_old
+    container[:ftp_repository].persist(dump)
+    container[:ftp_repository].remove_old(config[:database], config[:keep_dumps])
+
     self
   end
+
+  private
 
   def container
     @container ||= BootContainer.call(config.to_h)
   end
-
-  private
 
   def concurrently
     [].tap do |threads|
@@ -39,7 +40,7 @@ class PgExport
   def create_dump
     @create_dump ||= Thread.new do
       Thread.current[:dump] = container[:encryptor].call(
-        container[:factory].build_dump(container[:database])
+        container[:factory].build_dump(config[:database])
       )
     end
   end

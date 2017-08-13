@@ -5,6 +5,8 @@ require_relative 'roles/human_readable'
 
 class PgExport
   class Dump
+    TIMESTAMP = '_%Y%m%d_%H%M%S'.freeze
+
     extend Forwardable
     include Roles::HumanReadable
 
@@ -12,10 +14,11 @@ class PgExport
 
     def_delegators :file, :path, :read, :write, :<<, :rewind, :close, :size, :eof?
 
-    attr_reader :name
+    attr_reader :name, :db_name
 
-    def initialize(name)
-      @name = name
+    def initialize(name:, db_name:)
+      @name, @db_name = name, db_name
+      @timestamp = Time.now.strftime(TIMESTAMP)
     end
 
     def ext
@@ -36,11 +39,17 @@ class PgExport
       end
     end
 
+    def timestamped_name
+      db_name + timestamp + ext
+    end
+
     def to_s
       "#{name} (#{size_human})"
     end
 
     private
+
+    attr_reader :timestamp
 
     def file
       @file ||= Tempfile.new(file_name)

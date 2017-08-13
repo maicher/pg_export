@@ -59,7 +59,7 @@ class PgExport
 
         with_spinner do |cli|
           cli.print "Downloading dump #{name}"
-          encrypted_dump = container[:repository].download(name)
+          encrypted_dump = container[:ftp_repository].get(name)
           cli.print " (#{encrypted_dump.size_human})"
           cli.tick
           cli.print "Decrypting dump #{name}"
@@ -79,13 +79,13 @@ class PgExport
         if container[:database] == 'undefined'
           print 'Enter a local database name: '
         else
-          print "Enter a local database name (#{container[:database]}): "
+          print "Enter a local database name (#{config[:database]}): "
         end
-        database = gets.chomp
-        database = database.empty? ? container[:database] : database
+        db_name = gets.chomp
+        db_name = db_name.empty? ? config[:database] : db_name
         with_spinner do |cli|
-          cli.print "Restoring dump to #{database} database"
-          container[:bash_utils].restore_dump(dump, database)
+          cli.print "Restoring dump to #{db_name} database"
+          container[:bash_repository].persist(dump, db_name)
           cli.tick
         end
         self
@@ -95,7 +95,7 @@ class PgExport
       end
 
       def dumps
-        @dumps ||= container[:repository].all
+        @dumps ||= container[:ftp_repository].all
       end
     end
   end

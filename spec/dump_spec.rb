@@ -1,7 +1,7 @@
 require 'pg_export/dump'
 
 describe PgExport::Dump do
-  subject { PgExport::Dump.new('Name') }
+  subject { PgExport::Dump.new(name: 'Name', db_name: 'database_name') }
 
   it { expect(subject).to respond_to(:path) }
   it { expect(subject).to respond_to(:read) }

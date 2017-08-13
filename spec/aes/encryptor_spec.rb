@@ -6,7 +6,7 @@ RSpec.describe PgExport::Aes::Encryptor do
   let(:encryption_key) { '1234567890abcdef' }
 
   let(:plain_dump) do
-    PgExport::Dump.new('Plain Dump').tap do |dump|
+    PgExport::Dump.new(name: 'Plain Dump', db_name: 'database').tap do |dump|
       dump.open(:write) { |f| f << 'abc' }
     end
   end

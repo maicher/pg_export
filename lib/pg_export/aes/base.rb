@@ -11,7 +11,7 @@ class PgExport
       end
 
       def call(source_dump)
-        target_dump = Dump.new(target_dump_name)
+        target_dump = Dump.new(name: target_dump_name, db_name: source_dump.db_name)
         copy(from: source_dump, to: target_dump)
         logger.info "Create #{target_dump}"
         target_dump

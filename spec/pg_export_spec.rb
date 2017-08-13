@@ -29,13 +29,14 @@ describe PgExport do
     let(:enc_dump) { Object.new }
 
     before(:each) do
+      allow(enc_dump).to receive(:timestamped_name).and_return('timestamped_name')
       allow(Net::FTP).to receive(:new).and_return(mock)
     end
 
     it do
       expect_any_instance_of(PgExport::Factory).to receive(:build_dump).and_return(sql_dump)
       expect_any_instance_of(PgExport::Aes::Encryptor).to receive(:call).with(sql_dump).and_return(enc_dump)
-      expect_any_instance_of(PgExport::Repository).to receive(:upload).with(enc_dump)
+      expect_any_instance_of(PgExport::Repository).to receive(:persist).with(enc_dump)
       expect_any_instance_of(PgExport::Repository).to receive(:remove_old)
       subject.call
     end

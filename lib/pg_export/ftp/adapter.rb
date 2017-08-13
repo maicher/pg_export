@@ -17,12 +17,12 @@ class PgExport
         ftp.delete(filename)
       end
 
-      def upload_file(path, name)
-        ftp.putbinaryfile(path.to_s, name, CHUNK_SIZE)
+      def persist(path, timestamped_name)
+        ftp.putbinaryfile(path, timestamped_name, CHUNK_SIZE)
       end
 
-      def download_file(path, name)
-        ftp.getbinaryfile(name, path.to_s, CHUNK_SIZE)
+      def get(path, timestamped_name)
+        ftp.getbinaryfile(timestamped_name, path, CHUNK_SIZE)
       end
 
       def ftp

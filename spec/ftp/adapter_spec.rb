@@ -11,8 +11,8 @@ RSpec.describe PgExport::Ftp::Adapter do
 
   it { expect(subject).to respond_to(:list) }
   it { expect(subject).to respond_to(:delete) }
-  it { expect(subject).to respond_to(:upload_file) }
-  it { expect(subject).to respond_to(:download_file) }
+  it { expect(subject).to respond_to(:persist) }
+  it { expect(subject).to respond_to(:get) }
   it { expect(subject).to respond_to(:ftp) }
   it { expect(subject).to respond_to(:to_s) }
 end

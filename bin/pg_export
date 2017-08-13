@@ -56,7 +56,7 @@ option_parser = OptionParser.new do |opts|
       host: config[:ftp_host],
       user: config[:ftp_user],
       password: config[:ftp_password],
-      logger: PgExport::Services::BuildLogger.call(stream: $stdout, format: :plain)
+      logger: PgExport::BuildLogger.call(stream: $stdout, format: :plain)
     ).open
     exit
   end
