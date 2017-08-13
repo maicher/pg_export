@@ -11,12 +11,12 @@ class PgExport
         puts 'Interactive mode, for restoring dump into database.'.green
       end
 
-      def call
+      def call(database, _keep_dumps = nil)
         initialize_connection
         dumps = print_all_dumps
         dump = download_dump(select_dump(dumps))
         t = Thread.new { container[:ftp_connection].close }
-        restore_downloaded_dump(dump)
+        restore_downloaded_dump(dump, database)
         t.join
         puts 'Success'.green
         self
@@ -74,15 +74,15 @@ class PgExport
         retry
       end
 
-      def restore_downloaded_dump(dump)
+      def restore_downloaded_dump(dump, database)
         puts 'To which database you would like to restore the downloaded dump?'
-        if container[:database] == 'undefined'
+        if database == 'undefined'
           print 'Enter a local database name: '
         else
-          print "Enter a local database name (#{config[:database]}): "
+          print "Enter a local database name (#{database}): "
         end
         db_name = gets.chomp
-        db_name = db_name.empty? ? config[:database] : db_name
+        db_name = db_name.empty? ? database : db_name
         with_spinner do |cli|
           cli.print "Restoring dump to #{db_name} database"
           container[:bash_repository].persist(dump, db_name)

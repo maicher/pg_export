@@ -10,7 +10,7 @@ RSpec.describe PgExport::Ftp::Connection do
 
   before(:each) do
     allow(Net::FTP).to receive(:new).with(params[:host], params[:user], params[:password]).and_return(mock)
-    allow(mock).to receive(:passive=).with(true).exactly(1).times
+    allow(mock).to receive(:passive=).with(true)
   end
 
   describe '#open' do

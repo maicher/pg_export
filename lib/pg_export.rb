@@ -1,44 +1,30 @@
 require 'pg_export/version'
 require 'pg_export/configuration'
 require 'pg_export/boot_container'
+require 'pg_export/roles/interactive'
 require 'pg_export/errors'
+require 'pg_export/roles/validatable'
 require 'pry'
 
 class PgExport
+  include Roles::Validatable
+
   def initialize(**args)
-    @config = Configuration.new(**args)
+    config = Configuration.new(**args)
+    extend Roles::Interactive if config.interactive
+    @container = BootContainer.call(config.to_h)
   rescue Dry::Struct::Error => e
-    raise InvalidConfigurationError, e
+    raise ArgumentError, e
   end
 
-  def call
-    dump = build_dump
-    encrypted_dump = encrypt(dump)
-    persist(encrypted_dump)
-    remove_old
+  def call(database_name, keep_dumps)
+    container[:create_and_export_dump].call(
+      validate_database_name(database_name),
+      validate_keep_dumps(keep_dumps)
+    )
   end
 
   private
 
-  attr_reader :config
-
-  def build_dump
-    container[:bash_factory].build_dump(config[:database])
-  end
-
-  def encrypt(dump)
-    container[:encryptor].call(dump)
-  end
-
-  def persist(encrypted_dump)
-    container[:ftp_repository].persist(encrypted_dump)
-  end
-
-  def remove_old
-    container[:ftp_repository].remove_old(config[:database], config[:keep_dumps])
-  end
-
-  def container
-    @container ||= BootContainer.call(config.to_h)
-  end
+  attr_reader :container
 end

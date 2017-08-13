@@ -5,24 +5,22 @@ require 'ostruct'
 
 require 'pg_export'
 require 'pg_export/roles/colourable_string'
-require 'pg_export/roles/interactive'
 
 config = {
   database: 'undefined',
-  keep_dumps: ENV['KEEP_DUMPS'] || 10,
+  keep_dumps: ENV['KEEP_DUMPS'],
   dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
   ftp_host: ENV['BACKUP_FTP_HOST'],
   ftp_user: ENV['BACKUP_FTP_USER'],
   ftp_password: ENV['BACKUP_FTP_PASSWORD'],
-  logger_format: :plain
+  logger_format: :plain,
+  interactive: false
 }
-
-interactive = false
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
 
-  opts.on('-d', '--database DATABASE', '[Required] Name of the database to export') do |database|
+  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |database|
     config[:database] = database
   end
 
@@ -36,7 +34,7 @@ option_parser = OptionParser.new do |opts|
 
   opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
     config[:logger_format] = :muted
-    interactive = true
+    config[:interactive] = true
   end
 
   opts.on('-h', '--help', 'Show this message') do
@@ -64,10 +62,19 @@ end
 
 begin
   option_parser.parse!
-  pg_export = PgExport.new(**config)
-  pg_export.extend(PgExport::Roles::Interactive) if interactive
-  pg_export.call
-rescue OptionParser::MissingArgument, PgExportError => e
+
+  PgExport.new(
+    dump_encryption_key: config[:dump_encryption_key],
+    ftp_host: config[:ftp_host],
+    ftp_user: config[:ftp_user],
+    ftp_password: config[:ftp_password],
+    logger_format: config[:logger_format],
+    interactive: config[:interactive]
+  ).call(
+    config[:database],
+    config[:keep_dumps]
+  )
+rescue OptionParser::MissingArgument, PgExport::PgExportError, ArgumentError => e
   using PgExport::Roles::ColourableString
   puts "Error: #{e}".red
   puts option_parser
