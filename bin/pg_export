@@ -52,10 +52,11 @@ option_parser = OptionParser.new do |opts|
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::FtpConnection.new(
+    PgExport::Ftp::Connection.new(
       host: config[:ftp_host],
       user: config[:ftp_user],
-      password: config[:ftp_password]
+      password: config[:ftp_password],
+      logger: PgExport::Services::BuildLogger.call(stream: $stdout, format: :plain)
     ).open
     exit
   end

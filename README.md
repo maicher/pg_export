@@ -3,7 +3,6 @@
 [![Gem Version](https://badge.fury.io/rb/pg_export.svg)](https://badge.fury.io/rb/pg_export)
 [![Build Status](https://travis-ci.org/maicher/pg_export.svg?branch=master)](https://travis-ci.org/maicher/pg_export)
 [![Code Climate](https://codeclimate.com/github/maicher/pg_export/badges/gpa.svg)](https://codeclimate.com/github/maicher/pg_export)
-[![Test Coverage](https://codeclimate.com/github/maicher/cli_spinnable/badges/coverage.svg)](https://codeclimate.com/github/maicher/pg_export/coverage)
 
 CLI for creating and exporting PostgreSQL dumps to FTP.
 
@@ -86,18 +85,13 @@ __Step 3.__ Configure how many dumps should be kept in FTP (optional).
 __Step 4.__ Print the configuration to verify whether env variables has been loaded.
 
     $ pg_export --configuration
-    => database: 
-       keep_dumps: 5
-       dump_password: k40***
-       ftp_host: yourftp.example.com
-       ftp_user: user
-       ftp_password: pass***
+    => {:database=>"undefined", :keep_dumps=>10, :dump_encryption_key=>"k4***", :ftp_host=>"yourftp.example.com", 
+      :ftp_user=>"user", :ftp_password=>"pass***", :logger_format=>:plain} 
        
 __Step 5.__ Try connecting to FTP to verify the connection.
 
     $ pg_export --ftp
     => Connect to yourftp.example.com
-       Close FTP
     
 __Step 6.__ Perform database export.
 
