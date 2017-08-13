@@ -14,6 +14,5 @@ RSpec.describe PgExport::Ftp::Adapter do
   it { expect(subject).to respond_to(:upload_file) }
   it { expect(subject).to respond_to(:download_file) }
   it { expect(subject).to respond_to(:ftp) }
-  it { expect(subject).to respond_to(:host) }
   it { expect(subject).to respond_to(:to_s) }
 end

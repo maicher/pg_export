@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'pg_export'
 require 'ftp_mock'
 
 describe PgExport do
