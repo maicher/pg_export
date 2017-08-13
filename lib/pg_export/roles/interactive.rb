@@ -13,13 +13,11 @@ class PgExport
 
       def call
         initialize_connection
-        print_all_dumps
-        selected_dump = select_dump
-        dump = download_dump(selected_dump)
-        concurrently do |threads|
-          threads << Thread.new(dump) { restore_downloaded_dump(dump) }
-          threads << Thread.new { container[:ftp_connection].close }
-        end
+        dumps = print_all_dumps
+        dump = download_dump(select_dump(dumps))
+        t = Thread.new { container[:ftp_connection].close }
+        restore_downloaded_dump(dump)
+        t.join
         puts 'Success'.green
         self
       end
@@ -29,20 +27,22 @@ class PgExport
       def initialize_connection
         with_spinner do |cli|
           cli.print 'Connecting to FTP'
-          container[:ftp_connection].open
+          container[:ftp_connection].ftp
           cli.tick
         end
       end
 
       def print_all_dumps
+        dumps = container[:ftp_repository].all
         dumps.each.with_index(1) do |name, i|
           print "(#{i}) "
           puts name.to_s.gray
         end
-        self
+
+        dumps
       end
 
-      def select_dump
+      def select_dump(dumps)
         puts 'Which dump would you like to import?'
         number = loop do
           print "Type from 1 to #{dumps.count} (1): "
@@ -92,10 +92,6 @@ class PgExport
       rescue PgRestoreError => e
         puts e.to_s.red
         retry
-      end
-
-      def dumps
-        @dumps ||= container[:ftp_repository].all
       end
     end
   end

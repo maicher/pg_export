@@ -67,7 +67,7 @@ begin
   pg_export = PgExport.new(**config)
   pg_export.extend(PgExport::Roles::Interactive) if interactive
   pg_export.call
-rescue OptionParser::MissingArgument, Dry::Struct::Error => e
+rescue OptionParser::MissingArgument, PgExportError => e
   using PgExport::Roles::ColourableString
   puts "Error: #{e}".red
   puts option_parser

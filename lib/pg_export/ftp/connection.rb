@@ -3,11 +3,27 @@ require 'net/ftp'
 class PgExport
   module Ftp
     class Connection
-      attr_reader :ftp, :host
+      attr_reader :host
 
       def initialize(host:, user:, password:, logger:)
         @host, @user, @password, @logger = host, user, password, logger
+        open_ftp_thread
       end
+
+      def ftp
+        open_ftp_thread.join
+        @ftp
+      end
+
+      def close
+        ftp.close
+        logger.info 'Close FTP'
+        self
+      end
+
+      private
+
+      attr_reader :user, :password, :logger
 
       def open
         @ftp = Net::FTP.new(host, user, password)
@@ -16,15 +32,9 @@ class PgExport
         self
       end
 
-      def close
-        @ftp.close
-        logger.info 'Close FTP'
-        self
+      def open_ftp_thread
+        @open_ftp_thread ||= Thread.new { open }
       end
-
-      private
-
-      attr_reader :user, :password, :logger
     end
   end
 end

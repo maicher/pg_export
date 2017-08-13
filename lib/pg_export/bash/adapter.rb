@@ -1,9 +1,7 @@
 require 'open3'
+require 'pg_export/errors'
 
 class PgExport
-  class PgRestoreError < StandardError; end
-  class PgDumpError < StandardError; end
-
   module Bash
     class Adapter
       def get(path, db_name)

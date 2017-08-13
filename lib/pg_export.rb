@@ -1,51 +1,43 @@
 require 'pg_export/version'
 require 'pg_export/configuration'
 require 'pg_export/boot_container'
-require 'pry'
+require 'pg_export/errors'
 
 class PgExport
-  attr_reader :config
-
   def initialize(**args)
     @config = Configuration.new(**args)
+  rescue Dry::Struct::Error => e
+    raise InvalidConfigurationError, e
   end
 
   def call
-    concurrently do |threads|
-      threads << create_dump
-      threads << open_ftp_connection
-    end
-    container[:ftp_repository].persist(dump)
-    container[:ftp_repository].remove_old(config[:database], config[:keep_dumps])
-
-    self
+    dump = build_dump
+    encrypted_dump = encrypt(dump)
+    persist(encrypted_dump)
+    remove_old
   end
 
   private
 
+  attr_reader :config
+
+  def build_dump
+    container[:factory].build_dump(config[:database])
+  end
+
+  def encrypt(dump)
+    container[:encryptor].call(dump)
+  end
+
+  def persist(encrypted_dump)
+    container[:ftp_repository].persist(encrypted_dump)
+  end
+
+  def remove_old
+    container[:ftp_repository].remove_old(config[:database], config[:keep_dumps])
+  end
+
   def container
     @container ||= BootContainer.call(config.to_h)
-  end
-
-  def concurrently
-    [].tap do |threads|
-      yield threads
-    end.each(&:join)
-  end
-
-  def dump
-    create_dump[:dump]
-  end
-
-  def create_dump
-    @create_dump ||= Thread.new do
-      Thread.current[:dump] = container[:encryptor].call(
-        container[:factory].build_dump(config[:database])
-      )
-    end
-  end
-
-  def open_ftp_connection
-    Thread.new { container[:ftp_connection].open }
   end
 end
