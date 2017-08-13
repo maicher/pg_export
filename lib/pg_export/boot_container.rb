@@ -3,6 +3,7 @@ require_relative 'ftp/adapter'
 require_relative 'ftp/connection'
 require_relative 'services/bash_utils'
 require_relative 'repository'
+require_relative 'factory'
 require_relative 'aes'
 
 class PgExport
@@ -27,6 +28,7 @@ class PgExport
           keep: config[:keep_dumps],
           logger: container[:logger]
         )
+        container[:factory] = Factory.new(logger: container[:logger])
         container[:database] = config[:database]
         container
       end

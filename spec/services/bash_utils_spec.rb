@@ -1,5 +1,6 @@
 require 'pg'
 require 'null_logger'
+require 'pg_export/factory'
 require 'pg_export/services/bash_utils'
 
 RSpec.describe PgExport::BashUtils do
@@ -7,36 +8,13 @@ RSpec.describe PgExport::BashUtils do
   let(:dump_encryption_key) { '1234567890abcdef' }
   let(:utils) { PgExport::BashUtils.new(database_name: database, logger: NullLogger) }
 
-  describe '#create_dump' do
-    let(:database) { 'pg_export_database_test' }
-    let(:database_conn) { PG.connect(dbname: database) }
-    before(:each) { postgres_conn.exec("CREATE DATABASE #{database}") }
-    after(:each) do
-      database_conn.close
-      postgres_conn.exec("DROP DATABASE #{database}")
-    end
-
-    context 'when specified database does not exist' do
-      let(:utils) { PgExport::BashUtils.new(database_name: 'pg_export_not_existing_database', logger: NullLogger) }
-      subject { utils.create_dump }
-      it { expect { subject }.to raise_error(PgExport::PgDumpError) }
-    end
-
-    context 'when specified database exists' do
-      subject { utils.create_dump }
-      it { expect { subject }.not_to raise_error }
-      it { expect(subject).to be_a PgExport::Dump }
-      it { expect(subject.name).to eq('Dump') }
-    end
-  end
-
   describe '#restore_dump' do
     let(:database_from) { 'pg_export_database_test_1' }
     let(:database_to) { 'pg_export_database_test_2' }
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { utils.create_dump }
+    let(:dump) { PgExport::Factory.new(logger: NullLogger).build_dump(database) }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")

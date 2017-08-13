@@ -39,7 +39,7 @@ class PgExport
   def create_dump
     @create_dump ||= Thread.new do
       Thread.current[:dump] = container[:encryptor].call(
-        container[:bash_utils].create_dump
+        container[:factory].build_dump(container[:database])
       )
     end
   end

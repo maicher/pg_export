@@ -21,7 +21,7 @@ class PgExport
     end
 
     def remove_old
-      find_by_name(name).drop(keep.to_i).each do |filename|
+      find_by_name(name).drop(keep).each do |filename|
         adapter.delete(filename)
         logger.info "Remove #{filename} from #{adapter}"
       end
