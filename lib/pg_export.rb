@@ -2,6 +2,7 @@ require 'pg_export/version'
 require 'pg_export/configuration'
 require 'pg_export/boot_container'
 require 'pg_export/errors'
+require 'pry'
 
 class PgExport
   def initialize(**args)
@@ -22,7 +23,7 @@ class PgExport
   attr_reader :config
 
   def build_dump
-    container[:factory].build_dump(config[:database])
+    container[:bash_factory].build_dump(config[:database])
   end
 
   def encrypt(dump)

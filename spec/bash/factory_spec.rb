@@ -1,9 +1,9 @@
-require 'pg_export/factory'
+require 'pg_export/bash/factory'
 require 'null_logger'
 
-RSpec.describe PgExport::Factory do
+RSpec.describe PgExport::Bash::Factory do
   let(:mock) { Object.new }
-  let(:factory) { PgExport::Factory.new(adapter: mock, logger: NullLogger) }
+  let(:factory) { PgExport::Bash::Factory.new(adapter: mock, logger: NullLogger) }
 
   describe '#build_dump' do
     subject { factory.build_dump(database) }

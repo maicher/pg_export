@@ -1,5 +1,5 @@
 require 'pg'
-require 'pg_export/factory'
+require 'pg_export/bash/factory'
 require 'pg_export/bash/adapter'
 require 'null_logger'
 
@@ -14,7 +14,7 @@ RSpec.describe PgExport::Bash::Adapter do
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { PgExport::Factory.new(adapter: adapter, logger: NullLogger).build_dump(database) }
+    let(:dump) { PgExport::Bash::Factory.new(adapter: adapter, logger: NullLogger).build_dump(database) }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
