@@ -1,34 +1,34 @@
-require 'spec_helper'
+require 'pg_export/configuration'
 
 describe PgExport::Configuration do
-  let(:configuration) do
-    c = PgExport::Configuration.new
-    c.database = 'test',
-    c.keep_dumps = 10,
-    c.dump_encryption_key = '1234567890abcdef',
-    c.ftp_host = 'host'
-    c.ftp_user = 'user'
-    c.ftp_password = 'password'
-    c
+  subject { PgExport::Configuration.new(**params) }
+  let(:valid_params) do
+    {
+      dump_encryption_key: '1234567890abcdef',
+      ftp_host: 'host',
+      ftp_user: 'user',
+      ftp_password: 'password',
+      logger_format: :plain,
+      interactive: false
+    }
   end
 
-  describe '#validate' do
-    subject { configuration }
+  describe '.initialize' do
     context 'when all config parameters are provided' do
-      it { expect { subject.validate }.not_to raise_error }
+      let(:params) { valid_params }
+      it { expect { subject }.not_to raise_error }
     end
 
-    PgExport::Configuration::DEFAULTS.keys.each do |p|
-      context "when field #{p} is missing" do
-        before(:each) { configuration.send("#{p}=", nil) }
-        subject { configuration }
-        it { expect { subject.validate }.to raise_error(PgExport::InvalidConfigurationError) }
+    %i(dump_encryption_key ftp_host ftp_user ftp_password logger_format interactive).each do |param_name|
+      context "when #{param_name} parameter are missing" do
+        let(:params) { valid_params.tap { |p| p.delete(param_name) } }
+        it { expect { subject }.to raise_error(Dry::Struct::Error) }
       end
     end
-  end
 
-  describe '#ftp_params' do
-    subject { configuration }
-    it { expect(subject.ftp_params).to eq(host: 'host', user: 'user', password: 'password') }
+    context 'when dump_encryption_key has invalid length' do
+      let(:params) { valid_params.tap { |p| p[:dump_encryption_key] = '123' } }
+      it { expect { subject }.to raise_error(Dry::Struct::Error) }
+    end
   end
 end

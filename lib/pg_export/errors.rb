@@ -1,5 +1,5 @@
 class PgExport
-  class InvalidConfigurationError < StandardError; end
-  class PgDumpError < StandardError; end
-  class PgRestoreError < StandardError; end
+  class PgExportError < StandardError; end
+  class PgRestoreError < PgExportError; end
+  class PgDumpError < PgExportError; end
 end

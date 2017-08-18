@@ -1,3 +1,7 @@
+### 0.6.0 - 2017.08.18
+
+- Improve internal architecture
+
 ### 0.5.1 - 2017.03.31
 
 - Simplify Dump entity design

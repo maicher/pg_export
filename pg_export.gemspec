@@ -21,12 +21,13 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.1.0'
 
   spec.add_dependency 'cli_spinnable', '~> 0.2'
+  spec.add_dependency 'dry-types', '~> 0.11.1'
+  spec.add_dependency 'dry-struct', '~> 0.3.1'
 
   spec.add_development_dependency 'bundler', '~> 1.10'
   spec.add_development_dependency 'rubocop', '~> 0.44'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.4'
   spec.add_development_dependency 'pg', '~> 0.19'
-  spec.add_development_dependency 'simplecov', '~> 0.12'
   spec.add_development_dependency 'pry'
 end
