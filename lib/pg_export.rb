@@ -4,7 +4,6 @@ require 'pg_export/boot_container'
 require 'pg_export/roles/interactive'
 require 'pg_export/errors'
 require 'pg_export/roles/validatable'
-require 'pry'
 
 class PgExport
   include Roles::Validatable
