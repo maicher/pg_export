@@ -1,3 +1,7 @@
+### 0.6.1 - 2017.08.20
+
+- Change required ruby version from 2.1.0 to 2.2.0.
+
 ### 0.6.0 - 2017.08.18
 
 - Improve internal architecture

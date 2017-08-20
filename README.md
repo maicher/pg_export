@@ -26,7 +26,7 @@ Features:
 
 ## Dependencies
 
-  * Ruby >= 2.1
+  * Ruby >= 2.2.0
   * $ pg_dump
   * $ pg_restore
 
