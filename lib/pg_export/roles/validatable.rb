@@ -6,7 +6,7 @@ class PgExport
       include Dry::Types.module
 
       VALID_NON_EMPTY_STRING = Strict::String.constrained(min_size: 1)
-      VALID_POSITIVE_INTEGER = Strict::Int.constrained(gteq: 0)
+      VALID_POSITIVE_INTEGER = Strict::Integer.constrained(gteq: 0)
 
       def validate_database_name(database)
         VALID_NON_EMPTY_STRING[database]
