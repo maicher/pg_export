@@ -30,7 +30,7 @@ describe PgExport do
 
     context 'when invalid params' do
       before { allow(PgExport::Configuration).to receive(:new).and_raise(Dry::Struct::Error) }
-      it { expect { subject }.to raise_error(ArgumentError) }
+      it { expect { subject }.to raise_error(PgExport::InitializationError) }
     end
   end
 
@@ -63,42 +63,35 @@ describe PgExport do
         let(:database) { nil }
         let(:keep_dumps) { 10 }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
 
       context 'when database is empty string' do
         let(:database) { '' }
         let(:keep_dumps) { 10 }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
-      end
-
-      context 'when database is not string' do
-        let(:database) { 234 }
-        let(:keep_dumps) { 10 }
-
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
 
       context 'when keep_dumps nil' do
         let(:database) { 'a_database' }
         let(:keep_dumps) { nil }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
 
       context 'when keep_dumps is negative' do
         let(:database) { 'a_database' }
         let(:keep_dumps) { -10 }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
 
       context 'when keep_dumps is not numeric' do
         let(:database) { 'a_database' }
         let(:keep_dumps) { 'something' }
 
-        it { expect { subject }.to raise_error(ArgumentError) }
+        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
     end
   end

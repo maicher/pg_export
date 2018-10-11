@@ -6,6 +6,8 @@ require 'pg_export/configuration'
 require 'pry'
 
 class PgExport
+  class InitializationError < StandardError; end
+
   def initialize(**args)
     config = Configuration.new(**args)
 
@@ -18,11 +20,11 @@ class PgExport
 
     transaction.container = BootContainer.call(config.to_h)
   rescue Dry::Struct::Error => e
-    raise ArgumentError, e
+    raise InitializationError, e
   end
 
-  def call(database_name, keep_dumps)
-    transaction.call(database_name: database_name, keep_dumps: keep_dumps)
+  def call(database_name, keep_dumps, &block)
+    transaction.call(database_name: database_name, keep_dumps: keep_dumps, &block)
   end
 
   private

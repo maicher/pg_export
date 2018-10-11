@@ -33,7 +33,7 @@ RSpec.describe PgExport::Bash::Adapter do
 
     context 'when specified database does not exist' do
       subject { adapter.persist(dump.path, 'pg_export_not_existing_database') }
-      it { expect { subject }.to raise_error(PgExport::PgRestoreError) }
+      it { expect { subject }.to raise_error(PgExport::Bash::Adapter::PgPersistError) }
     end
 
     context 'when specified database exists' do
@@ -60,7 +60,7 @@ RSpec.describe PgExport::Bash::Adapter do
 
     context 'when specified database does not exist' do
       let(:database) { 'pg_export_not_existing_database' }
-      it { expect { subject }.to raise_error(PgExport::PgDumpError) }
+      it { expect { subject }.to raise_error(PgExport::Bash::Adapter::PgDumpError) }
     end
 
     context 'when specified database exists' do

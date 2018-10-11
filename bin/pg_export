@@ -9,7 +9,7 @@ require 'pg_export/roles/colourable_string'
 
 config = {
   database: 'undefined',
-  keep_dumps: ENV['KEEP_DUMPS'],
+  keep_dumps: ENV['KEEP_DUMPS'] || 10,
   dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
   ftp_host: ENV['BACKUP_FTP_HOST'],
   ftp_user: ENV['BACKUP_FTP_USER'],
@@ -71,14 +71,18 @@ begin
     ftp_password: config[:ftp_password],
     logger_format: config[:logger_format],
     interactive: config[:interactive]
-  ).call(
-    config[:database],
-    config[:keep_dumps]
-  )
-rescue OptionParser::MissingArgument, PgExport::PgExportError, ArgumentError => e
+  ).call(*config.values_at(:database, :keep_dumps)) do |result|
+    result.success do |output|
+      puts 'Success'
+    end
+
+    result.failure do |output|
+      using PgExport::Roles::ColourableString
+      puts "Error: #{output[:message]}".red
+    end
+  end
+rescue OptionParser::MissingArgument, PgExport::InitializationError => e
   using PgExport::Roles::ColourableString
   puts "Error: #{e}".red
   puts option_parser
-rescue PgExport::PgDumpError => e
-  puts e
 end

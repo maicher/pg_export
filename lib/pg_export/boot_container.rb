@@ -10,7 +10,6 @@ require_relative 'bash/adapter'
 require_relative 'bash/repository'
 require_relative 'bash/factory'
 require_relative 'aes'
-require_relative 'services/create_and_export_dump'
 
 class PgExport
   class BootContainer
@@ -22,7 +21,6 @@ class PgExport
         boot_aes(container, config)
         boot_ftp(container, config)
         boot_bash(container)
-        boot_services(container)
 
         container
       end
@@ -63,16 +61,6 @@ class PgExport
           Bash::Factory.new(
             adapter: container[:bash_adapter],
             logger: container[:logger]
-          )
-        end
-      end
-
-      def boot_services(container)
-        container.register(:create_and_export_dump, memoize: true) do
-          Services::CreateAndExportDump.new(
-            bash_factory: container[:bash_factory],
-            encryptor: container[:encryptor],
-            ftp_repository: container[:ftp_repository]
           )
         end
       end

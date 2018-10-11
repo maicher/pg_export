@@ -3,7 +3,6 @@
 require 'pg_export/version'
 require 'pg_export/configuration'
 require 'pg_export/boot_container'
-require 'pg_export/errors'
 require 'dry/transaction'
 
 require 'cli_spinnable'
@@ -75,37 +74,36 @@ class PgExport
 
         Success(dump: dump, database_name: database_name)
       rescue OpenSSL::Cipher::CipherError => e
-        puts "Problem decrypting dump file: #{e}. Try again.".red
-        retry
+        return Failure(message: "Problem decrypting dump file: #{e}. Try again.".red)
       end
 
       def import(dump:, database_name:)
         t = Thread.new { container[:ftp_connection].close }
-        restore_downloaded_dump(dump, database_name)
-        t.join
-        puts 'Success'.green
-
-        Success({})
-      end
-
-      def restore_downloaded_dump(dump, database)
         puts 'To which database you would like to restore the downloaded dump?'
-        if database == 'undefined'
+        if database_name == 'undefined'
           print 'Enter a local database name: '
         else
-          print "Enter a local database name (#{database}): "
+          print "Enter a local database name (#{database_name}): "
         end
-        db_name = gets.chomp
-        db_name = db_name.empty? ? database : db_name
+
+        name = loop do
+          db_name = gets.chomp
+          db_name = db_name.empty? ? database_name : db_name
+
+          break db_name unless db_name == 'undefined'
+          print 'Enter a local database name: '
+        end
+
+        ret = nil
         with_spinner do |cli|
-          cli.print "Restoring dump to #{db_name} database"
-          container[:bash_repository].persist(dump, db_name)
+          cli.print "Restoring dump to #{name} database"
+          ret = container[:bash_repository].persist(dump, name)
           cli.tick
+
         end
-        self
-      rescue PgRestoreError => e
-        puts e.to_s.red
-        retry
+        t.join
+
+        ret
       end
     end
   end

@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'open3'
-require 'pg_export/errors'
 
 class PgExport
   module Bash
     class Adapter
+      class PgPersistError < StandardError; end
+      class PgDumpError < StandardError; end
+
       def get(path, db_name)
         popen("pg_dump -Fc --file #{path} #{db_name}") do |errors|
           raise PgDumpError, errors unless errors.empty?
@@ -14,7 +16,7 @@ class PgExport
 
       def persist(path, db_name)
         popen("pg_restore -c -d #{db_name} #{path}") do |errors|
-          raise PgRestoreError, errors if /FATAL/ =~ errors
+          raise PgPersistError, errors if /FATAL/ =~ errors
         end
       end
 
