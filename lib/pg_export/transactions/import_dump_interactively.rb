@@ -80,7 +80,7 @@ class PgExport
       def import(dump:, database_name:)
         t = Thread.new { container[:ftp_connection].close }
         puts 'To which database you would like to restore the downloaded dump?'
-        if database_name == 'undefined'
+        if database_name.nil?
           print 'Enter a local database name: '
         else
           print "Enter a local database name (#{database_name}): "
@@ -90,7 +90,7 @@ class PgExport
           db_name = gets.chomp
           db_name = db_name.empty? ? database_name : db_name
 
-          break db_name unless db_name == 'undefined'
+          break db_name unless db_name.nil?
           print 'Enter a local database name: '
         end
 

@@ -12,9 +12,18 @@ require_relative 'bash/factory'
 require_relative 'aes'
 
 class PgExport
+  class InitializationError < StandardError; end
+
   class BootContainer
     class << self
-      def call(config)
+      def call
+        config = Configuration.new(
+          dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
+          ftp_host: ENV['BACKUP_FTP_HOST'],
+          ftp_user: ENV['BACKUP_FTP_USER'],
+          ftp_password: ENV['BACKUP_FTP_PASSWORD'],
+          logger_format: ENV['LOGGER_FORMAT']
+        )
         container = Dry::Container.new
 
         boot_logger(container, config)
@@ -23,6 +32,8 @@ class PgExport
         boot_bash(container)
 
         container
+      rescue Dry::Struct::Error => e
+        raise PgExport::InitializationError, e
       end
 
       private

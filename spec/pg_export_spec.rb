@@ -12,7 +12,7 @@ describe PgExport do
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
   end
-  let(:pg_export) { PgExport.new }
+  let(:pg_export) { PgExport.plain }
 
   it 'has a version number' do
     expect(PgExport::VERSION).not_to be nil

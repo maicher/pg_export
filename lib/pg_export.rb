@@ -6,28 +6,19 @@ require 'pg_export/configuration'
 require 'pry'
 
 class PgExport
-  class InitializationError < StandardError; end
+  class << self
+    def interactive
+      new(transaction: Transactions::ImportDumpInteractively.new)
+    end
 
-  def initialize
-    config = Configuration.new(
-      dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
-      ftp_host: ENV['BACKUP_FTP_HOST'],
-      ftp_user: ENV['BACKUP_FTP_USER'],
-      ftp_password: ENV['BACKUP_FTP_PASSWORD'],
-      logger_format: ENV['LOGGER_FORMAT'],
-      interactive: ENV['INTERACTIVE']
-    )
+    def plain
+      new(transaction: Transactions::ExportDump.new)
+    end
+  end
 
-    @transaction =
-      if config.interactive
-        Transactions::ImportDumpInteractively.new
-      else
-        Transactions::ExportDump.new
-      end
-
-    transaction.container = BootContainer.call(config.to_h)
-  rescue Dry::Struct::Error => e
-    raise InitializationError, e
+  def initialize(transaction:)
+    transaction.container = BootContainer.call
+    @transaction = transaction
   end
 
   def call(database_name, keep_dumps, &block)

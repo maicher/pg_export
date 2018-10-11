@@ -9,6 +9,7 @@ require 'pg_export/roles/colourable_string'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 ENV['LOGGER_FORMAT'] = ENV['LOGGER_FORMAT'] || 'plain'
+interactive = false
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
@@ -27,7 +28,7 @@ option_parser = OptionParser.new do |opts|
 
   opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
     ENV['LOGGER_FORMAT'] = 'muted'
-    ENV['INTERACTIVE'] = 'true'
+    interactive = true
   end
 
   opts.on('-h', '--help', 'Show this message') do
@@ -63,7 +64,14 @@ end
 begin
   option_parser.parse!
 
-  PgExport.new.call(ENV['DATABASE'], ENV['KEEP_DUMPS']) do |result|
+  pg_export =
+    if interactive
+      PgExport.interactive
+    else
+      PgExport.plain
+    end
+
+  pg_export.call(ENV['DATABASE'], ENV['KEEP_DUMPS']) do |result|
     result.success do |output|
       puts 'Success'
     end
