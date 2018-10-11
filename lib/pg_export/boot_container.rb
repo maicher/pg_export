@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dry-container'
 
 require_relative 'build_logger'
@@ -37,42 +39,42 @@ class PgExport
       end
 
       def boot_ftp(container, config)
-        container.register(:ftp_connection, memoize: true) {
+        container.register(:ftp_connection, memoize: true) do
           Ftp::Connection.new(
             host: config[:ftp_host],
             user: config[:ftp_user],
             password: config[:ftp_password],
             logger: container[:logger]
           )
-        }
+        end
         container.register(:ftp_adapter, memoize: true) { Ftp::Adapter.new(connection: container[:ftp_connection]) }
         container.register(:ftp_repository, memoize: true) { Ftp::Repository.new(adapter: container[:ftp_adapter], logger: container[:logger]) }
       end
 
       def boot_bash(container)
         container.register(:bash_adapter, memoize: true) { Bash::Adapter.new }
-        container.register(:bash_repository, memoize: true) {
+        container.register(:bash_repository, memoize: true) do
           Bash::Repository.new(
             adapter: container[:bash_adapter],
             logger: container[:logger]
           )
-        }
-        container.register(:bash_factory, memoize: true) {
+        end
+        container.register(:bash_factory, memoize: true) do
           Bash::Factory.new(
             adapter: container[:bash_adapter],
             logger: container[:logger]
           )
-        }
+        end
       end
 
       def boot_services(container)
-        container.register(:create_and_export_dump, memoize: true) {
+        container.register(:create_and_export_dump, memoize: true) do
           Services::CreateAndExportDump.new(
             bash_factory: container[:bash_factory],
             encryptor: container[:encryptor],
             ftp_repository: container[:ftp_repository]
           )
-        }
+        end
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pg_export/roles/human_readable'
 
 describe PgExport::Roles::HumanReadable do

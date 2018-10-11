@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'openssl'
 require 'pg_export/dump'
 
 class PgExport
   module Aes
     class Base
-      ALGORITHM = 'AES-128-CBC'.freeze
+      ALGORITHM = 'AES-128-CBC'
 
       def initialize(key:, logger:)
         @key, @logger = key, logger

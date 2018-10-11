@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 require 'tempfile'
 
@@ -5,7 +7,7 @@ require_relative 'roles/human_readable'
 
 class PgExport
   class Dump
-    TIMESTAMP = '_%Y%m%d_%H%M%S'.freeze
+    TIMESTAMP = '_%Y%m%d_%H%M%S'
 
     extend Forwardable
     include Roles::HumanReadable

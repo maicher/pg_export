@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PgExport
   module Services
     class CreateAndExportDump

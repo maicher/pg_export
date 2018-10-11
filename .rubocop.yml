@@ -1,9 +1,9 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.5
   Exclude:
     - 'spec/spec_helper.rb'
 
-Style/BlockLength:
+Metrics/BlockLength:
   Exclude:
     - 'bin/pg_export'
     - 'spec/**/*.rb'
@@ -15,7 +15,7 @@ Lint/AmbiguousOperator:
   Exclude:
     - 'lib/pg_export/configuration.rb'
 
-Style/AlignArray:
+Layout/AlignArray:
   Exclude:
     - 'spec/configuration_spec.rb'
 

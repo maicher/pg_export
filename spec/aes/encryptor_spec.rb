@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'null_logger'
 require 'pg_export/aes'
 

@@ -1,5 +1,6 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+# frozen_string_literal: true
+
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'pg_export/version'
 
@@ -21,14 +22,16 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.2.0'
 
   spec.add_dependency 'cli_spinnable', '~> 0.2'
-  spec.add_dependency 'dry-system', '~> 0.10.0'
-  spec.add_dependency 'dry-types', '~> 0.13.2'
   spec.add_dependency 'dry-struct', '~> 0.5.1'
+  spec.add_dependency 'dry-system', '~> 0.10.0'
+  spec.add_dependency 'dry-transaction', '~> 0.13.0'
+  spec.add_dependency 'dry-types', '~> 0.13.2'
+  spec.add_dependency 'dry-validation', '~> 0.12.2'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
-  spec.add_development_dependency 'rubocop', '~> 0.59.2'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'rspec', '~> 3.4'
   spec.add_development_dependency 'pg', '~> 0.21'
   spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rspec', '~> 3.4'
+  spec.add_development_dependency 'rubocop', '~> 0.59.2'
 end

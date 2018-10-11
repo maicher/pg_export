@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pg'
 require 'pg_export/bash/factory'
 require 'pg_export/bash/adapter'

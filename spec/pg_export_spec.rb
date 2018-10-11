@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pg_export'
 require 'ftp_mock'
 

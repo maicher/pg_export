@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'null_logger'
 require 'ftp_mock'
 require 'pg_export/ftp/connection'

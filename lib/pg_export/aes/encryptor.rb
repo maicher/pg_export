@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class PgExport
   module Aes
     class Encryptor < Base
       def target_dump_name
-        'Encrypted Dump'.freeze
+        'Encrypted Dump'
       end
 
       def cipher_type
