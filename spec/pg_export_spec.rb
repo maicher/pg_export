@@ -4,18 +4,15 @@ require 'pg_export'
 require 'ftp_mock'
 
 describe PgExport do
-  let(:pg_export) { PgExport.new(**params) }
-
-  let(:params) do
-    {
-      dump_encryption_key: '1234567890abcdef',
-      ftp_host: 'ftp.example.com',
-      ftp_user: 'user',
-      ftp_password: 'pass',
-      logger_format: :muted,
-      interactive: false
-    }
+  before do
+    ENV['DUMP_ENCRYPTION_KEY'] = '1234567890abcdef'
+    ENV['FTP_HOST'] = 'ftp.example.com'
+    ENV['FTP_USER'] = 'user'
+    ENV['FTP_PASSWORD'] = 'pass'
+    ENV['LOGGER_FORMAT'] = 'muted'
+    ENV['INTERACTIVE'] = 'false'
   end
+  let(:pg_export) { PgExport.new }
 
   it 'has a version number' do
     expect(PgExport::VERSION).not_to be nil

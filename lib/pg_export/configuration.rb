@@ -10,7 +10,7 @@ class PgExport
     attribute :ftp_host,            Strict::String
     attribute :ftp_user,            Strict::String
     attribute :ftp_password,        Strict::String
-    attribute :logger_format,       Strict::Symbol.enum(:plain, :timestamped, :muted)
-    attribute :interactive,         Strict::Bool
+    attribute :logger_format,       Coercible::String.enum('plain', 'timestamped', 'muted')
+    attribute :interactive,         Params::Bool
   end
 end

@@ -14,7 +14,7 @@ class PgExport
 
     def self.call(stream:, format:)
       Logger.new(stream).tap do |logger|
-        logger.formatter = FORMATS.fetch(format)
+        logger.formatter = FORMATS.fetch(format.to_sym)
       end
     end
   end
