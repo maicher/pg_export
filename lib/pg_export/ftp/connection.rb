@@ -21,16 +21,16 @@ class PgExport
         self
       end
 
-      private
-
-      attr_reader :user, :password, :logger
-
       def open
         @ftp = Net::FTP.new(host, user, password)
         @ftp.passive = true
         logger.info "Connect to #{host}"
         self
       end
+
+      private
+
+      attr_reader :user, :password, :logger
 
       def open_ftp_thread
         @open_ftp_thread ||= Thread.new { open }
