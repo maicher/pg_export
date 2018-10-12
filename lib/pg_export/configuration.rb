@@ -23,7 +23,6 @@ class PgExport
         logger_format: ENV['LOGGER_FORMAT'] || 'plain'
       )
     rescue Dry::Struct::Error => e
-      bidning.pry
       raise PgExport::InitializationError, e
     end
   end

@@ -8,9 +8,9 @@ require 'ftp_mock'
 describe PgExport do
   before do
     ENV['DUMP_ENCRYPTION_KEY'] = '1234567890abcdef'
-    ENV['FTP_HOST'] = 'ftp.example.com'
-    ENV['FTP_USER'] = 'user'
-    ENV['FTP_PASSWORD'] = 'pass'
+    ENV['BACKUP_FTP_HOST'] = 'ftp.example.com'
+    ENV['BACKUP_FTP_USER'] = 'user'
+    ENV['BACKUP_FTP_PASSWORD'] = 'pass'
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
     PgExport::Container.start(:main)
