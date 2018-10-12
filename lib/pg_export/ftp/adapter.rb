@@ -5,10 +5,10 @@ class PgExport
     class Adapter
       CHUNK_SIZE = (2**16).freeze
 
-      def initialize(connection:)
-        @connection = connection
-        @host = connection.host
-        ObjectSpace.define_finalizer(self, proc { connection.close })
+      def initialize(ftp_connection:)
+        @ftp_connection = ftp_connection
+        @host = ftp_connection.host
+        ObjectSpace.define_finalizer(self, proc { ftp_connection.close })
       end
 
       def list(regex_string)
@@ -28,7 +28,7 @@ class PgExport
       end
 
       def ftp
-        connection.ftp
+        ftp_connection.ftp
       end
 
       def to_s
@@ -37,7 +37,7 @@ class PgExport
 
       private
 
-      attr_reader :connection, :host
+      attr_reader :ftp_connection, :host
     end
   end
 end

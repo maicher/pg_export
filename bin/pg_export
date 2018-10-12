@@ -5,10 +5,10 @@ require 'optparse'
 require 'ostruct'
 
 require 'pg_export'
+require 'pg_export/container'
 require 'pg_export/roles/colourable_string'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
-ENV['LOGGER_FORMAT'] = ENV['LOGGER_FORMAT'] || 'plain'
 interactive = false
 
 option_parser = OptionParser.new do |opts|
@@ -39,30 +39,22 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nSetting can be verified by running following commands:"
 
   opts.on('-c', '--configuration', 'Prints the configuration') do
-    puts({
-      database: ENV['DATABASE'],
-      keep_dumps: ENV['KEEP_DUMPS'],
-      dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
-      ftp_host: ENV['BACKUP_FTP_HOST'],
-      ftp_user: ENV['BACKUP_FTP_USER'],
-      ftp_password: ENV['BACKUP_FTP_PASSWORD']
-    })
+    PgExport::Container.start(:config)
+    puts PgExport::Container['config'].to_h
     exit
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::Ftp::Connection.new(
-      host: ENV['BACKUP_FTP_HOST'],
-      user: ENV['BACKUP_FTP_USER'],
-      password: ENV['BACKUP_FTP_PASSWORD'],
-      logger: PgExport::BuildLogger.call(stream: $stdout, format: :plain)
-    ).open
+    PgExport::Container.start(:ftp)
+    PgExport::Container['ftp_adapter'].ftp
     exit
   end
 end
 
 begin
   option_parser.parse!
+
+  PgExport::Container.start(:main)
 
   pg_export =
     if interactive
@@ -72,7 +64,7 @@ begin
     end
 
   pg_export.call(ENV['DATABASE'], ENV['KEEP_DUMPS']) do |result|
-    result.success do |output|
+    result.success do |_output|
       puts 'Success'
     end
 

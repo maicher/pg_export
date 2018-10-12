@@ -1,27 +1,21 @@
 # frozen_string_literal: true
 
 require 'dry/monads/result'
+require 'pg_export/import'
 
 class PgExport
   module Bash
     class Repository
       include Dry::Monads::Result::Mixin
-
-      def initialize(adapter:, logger:)
-        @adapter, @logger = adapter, logger
-      end
+      include Import['logger', 'bash_adapter']
 
       def persist(dump, db_name)
-        adapter.persist(dump.path, db_name)
-        logger.info "Persist #{dump} #{db_name} to #{adapter}"
-        return Success({})
-      rescue Adapter::PgPersistError => e
-        return Failure(e.to_s)
+        bash_adapter.persist(dump.path, db_name)
+        logger.info "Persist #{dump} #{db_name} to #{bash_adapter}"
+        Success({})
+      rescue bash_adapter::PgPersistError => e
+        Failure(e.to_s)
       end
-
-      private
-
-      attr_reader :adapter, :logger
     end
   end
 end

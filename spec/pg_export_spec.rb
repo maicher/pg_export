@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'net/ftp'
 require 'pg_export'
+require 'pg_export/container'
 require 'ftp_mock'
 
 describe PgExport do
@@ -11,24 +13,12 @@ describe PgExport do
     ENV['FTP_PASSWORD'] = 'pass'
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
+    PgExport::Container.start(:main)
   end
   let(:pg_export) { PgExport.plain }
 
   it 'has a version number' do
     expect(PgExport::VERSION).not_to be nil
-  end
-
-  describe '.new' do
-    subject { pg_export }
-
-    context 'when valid params' do
-      it { expect { subject }.not_to raise_error }
-    end
-
-    context 'when invalid params' do
-      before { allow(PgExport::Configuration).to receive(:new).and_raise(Dry::Struct::Error) }
-      it { expect { subject }.to raise_error(PgExport::InitializationError) }
-    end
   end
 
   describe '#call' do

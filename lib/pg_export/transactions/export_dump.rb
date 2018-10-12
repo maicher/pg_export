@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 require 'pg_export/version'
-require 'pg_export/boot_container'
 require 'dry/transaction'
+require 'pg_export/container'
 
 class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction
-
-      attr_accessor :container
 
       step :prepare_params
       step :build_dump
@@ -20,7 +18,7 @@ class PgExport
       def prepare_params(database_name:, keep_dumps:)
         database_name = database_name.to_s
 
-        return Failure(message: 'Invalid database name') unless database_name.length > 0
+        return Failure(message: 'Invalid database name') if database_name.empty?
 
         begin
           keep_dumps = Integer(keep_dumps)
@@ -36,7 +34,7 @@ class PgExport
 
         Success(dump: dump, database_name: database_name, keep_dumps: keep_dumps)
       rescue Bash::Adapter::PgDumpError => e
-        return Failure(message: e.to_s)
+        Failure(message: e.to_s)
       end
 
       def export(database_name:, keep_dumps:, dump:)
@@ -47,15 +45,15 @@ class PgExport
       end
 
       def bash_factory
-        container[:bash_factory]
+        Container[:bash_factory]
       end
 
       def encryptor
-        container[:encryptor]
+        Container[:encryptor]
       end
 
       def ftp_repository
-        container[:ftp_repository]
+        Container[:ftp_repository]
       end
     end
   end

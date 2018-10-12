@@ -17,7 +17,6 @@ class PgExport
   end
 
   def initialize(transaction:)
-    transaction.container = BootContainer.call
     @transaction = transaction
   end
 

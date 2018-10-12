@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require 'pg_export/version'
-require 'pg_export/configuration'
-require 'pg_export/boot_container'
 require 'dry/transaction'
 
 require 'cli_spinnable'
 require 'pg_export/roles/colourable_string'
+require 'pg_export/container'
 
 class PgExport
   module Transactions
@@ -14,8 +13,6 @@ class PgExport
       include Dry::Transaction
       include CliSpinnable
       using Roles::ColourableString
-
-      attr_accessor :container
 
       tee  :info
       tee  :initialize_connection
@@ -32,13 +29,13 @@ class PgExport
       def initialize_connection
         with_spinner do |cli|
           cli.print 'Connecting to FTP'
-          container[:ftp_connection].ftp
+          Container[:ftp_connection].ftp
           cli.tick
         end
       end
 
       def select_dump(database_name:, keep_dumps: nil)
-        dumps = container[:ftp_repository].all
+        dumps = Container[:ftp_repository].all
         dumps.each.with_index(1) do |name, i|
           print "(#{i}) "
           puts name.to_s.gray
@@ -63,22 +60,22 @@ class PgExport
 
         with_spinner do |cli|
           cli.print "Downloading dump #{selected_dump}"
-          encrypted_dump = container[:ftp_repository].get(selected_dump)
+          encrypted_dump = Container[:ftp_repository].get(selected_dump)
           cli.print " (#{encrypted_dump.size_human})"
           cli.tick
           cli.print "Decrypting dump #{selected_dump}"
-          dump = container[:decryptor].call(encrypted_dump)
+          dump = Container[:decryptor].call(encrypted_dump)
           cli.print " (#{dump.size_human})"
           cli.tick
         end
 
         Success(dump: dump, database_name: database_name)
       rescue OpenSSL::Cipher::CipherError => e
-        return Failure(message: "Problem decrypting dump file: #{e}. Try again.".red)
+        Failure(message: "Problem decrypting dump file: #{e}. Try again.".red)
       end
 
       def import(dump:, database_name:)
-        t = Thread.new { container[:ftp_connection].close }
+        t = Thread.new { Container[:ftp_connection].close }
         puts 'To which database you would like to restore the downloaded dump?'
         if database_name.nil?
           print 'Enter a local database name: '
@@ -91,15 +88,15 @@ class PgExport
           db_name = db_name.empty? ? database_name : db_name
 
           break db_name unless db_name.nil?
+
           print 'Enter a local database name: '
         end
 
         ret = nil
         with_spinner do |cli|
           cli.print "Restoring dump to #{name} database"
-          ret = container[:bash_repository].persist(dump, name)
+          ret = Container[:bash_repository].persist(dump, name)
           cli.tick
-
         end
         t.join
 
