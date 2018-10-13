@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'pg_export/bash/factory'
+require 'pg_export/factories/dump_factory'
 require 'null_logger'
 
-RSpec.describe PgExport::Bash::Factory do
+RSpec.describe PgExport::Factories::DumpFactory do
   let(:mock) { Object.new }
-  let(:factory) { PgExport::Bash::Factory.new(bash_repository: mock, logger: NullLogger) }
+  let(:factory) { described_class.new(bash_repository: mock, logger: NullLogger) }
 
-  describe '#build_dump' do
-    subject { factory.build_dump(database) }
+  describe '#dump_from_database' do
+    subject { factory.dump_from_database(database) }
     let(:database) { 'pg_export_database_test' }
 
     before { allow(mock).to receive(:get) }

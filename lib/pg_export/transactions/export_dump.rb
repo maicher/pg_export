@@ -30,7 +30,7 @@ class PgExport
       end
 
       def build_dump(database_name:, keep_dumps:)
-        dump = bash_factory.build_dump(database_name)
+        dump = dump_factory.dump_from_database(database_name)
 
         Success(dump: dump, database_name: database_name, keep_dumps: keep_dumps)
       rescue Repositories::BashRepository::PgDumpError => e
@@ -44,8 +44,8 @@ class PgExport
         Success({})
       end
 
-      def bash_factory
-        Container[:bash_factory]
+      def dump_factory
+        Container['factories.dump_factory']
       end
 
       def encryptor

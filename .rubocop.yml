@@ -1,12 +1,10 @@
 AllCops:
-  TargetRubyVersion: 2.5
-  Exclude:
-    - 'spec/spec_helper.rb'
+  TargetRubyVersion: 2.3
 
 Metrics/BlockLength:
   Exclude:
     - 'bin/pg_export'
-    - 'spec/**/*.rb'
+  ExcludedMethods: ['describe', 'context']
 
 Metrics/LineLength:
   Max: 200

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'pg'
-require 'pg_export/bash/factory'
+require 'pg_export/factories/dump_factory'
 require 'pg_export/repositories/bash_repository'
 require 'null_logger'
 
@@ -16,7 +16,7 @@ RSpec.describe PgExport::Repositories::BashRepository do
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { PgExport::Bash::Factory.new(bash_repository: repository, logger: NullLogger).build_dump(database) }
+    let(:dump) { PgExport::Factories::DumpFactory.new(bash_repository: repository, logger: NullLogger).dump_from_database(database) }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")

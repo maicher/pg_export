@@ -66,7 +66,7 @@ class PgExport
       init do
         require 'pg_export/repositories/bash_repository'
         require 'pg_export/operations/bash/persist_dump'
-        require 'pg_export/bash/factory'
+        require 'pg_export/factories/dump_factory'
         require 'pg_export/factories/cipher_factory'
         require 'pg_export/operations/decrypt_dump'
         require 'pg_export/operations/encrypt_dump'
@@ -84,7 +84,7 @@ class PgExport
         register(:decryptor) { Operations::DecryptDump.new }
         register(:ftp_repository) { Ftp::Repository.new }
         register('operations.bash.persist_dump') { Operations::Bash::PersistDump.new }
-        register(:bash_factory) { Bash::Factory.new }
+        register('factories.dump_factory') { Factories::DumpFactory.new }
       end
     end
   end
