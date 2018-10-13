@@ -67,16 +67,21 @@ class PgExport
         require 'pg_export/bash/adapter'
         require 'pg_export/bash/repository'
         require 'pg_export/bash/factory'
-        require 'pg_export/aes'
+        require 'pg_export/factories/cipher_factory'
+        require 'pg_export/operations/decrypt_dump'
+        require 'pg_export/operations/encrypt_dump'
+        require 'pg_export/operations/copy_dump'
 
         register(:bash_adapter) { Bash::Adapter.new }
+        register(:cipher_factory) { Factories::CipherFactory.new }
+        register(:copy_dump) { Operations::CopyDump.new }
       end
 
       start do
         use :ftp
 
-        register(:encryptor) { Aes::Encryptor.new(key: target[:config][:dump_encryption_key], logger: target[:logger]) }
-        register(:decryptor) { Aes::Decryptor.new(key: target[:config][:dump_encryption_key], logger: target[:logger]) }
+        register(:encryptor) { Operations::EncryptDump.new }
+        register(:decryptor) { Operations::DecryptDump.new }
         register(:ftp_repository) { Ftp::Repository.new }
         register(:bash_repository) { Bash::Repository.new }
         register(:bash_factory) { Bash::Factory.new }

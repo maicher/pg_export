@@ -14,7 +14,7 @@ RSpec.describe PgExport::Bash::Factory do
     before { allow(mock).to receive(:get) }
 
     it { expect { subject }.not_to raise_error }
-    it { expect(subject).to be_a PgExport::Dump }
+    it { expect(subject).to be_a PgExport::ValueObjects::Dump }
     it { expect(subject.name).to eq('Dump') }
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'open3'
-require 'pg_export/dump'
+require 'pg_export/value_objects/dump'
 require 'pg_export/import'
 
 class PgExport
@@ -10,7 +10,7 @@ class PgExport
       include Import['logger', 'bash_adapter']
 
       def build_dump(db_name)
-        dump = Dump.new(name: 'Dump', db_name: db_name)
+        dump = ValueObjects::Dump.new(name: 'Dump', db_name: db_name)
         bash_adapter.get(dump.path, dump.db_name)
         logger.info "Create #{dump}"
         dump

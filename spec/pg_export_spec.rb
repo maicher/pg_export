@@ -38,7 +38,7 @@ describe PgExport do
 
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Bash::Factory).to receive(:build_dump).and_return(sql_dump)
-        expect_any_instance_of(PgExport::Aes::Encryptor).to receive(:call).with(sql_dump).and_return(enc_dump)
+        expect_any_instance_of(PgExport::Operations::EncryptDump).to receive(:call).with(sql_dump).and_return(enc_dump)
         expect_any_instance_of(PgExport::Ftp::Repository).to receive(:persist).with(enc_dump)
         expect_any_instance_of(PgExport::Ftp::Repository).to receive(:remove_old)
         subject

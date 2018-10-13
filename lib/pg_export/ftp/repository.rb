@@ -13,7 +13,7 @@ class PgExport
       end
 
       def get(db_name)
-        dump = Dump.new(name: 'Encrypted Dump', db_name: db_name)
+        dump = ValueObjects::Dump.new(name: 'Encrypted Dump', db_name: db_name)
         ftp_adapter.get(dump.path, dump.db_name)
         logger.info "Get #{dump} #{db_name} from #{ftp_adapter}"
         dump
