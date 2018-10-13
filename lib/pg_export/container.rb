@@ -13,11 +13,11 @@ class PgExport
 
     boot(:config) do
       init do
-        require 'pg_export/value_objects/configuration'
+        require 'pg_export/configuration'
       end
 
       start do
-        register(:config, memoize: true) { ValueObjects::Configuration.build_from_env }
+        register(:config, memoize: true) { Configuration.build(ENV) }
       end
     end
 
@@ -64,19 +64,9 @@ class PgExport
     end
 
     boot(:main) do
-      init do
-        require 'pg_export/repositories/bash_repository'
-        require 'pg_export/factories/dump_factory'
-        require 'pg_export/factories/cipher_factory'
-
-        register('repositories.bash_repository') { Repositories::BashRepository.new }
-        register(:cipher_factory) { Factories::CipherFactory.new }
-      end
-
       start do
         use :ftp
         register(:ftp_repository) { Ftp::Repository.new }
-        register('factories.dump_factory') { Factories::DumpFactory.new }
       end
     end
 

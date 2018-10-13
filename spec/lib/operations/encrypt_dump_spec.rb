@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'null_logger'
-require 'pg_export/factories/cipher_factory'
-require 'pg_export/operations/encrypt_dump'
-require 'pg_export/operations/copy_dump'
+require 'pg_export/lib/pg_export/factories/cipher_factory'
+require 'pg_export/lib/pg_export/operations/encrypt_dump'
+require 'pg_export/lib/pg_export/operations/copy_dump'
 
 RSpec.describe PgExport::Operations::EncryptDump do
   let(:copy_dump) { PgExport::Operations::CopyDump.new(logger: NullLogger) }

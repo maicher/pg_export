@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/factories/dump_factory'
+require 'pg_export/lib/pg_export/factories/dump_factory'
 require 'null_logger'
 
 RSpec.describe PgExport::Factories::DumpFactory do

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'pg_export/value_objects/configuration'
+require 'pg_export/configuration'
 
-describe PgExport::ValueObjects::Configuration do
-  subject { PgExport::ValueObjects::Configuration.new(**params) }
+describe PgExport::Configuration do
+  subject { PgExport::Configuration.new(**params) }
   let(:valid_params) do
     {
       dump_encryption_key: '1234567890abcdef',

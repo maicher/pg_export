@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pg_export/import'
+require 'pg_export/value_objects/dump'
 
 class PgExport
   module Ftp
