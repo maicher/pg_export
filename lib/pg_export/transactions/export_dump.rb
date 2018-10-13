@@ -33,7 +33,7 @@ class PgExport
         dump = bash_factory.build_dump(database_name)
 
         Success(dump: dump, database_name: database_name, keep_dumps: keep_dumps)
-      rescue Bash::Adapter::PgDumpError => e
+      rescue Repositories::BashRepository::PgDumpError => e
         Failure(message: e.to_s)
       end
 

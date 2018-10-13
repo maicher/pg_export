@@ -5,7 +5,7 @@ require 'null_logger'
 
 RSpec.describe PgExport::Bash::Factory do
   let(:mock) { Object.new }
-  let(:factory) { PgExport::Bash::Factory.new(bash_adapter: mock, logger: NullLogger) }
+  let(:factory) { PgExport::Bash::Factory.new(bash_repository: mock, logger: NullLogger) }
 
   describe '#build_dump' do
     subject { factory.build_dump(database) }

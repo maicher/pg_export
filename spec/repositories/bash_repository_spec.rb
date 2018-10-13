@@ -2,13 +2,13 @@
 
 require 'pg'
 require 'pg_export/bash/factory'
-require 'pg_export/bash/adapter'
+require 'pg_export/repositories/bash_repository'
 require 'null_logger'
 
-RSpec.describe PgExport::Bash::Adapter do
+RSpec.describe PgExport::Repositories::BashRepository do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
   let(:dump_encryption_key) { '1234567890abcdef' }
-  let(:adapter) { PgExport::Bash::Adapter.new }
+  let(:repository) { described_class.new }
 
   describe '#persist' do
     let(:database_from) { 'pg_export_database_test_1' }
@@ -16,7 +16,7 @@ RSpec.describe PgExport::Bash::Adapter do
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { PgExport::Bash::Factory.new(bash_adapter: adapter, logger: NullLogger).build_dump(database) }
+    let(:dump) { PgExport::Bash::Factory.new(bash_repository: repository, logger: NullLogger).build_dump(database) }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
@@ -32,12 +32,12 @@ RSpec.describe PgExport::Bash::Adapter do
     end
 
     context 'when specified database does not exist' do
-      subject { adapter.persist(dump.path, 'pg_export_not_existing_database') }
-      it { expect { subject }.to raise_error(PgExport::Bash::Adapter::PgPersistError) }
+      subject { repository.persist(dump.path, 'pg_export_not_existing_database') }
+      it { expect { subject }.to raise_error(PgExport::Repositories::BashRepository::PgPersistError) }
     end
 
     context 'when specified database exists' do
-      subject! { adapter.persist(dump.path, database_to) }
+      subject! { repository.persist(dump.path, database_to) }
       it { expect { subject }.not_to raise_error }
 
       it 'doesn\'t copy not existing table' do
@@ -56,11 +56,11 @@ RSpec.describe PgExport::Bash::Adapter do
 
   describe '#get' do
     let(:file) { Tempfile.new('test') }
-    subject { adapter.get(file.path, database) }
+    subject { repository.get(file.path, database) }
 
     context 'when specified database does not exist' do
       let(:database) { 'pg_export_not_existing_database' }
-      it { expect { subject }.to raise_error(PgExport::Bash::Adapter::PgDumpError) }
+      it { expect { subject }.to raise_error(PgExport::Repositories::BashRepository::PgDumpError) }
     end
 
     context 'when specified database exists' do

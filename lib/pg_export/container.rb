@@ -64,15 +64,15 @@ class PgExport
 
     boot(:main) do
       init do
-        require 'pg_export/bash/adapter'
-        require 'pg_export/bash/repository'
+        require 'pg_export/repositories/bash_repository'
+        require 'pg_export/operations/bash/persist_dump'
         require 'pg_export/bash/factory'
         require 'pg_export/factories/cipher_factory'
         require 'pg_export/operations/decrypt_dump'
         require 'pg_export/operations/encrypt_dump'
         require 'pg_export/operations/copy_dump'
 
-        register(:bash_adapter) { Bash::Adapter.new }
+        register('repositories.bash_repository') { Repositories::BashRepository.new }
         register(:cipher_factory) { Factories::CipherFactory.new }
         register(:copy_dump) { Operations::CopyDump.new }
       end
@@ -83,7 +83,7 @@ class PgExport
         register(:encryptor) { Operations::EncryptDump.new }
         register(:decryptor) { Operations::DecryptDump.new }
         register(:ftp_repository) { Ftp::Repository.new }
-        register(:bash_repository) { Bash::Repository.new }
+        register('operations.bash.persist_dump') { Operations::Bash::PersistDump.new }
         register(:bash_factory) { Bash::Factory.new }
       end
     end

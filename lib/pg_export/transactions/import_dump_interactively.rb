@@ -95,7 +95,7 @@ class PgExport
         ret = nil
         with_spinner do |cli|
           cli.print "Restoring dump to #{name} database"
-          ret = Container[:bash_repository].persist(dump, name)
+          ret = Container['operations.bash.persist_dump'].call(dump, name)
           cli.tick
         end
         t.join
