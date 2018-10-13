@@ -8,6 +8,7 @@ class PgExport
       config.root = Pathname(__FILE__).realpath.dirname
       config.name = :pg_export
       config.default_namespace = 'pg_export'
+      config.auto_register = %w[lib]
     end
 
     boot(:config) do
@@ -65,27 +66,20 @@ class PgExport
     boot(:main) do
       init do
         require 'pg_export/repositories/bash_repository'
-        require 'pg_export/operations/bash/persist_dump'
         require 'pg_export/factories/dump_factory'
         require 'pg_export/factories/cipher_factory'
-        require 'pg_export/operations/decrypt_dump'
-        require 'pg_export/operations/encrypt_dump'
-        require 'pg_export/operations/copy_dump'
 
         register('repositories.bash_repository') { Repositories::BashRepository.new }
         register(:cipher_factory) { Factories::CipherFactory.new }
-        register(:copy_dump) { Operations::CopyDump.new }
       end
 
       start do
         use :ftp
-
-        register('operations.encrypt_dump') { Operations::EncryptDump.new }
-        register('operations.decrypt_dump') { Operations::DecryptDump.new }
         register(:ftp_repository) { Ftp::Repository.new }
-        register('operations.bash.persist_dump') { Operations::Bash::PersistDump.new }
         register('factories.dump_factory') { Factories::DumpFactory.new }
       end
     end
+
+    load_paths!('lib')
   end
 end

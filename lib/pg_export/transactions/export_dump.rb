@@ -2,12 +2,17 @@
 
 require 'pg_export/version'
 require 'dry/transaction'
-require 'pg_export/container'
+require 'pg_export/import'
 
 class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction
+      include Import[
+        'factories.dump_factory',
+        'operations.encrypt_dump',
+        'ftp_repository'
+      ]
 
       step :prepare_params
       step :build_dump
@@ -42,18 +47,6 @@ class PgExport
         ftp_repository.persist(encrypted_dump)
         ftp_repository.remove_old(database_name, keep_dumps)
         Success({})
-      end
-
-      def dump_factory
-        Container['factories.dump_factory']
-      end
-
-      def encrypt_dump
-        Container[:'operations.encrypt_dump']
-      end
-
-      def ftp_repository
-        Container[:ftp_repository]
       end
     end
   end
