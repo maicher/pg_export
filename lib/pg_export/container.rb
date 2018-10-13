@@ -12,11 +12,11 @@ class PgExport
 
     boot(:config) do
       init do
-        require 'pg_export/configuration'
+        require 'pg_export/value_objects/configuration'
       end
 
       start do
-        register(:config, memoize: true) { Configuration.build_from_env }
+        register(:config, memoize: true) { ValueObjects::Configuration.build_from_env }
       end
     end
 

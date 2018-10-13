@@ -11,14 +11,6 @@ Metrics/BlockLength:
 Metrics/LineLength:
   Max: 200
 
-Lint/AmbiguousOperator:
-  Exclude:
-    - 'lib/pg_export/configuration.rb'
-
-Layout/AlignArray:
-  Exclude:
-    - 'spec/configuration_spec.rb'
-
 Style/ParallelAssignment:
   Enabled: false
 

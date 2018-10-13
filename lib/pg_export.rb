@@ -2,7 +2,7 @@
 
 require 'pg_export/transactions/export_dump'
 require 'pg_export/transactions/import_dump_interactively'
-require 'pg_export/configuration'
+require 'pg_export/value_objects/configuration'
 require 'pry'
 
 class PgExport
