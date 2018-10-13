@@ -7,7 +7,7 @@ require 'pg_export/operations/copy_dump'
 
 RSpec.describe PgExport::Operations::EncryptDump do
   let(:copy_dump) { PgExport::Operations::CopyDump.new(logger: NullLogger) }
-  let(:encryptor) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory, copy_dump: copy_dump) }
+  let(:encrypt_dump) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory, copy_dump: copy_dump) }
   let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(dump_encryption_key: encryption_key)) }
   let(:encryption_key) { '1234567890abcdef' }
 
@@ -18,7 +18,7 @@ RSpec.describe PgExport::Operations::EncryptDump do
   end
 
   describe '#call' do
-    subject { encryptor.call(plain_dump) }
+    subject { encrypt_dump.call(plain_dump) }
 
     it { expect(subject.name).to eq('Encrypted Dump') }
     it { expect(subject.read).to eq("\u0000\x8A0\xF1\ecW,-\xA1\xFA\xD6{\u0018\xEBf") }

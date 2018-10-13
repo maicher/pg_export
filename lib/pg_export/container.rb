@@ -80,8 +80,8 @@ class PgExport
       start do
         use :ftp
 
-        register(:encryptor) { Operations::EncryptDump.new }
-        register(:decryptor) { Operations::DecryptDump.new }
+        register('operations.encrypt_dump') { Operations::EncryptDump.new }
+        register('operations.decrypt_dump') { Operations::DecryptDump.new }
         register(:ftp_repository) { Ftp::Repository.new }
         register('operations.bash.persist_dump') { Operations::Bash::PersistDump.new }
         register('factories.dump_factory') { Factories::DumpFactory.new }

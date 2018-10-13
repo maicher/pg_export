@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require 'pg_export/version'
 require 'dry/transaction'
 
 require 'cli_spinnable'
 require 'pg_export/roles/colourable_string'
-require 'pg_export/container'
+require 'pg_export/import'
 
 class PgExport
   module Transactions
@@ -13,6 +12,12 @@ class PgExport
       include Dry::Transaction
       include CliSpinnable
       using Roles::ColourableString
+      include Import[
+        'ftp_connection',
+        'ftp_repository',
+        'operations.decrypt_dump',
+        'operations.bash.persist_dump'
+      ]
 
       tee  :info
       tee  :initialize_connection
@@ -29,13 +34,13 @@ class PgExport
       def initialize_connection
         with_spinner do |cli|
           cli.print 'Connecting to FTP'
-          Container[:ftp_connection].ftp
+          ftp_connection.ftp
           cli.tick
         end
       end
 
       def select_dump(database_name:, keep_dumps: nil)
-        dumps = Container[:ftp_repository].all
+        dumps = ftp_repository.all
         dumps.each.with_index(1) do |name, i|
           print "(#{i}) "
           puts name.to_s.gray
@@ -60,11 +65,11 @@ class PgExport
 
         with_spinner do |cli|
           cli.print "Downloading dump #{selected_dump}"
-          encrypted_dump = Container[:ftp_repository].get(selected_dump)
+          encrypted_dump = ftp_repository.get(selected_dump)
           cli.print " (#{encrypted_dump.size_human})"
           cli.tick
           cli.print "Decrypting dump #{selected_dump}"
-          dump = Container[:decryptor].call(encrypted_dump)
+          dump = decrypt_dump.call(encrypted_dump)
           cli.print " (#{dump.size_human})"
           cli.tick
         end
@@ -75,7 +80,7 @@ class PgExport
       end
 
       def import(dump:, database_name:)
-        t = Thread.new { Container[:ftp_connection].close }
+        t = Thread.new { ftp_connection.close }
         puts 'To which database you would like to restore the downloaded dump?'
         if database_name.nil?
           print 'Enter a local database name: '
@@ -95,7 +100,7 @@ class PgExport
         ret = nil
         with_spinner do |cli|
           cli.print "Restoring dump to #{name} database"
-          ret = Container['operations.bash.persist_dump'].call(dump, name)
+          ret = persist_dump.call(dump, name)
           cli.tick
         end
         t.join

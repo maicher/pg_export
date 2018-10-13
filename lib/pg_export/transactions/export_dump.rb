@@ -38,7 +38,7 @@ class PgExport
       end
 
       def export(database_name:, keep_dumps:, dump:)
-        encrypted_dump = encryptor.call(dump)
+        encrypted_dump = encrypt_dump.call(dump)
         ftp_repository.persist(encrypted_dump)
         ftp_repository.remove_old(database_name, keep_dumps)
         Success({})
@@ -48,8 +48,8 @@ class PgExport
         Container['factories.dump_factory']
       end
 
-      def encryptor
-        Container[:encryptor]
+      def encrypt_dump
+        Container[:'operations.encrypt_dump']
       end
 
       def ftp_repository
