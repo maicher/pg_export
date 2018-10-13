@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'pg_export/import'
-require 'pg_export/lib/pg_export/value_objects/dump'
+require 'pg_export/lib/pg_export/entities/dump'
 
 class PgExport
   module Ftp
@@ -14,7 +14,7 @@ class PgExport
       end
 
       def get(db_name)
-        dump = ValueObjects::Dump.new(name: 'Encrypted Dump', db_name: db_name)
+        dump = Entities::Dump.new(name: 'Encrypted Dump', db_name: db_name)
         ftp_adapter.get(dump.path, dump.db_name)
         logger.info "Get #{dump} #{db_name} from #{ftp_adapter}"
         dump

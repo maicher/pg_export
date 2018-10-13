@@ -3,20 +3,20 @@
 require 'open3'
 
 class PgExport
-  module Repositories
-    class BashRepository
-      class PgPersistError < StandardError; end
+  module Services
+    class Bash
+      class PgRestoreError < StandardError; end
       class PgDumpError < StandardError; end
 
-      def get(path, db_name)
+      def pg_dump(path, db_name)
         popen("pg_dump -Fc --file #{path} #{db_name}") do |errors|
           raise PgDumpError, errors unless errors.empty?
         end
       end
 
-      def persist(path, db_name)
+      def pg_restore(path, db_name)
         popen("pg_restore -c -d #{db_name} #{path}") do |errors|
-          raise PgPersistError, errors if /FATAL/ =~ errors
+          raise PgRestoreError, errors if /FATAL/ =~ errors
         end
       end
 

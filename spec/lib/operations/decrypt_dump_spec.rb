@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
 require 'null_logger'
+require 'ostruct'
 require 'pg_export/lib/pg_export/factories/cipher_factory'
 require 'pg_export/lib/pg_export/operations/decrypt_dump'
-require 'pg_export/lib/pg_export/operations/copy_dump'
 
 RSpec.describe PgExport::Operations::DecryptDump do
-  let(:copy_dump) { PgExport::Operations::CopyDump.new(logger: NullLogger) }
-  let(:decrypt_dump) { PgExport::Operations::DecryptDump.new(cipher_factory: cipher_factory, copy_dump: copy_dump) }
+  let(:decrypt_dump) { PgExport::Operations::DecryptDump.new(cipher_factory: cipher_factory, logger: NullLogger) }
   let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(dump_encryption_key: encryption_key)) }
   let(:encryption_key) { '1234567890abcdef' }
 
   let(:encrypted_dump) do
-    PgExport::ValueObjects::Dump.new(name: 'Plain Dump', db_name: 'database').tap do |dump|
+    PgExport::Entities::Dump.new(name: 'Plain Dump', db_name: 'database').tap do |dump|
       dump.open(:write) { |f| f << "\u0000\x8A0\xF1\ecW,-\xA1\xFA\xD6{\u0018\xEBf" }
     end
   end

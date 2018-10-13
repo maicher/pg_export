@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/value_objects/dump'
+require 'pg_export/lib/pg_export/entities/dump'
 
-describe PgExport::ValueObjects::Dump do
-  subject { PgExport::ValueObjects::Dump.new(name: 'Name', db_name: 'database_name') }
+describe PgExport::Entities::Dump do
+  subject { PgExport::Entities::Dump.new(name: 'Name', db_name: 'database_name') }
 
   it { expect(subject).to respond_to(:path) }
   it { expect(subject).to respond_to(:read) }

@@ -35,10 +35,10 @@ class PgExport
       end
 
       def build_dump(database_name:, keep_dumps:)
-        dump = dump_factory.dump_from_database(database_name)
+        dump = dump_factory.from_database(database_name)
 
         Success(dump: dump, database_name: database_name, keep_dumps: keep_dumps)
-      rescue Repositories::BashRepository::PgDumpError => e
+      rescue Services::Bash::PgDumpError => e
         Failure(message: e.to_s)
       end
 

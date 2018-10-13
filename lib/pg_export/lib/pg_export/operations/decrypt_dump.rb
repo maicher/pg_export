@@ -5,11 +5,11 @@ require 'pg_export/import'
 class PgExport
   module Operations
     class DecryptDump
-      include Import['factories.cipher_factory', 'operations.copy_dump']
+      include Import['factories.cipher_factory', 'logger']
 
       def call(source_dump)
-        target_dump = ValueObjects::Dump.new(name: 'Dump', db_name: source_dump.db_name)
-        copy_dump.call(from: source_dump, to: target_dump, cipher: cipher_factory.decryptor)
+        target_dump = source_dump.copy(name: 'Dump', cipher: cipher_factory.decryptor)
+        logger.info "Create #{target_dump}"
         target_dump
       end
     end

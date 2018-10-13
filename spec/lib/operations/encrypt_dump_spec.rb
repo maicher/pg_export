@@ -3,16 +3,14 @@
 require 'null_logger'
 require 'pg_export/lib/pg_export/factories/cipher_factory'
 require 'pg_export/lib/pg_export/operations/encrypt_dump'
-require 'pg_export/lib/pg_export/operations/copy_dump'
 
 RSpec.describe PgExport::Operations::EncryptDump do
-  let(:copy_dump) { PgExport::Operations::CopyDump.new(logger: NullLogger) }
-  let(:encrypt_dump) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory, copy_dump: copy_dump) }
+  let(:encrypt_dump) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory, logger: NullLogger) }
   let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(dump_encryption_key: encryption_key)) }
   let(:encryption_key) { '1234567890abcdef' }
 
   let(:plain_dump) do
-    PgExport::ValueObjects::Dump.new(name: 'Plain Dump', db_name: 'database').tap do |dump|
+    PgExport::Entities::Dump.new(name: 'Plain Dump', db_name: 'database').tap do |dump|
       dump.open(:write) { |f| f << 'abc' }
     end
   end

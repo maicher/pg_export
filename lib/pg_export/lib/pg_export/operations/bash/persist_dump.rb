@@ -8,13 +8,13 @@ class PgExport
     module Bash
       class PersistDump
         include Dry::Monads::Result::Mixin
-        include Import['logger', 'repositories.bash_repository']
+        include Import['logger', 'services.bash']
 
         def call(dump, db_name)
-          bash_repository.persist(dump.path, db_name)
-          logger.info "Persist #{dump} #{db_name} to #{bash_repository}"
+          bash.pg_restore(dump.path, db_name)
+          logger.info "Persist #{dump} #{db_name}"
           Success({})
-        rescue bash_repository.class::PgPersistError => e
+        rescue Services::Bash::PgRestoreError => e
           Failure(message: e.to_s)
         end
       end

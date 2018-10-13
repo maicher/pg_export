@@ -6,7 +6,7 @@ require 'tempfile'
 require 'pg_export/roles/human_readable'
 
 class PgExport
-  module ValueObjects
+  module Entities
     class Dump
       TIMESTAMP = '_%Y%m%d_%H%M%S'
 
@@ -44,6 +44,19 @@ class PgExport
 
       def timestamped_name
         db_name + timestamp + ext
+      end
+
+      def copy(name:, cipher:)
+        cipher.reset
+        new_dump = self.class.new(name: name, db_name: db_name)
+        new_dump.open(:write) do |f|
+          each_chunk do |chunk|
+            f << cipher.update(chunk)
+          end
+          f << cipher.final
+        end
+
+        new_dump
       end
 
       def to_s
