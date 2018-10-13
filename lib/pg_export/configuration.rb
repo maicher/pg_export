@@ -3,8 +3,6 @@
 require 'dry-struct'
 
 class PgExport
-  class InitializationError < StandardError; end
-
   class Configuration < Dry::Struct
     include Dry::Types.module
 

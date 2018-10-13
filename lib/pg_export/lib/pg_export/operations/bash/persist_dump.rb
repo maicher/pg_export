@@ -14,8 +14,8 @@ class PgExport
           bash_repository.persist(dump.path, db_name)
           logger.info "Persist #{dump} #{db_name} to #{bash_repository}"
           Success({})
-        rescue bash_repository::PgPersistError => e
-          Failure(e.to_s)
+        rescue bash_repository.class::PgPersistError => e
+          Failure(message: e.to_s)
         end
       end
     end

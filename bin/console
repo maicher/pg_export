@@ -3,8 +3,6 @@
 
 require 'bundler/setup'
 require 'pg_export'
-require 'pg_export/container'
 require 'irb'
 
-PgExport::Container.finalize!
 IRB.start

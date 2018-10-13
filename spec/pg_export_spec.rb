@@ -3,6 +3,7 @@
 require 'net/ftp'
 require 'pg_export'
 require 'pg_export/container'
+require 'pg_export/ftp/repository'
 require 'ftp_mock'
 
 describe PgExport do
@@ -13,7 +14,6 @@ describe PgExport do
     ENV['BACKUP_FTP_PASSWORD'] = 'pass'
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
-    PgExport::Container.start(:main)
   end
   let(:pg_export) { PgExport.plain }
 

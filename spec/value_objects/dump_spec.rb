@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/value_objects/dump'
+require 'pg_export/lib/pg_export/value_objects/dump'
 
 describe PgExport::ValueObjects::Dump do
   subject { PgExport::ValueObjects::Dump.new(name: 'Name', db_name: 'database_name') }

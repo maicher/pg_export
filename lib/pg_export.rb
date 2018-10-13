@@ -1,18 +1,26 @@
 # frozen_string_literal: true
 
-require 'pg_export/transactions/export_dump'
-require 'pg_export/transactions/import_dump_interactively'
-require 'pg_export/configuration'
 require 'pry'
+require 'pg_export/container'
 
 class PgExport
+  class InitializationError < StandardError; end
+
   class << self
     def interactive
-      new(transaction: Transactions::ImportDumpInteractively.new)
+      boot_main
+      new(transaction: PgExport::Container['transactions.import_dump_interactively'])
     end
 
     def plain
-      new(transaction: Transactions::ExportDump.new)
+      boot_main
+      new(transaction: PgExport::Container['transactions.export_dump'])
+    end
+
+    private
+
+    def boot_main
+      PgExport::Container.start(:main)
     end
   end
 

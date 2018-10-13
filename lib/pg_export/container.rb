@@ -11,27 +11,6 @@ class PgExport
       config.auto_register = %w[lib]
     end
 
-    boot(:config) do
-      init do
-        require 'pg_export/configuration'
-      end
-
-      start do
-        register(:config, memoize: true) { Configuration.build(ENV) }
-      end
-    end
-
-    boot(:logger) do
-      init do
-        require 'pg_export/build_logger'
-      end
-
-      start do
-        use :config
-        register(:logger) { BuildLogger.call(stream: $stdout, format: target[:config][:logger_format]) }
-      end
-    end
-
     boot(:ftp_connection) do
       init do
         require 'pg_export/ftp/connection'
@@ -59,14 +38,15 @@ class PgExport
 
       start do
         use :ftp_connection
-        register(:ftp_adapter) { Ftp::Adapter.new(ftp_connection: target[:ftp_connection]) }
+        ftp_adapter = Ftp::Adapter.new(ftp_connection: target[:ftp_connection])
+        register(:ftp_adapter) { ftp_adapter }
+        register(:ftp_repository) { Ftp::Repository.new(ftp_adapter: ftp_adapter) }
       end
     end
 
     boot(:main) do
       start do
         use :ftp
-        register(:ftp_repository) { Ftp::Repository.new }
       end
     end
 
