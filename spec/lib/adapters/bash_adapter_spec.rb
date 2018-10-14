@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'pg'
-require 'pg_export/factories/dump_factory'
-require 'pg_export/services/bash'
+require 'pg_export/lib/pg_export/factories/dump_factory'
+require 'pg_export/lib/pg_export/adapters/bash_adapter'
 require 'null_logger'
 
-RSpec.describe PgExport::Services::Bash do
+RSpec.describe PgExport::Adapters::BashAdapter do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
   let(:dump_encryption_key) { '1234567890abcdef' }
-  let(:bash) { described_class.new }
+  let(:bash_adapter) { described_class.new }
 
   describe '#pg_restore' do
     let(:database_from) { 'pg_export_database_test_1' }
@@ -16,7 +16,7 @@ RSpec.describe PgExport::Services::Bash do
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { PgExport::Factories::DumpFactory.new(bash: bash, logger: NullLogger).from_database(database) }
+    let(:dump) { PgExport::Factories::DumpFactory.new(bash: bash_adapter, logger: NullLogger).from_database(database) }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
@@ -32,12 +32,12 @@ RSpec.describe PgExport::Services::Bash do
     end
 
     context 'when specified database does not exist' do
-      subject { bash.pg_restore(dump.path, 'pg_export_not_existing_database') }
-      it { expect { subject }.to raise_error(PgExport::Services::Bash::PgRestoreError) }
+      subject { bash_adapter.pg_restore(dump.path, 'pg_export_not_existing_database') }
+      it { expect { subject }.to raise_error(PgExport::Adapters::BashAdapter::PgRestoreError) }
     end
 
     context 'when specified database exists' do
-      subject! { bash.pg_restore(dump.path, database_to) }
+      subject! { bash_adapter.pg_restore(dump.path, database_to) }
       it { expect { subject }.not_to raise_error }
 
       it 'doesn\'t copy not existing table' do
@@ -56,11 +56,11 @@ RSpec.describe PgExport::Services::Bash do
 
   describe '#pg_dump' do
     let(:file) { Tempfile.new('test') }
-    subject { bash.pg_dump(file.path, database) }
+    subject { bash_adapter.pg_dump(file.path, database) }
 
     context 'when specified database does not exist' do
       let(:database) { 'pg_export_not_existing_database' }
-      it { expect { subject }.to raise_error(PgExport::Services::Bash::PgDumpError) }
+      it { expect { subject }.to raise_error(PgExport::Adapters::BashAdapter::PgDumpError) }
     end
 
     context 'when specified database exists' do

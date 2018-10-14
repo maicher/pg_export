@@ -35,7 +35,7 @@ class PgExport
         dump = dump_factory.from_database(database_name)
 
         Success(dump: dump, database_name: database_name)
-      rescue Services::Bash::PgDumpError => e
+      rescue Adapters::BashAdapter::PgDumpError => e
         Failure(message: e.to_s)
       end
 

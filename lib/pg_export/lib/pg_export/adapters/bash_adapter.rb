@@ -3,8 +3,8 @@
 require 'open3'
 
 class PgExport
-  module Services
-    class Bash
+  module Adapters
+    class BashAdapter
       class PgRestoreError < StandardError; end
       class PgDumpError < StandardError; end
 

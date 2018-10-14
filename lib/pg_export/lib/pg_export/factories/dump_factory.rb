@@ -7,11 +7,11 @@ require 'pg_export/import'
 class PgExport
   module Factories
     class DumpFactory
-      include Import['logger', 'services.bash']
+      include Import['logger', 'adapters.bash_adapter']
 
       def from_database(db_name)
         dump = Entities::Dump.new(name: 'Dump', db_name: db_name)
-        bash.pg_dump(dump.path, dump.db_name)
+        bash_adapter.pg_dump(dump.path, dump.db_name)
         logger.info "Create #{dump}"
         dump
       end
