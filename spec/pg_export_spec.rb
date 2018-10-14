@@ -30,6 +30,7 @@ describe PgExport do
 
     before(:each) do
       allow(enc_dump).to receive(:timestamped_name).and_return('timestamped_name')
+      allow(sql_dump).to receive(:copy).and_return(enc_dump)
       allow(Net::FTP).to receive(:new).and_return(mock)
     end
 
@@ -38,7 +39,6 @@ describe PgExport do
 
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:from_database).and_return(sql_dump)
-        expect_any_instance_of(PgExport::Operations::EncryptDump).to receive(:call).with(sql_dump).and_return(enc_dump)
         expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:persist).with(enc_dump)
         expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:by_name).and_return(['a'] * 11)
         expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:delete).with('a')

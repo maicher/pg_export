@@ -16,9 +16,9 @@ RSpec.describe PgExport::Operations::EncryptDump do
   end
 
   describe '#call' do
-    subject { encrypt_dump.call(plain_dump) }
+    subject { encrypt_dump.call(database_name: 'x', dump: plain_dump) }
 
-    it { expect(subject.name).to eq('Encrypted Dump') }
-    it { expect(subject.read).to eq("\u0000\x8A0\xF1\ecW,-\xA1\xFA\xD6{\u0018\xEBf") }
+    it { expect(subject.success[:dump].name).to eq('Encrypted Dump') }
+    it { expect(subject.success[:dump].read).to eq("\u0000\x8A0\xF1\ecW,-\xA1\xFA\xD6{\u0018\xEBf") }
   end
 end

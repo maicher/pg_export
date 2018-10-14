@@ -9,11 +9,17 @@ class PgExport
 
       def initialize(host:, user:, password:, logger:)
         @host, @user, @password, @logger = host, user, password, logger
-        open_ftp_thread
         ObjectSpace.define_finalizer(self, proc do
                                              ftp.close
                                              logger.info 'Close FTP'
                                            end)
+      end
+
+      def open_ftp
+        @ftp = Net::FTP.new(host, user, password)
+        @ftp.passive = true
+        logger.info "Connect to #{host}"
+        @ftp
       end
 
       def list(regex_string)
@@ -36,25 +42,13 @@ class PgExport
         host
       end
 
+      def ftp
+        @ftp ||= open_ftp
+      end
+
       private
 
       attr_reader :host, :user, :password, :logger
-
-      def open_ftp_thread
-        @open_ftp_thread ||= Thread.new { open_ftp }
-      end
-
-      def open_ftp
-        @ftp = Net::FTP.new(host, user, password)
-        @ftp.passive = true
-        logger.info "Connect to #{host}"
-        self
-      end
-
-      def ftp
-        open_ftp_thread.join
-        @ftp
-      end
     end
   end
 end

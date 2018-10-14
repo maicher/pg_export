@@ -31,8 +31,17 @@ class PgExport
     end
 
     boot(:main) do
+      init do
+        require 'pg_export/lib/pg_export/operations/encrypt_dump'
+        require 'pg_export/lib/pg_export/operations/remove_old_dumps_from_ftp'
+        require 'pg_export/lib/pg_export/operations/upload_dump_to_ftp'
+      end
+
       start do
         use :ftp
+        register('operations.encrypt_dump') { ::PgExport::Operations::EncryptDump.new }
+        register('operations.remove_old_dumps_from_ftp') { ::PgExport::Operations::RemoveOldDumpsFromFtp.new }
+        register('operations.upload_dump_to_ftp') { ::PgExport::Operations::UploadDumpToFtp.new }
       end
     end
 
