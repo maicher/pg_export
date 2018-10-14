@@ -14,9 +14,9 @@ class PgExport
       using Roles::ColourableString
       include Import[
         'ftp_connection',
-        'ftp_repository',
         'operations.decrypt_dump',
-        'operations.bash.persist_dump'
+        'operations.bash.persist_dump',
+        'repositories.ftp_dump_repository'
       ]
 
       tee  :info
@@ -40,7 +40,7 @@ class PgExport
       end
 
       def select_dump(database_name:, keep_dumps: nil)
-        dumps = ftp_repository.all
+        dumps = ftp_dump_repository.all
         dumps.each.with_index(1) do |name, i|
           print "(#{i}) "
           puts name.to_s.gray
@@ -65,7 +65,7 @@ class PgExport
 
         with_spinner do |cli|
           cli.print "Downloading dump #{selected_dump}"
-          encrypted_dump = ftp_repository.get(selected_dump)
+          encrypted_dump = ftp_dump_repository.get(selected_dump)
           cli.print " (#{encrypted_dump.size_human})"
           cli.tick
           cli.print "Decrypting dump #{selected_dump}"

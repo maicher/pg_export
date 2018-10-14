@@ -11,12 +11,14 @@ class PgExport
       include Import[
         'factories.dump_factory',
         'operations.encrypt_dump',
-        'ftp_repository'
+        'repositories.ftp_dump_repository',
+        'logger'
       ]
 
       step :prepare_params
       step :build_dump
       step :export
+      step :remove_old
 
       private
 
@@ -44,8 +46,16 @@ class PgExport
 
       def export(database_name:, keep_dumps:, dump:)
         encrypted_dump = encrypt_dump.call(dump)
-        ftp_repository.persist(encrypted_dump)
-        ftp_repository.remove_old(database_name, keep_dumps)
+        ftp_dump_repository.persist(encrypted_dump)
+        logger.info "Persist #{encrypted_dump} #{encrypted_dump.timestamped_name} to #{ftp_dump_repository.ftp_adapter}"
+        Success(database_name: database_name, keep_dumps: keep_dumps)
+      end
+
+      def remove_old(database_name:, keep_dumps:)
+        ftp_dump_repository.by_name(database_name).drop(keep_dumps).each do |filename|
+          ftp_dump_repository.delete(filename)
+          logger.info "Remove #{filename} from #{ftp_dump_repository.ftp_adapter}"
+        end
         Success({})
       end
     end

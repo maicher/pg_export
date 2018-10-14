@@ -3,7 +3,7 @@
 require 'net/ftp'
 require 'pg_export'
 require 'pg_export/container'
-require 'pg_export/ftp/repository'
+require 'pg_export/lib/pg_export/repositories/ftp_dump_repository'
 require 'ftp_mock'
 
 describe PgExport do
@@ -39,8 +39,9 @@ describe PgExport do
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:from_database).and_return(sql_dump)
         expect_any_instance_of(PgExport::Operations::EncryptDump).to receive(:call).with(sql_dump).and_return(enc_dump)
-        expect_any_instance_of(PgExport::Ftp::Repository).to receive(:persist).with(enc_dump)
-        expect_any_instance_of(PgExport::Ftp::Repository).to receive(:remove_old)
+        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:persist).with(enc_dump)
+        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:by_name).and_return(['a'] * 11)
+        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:delete).with('a')
         subject
       end
     end
