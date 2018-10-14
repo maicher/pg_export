@@ -11,6 +11,7 @@ class PgExport
     attribute :ftp_user,            Strict::String
     attribute :ftp_password,        Strict::String
     attribute :logger_format,       Coercible::String.enum('plain', 'timestamped', 'muted')
+    attribute :keep_dumps,          Coercible::Integer.default(10).constrained(gteq: 0)
 
     def self.build(env)
       new(
@@ -18,7 +19,8 @@ class PgExport
         ftp_host: env['BACKUP_FTP_HOST'],
         ftp_user: env['BACKUP_FTP_USER'],
         ftp_password: env['BACKUP_FTP_PASSWORD'],
-        logger_format: env['LOGGER_FORMAT'] || 'plain'
+        logger_format: env['LOGGER_FORMAT'] || 'plain',
+        keep_dumps: env['KEEP_DUMPS']
       )
     rescue Dry::Struct::Error => e
       raise PgExport::InitializationError, e

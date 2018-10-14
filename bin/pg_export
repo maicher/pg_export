@@ -61,7 +61,7 @@ begin
       PgExport.plain
     end
 
-  pg_export.call(ENV['DATABASE'], ENV['KEEP_DUMPS']) do |result|
+  pg_export.call(ENV['DATABASE']) do |result|
     result.success do |_output|
       puts 'Success'
     end

@@ -13,14 +13,12 @@ class PgExport
       include CliSpinnable
       using Roles::ColourableString
       include Import[
-        'ftp_connection',
         'operations.decrypt_dump',
         'operations.bash.persist_dump',
         'repositories.ftp_dump_repository'
       ]
 
       tee  :info
-      tee  :initialize_connection
       step :select_dump
       step :download_dump
       step :import
@@ -29,14 +27,6 @@ class PgExport
 
       def info
         puts 'Interactive mode, for restoring dump into database.'.green
-      end
-
-      def initialize_connection
-        with_spinner do |cli|
-          cli.print 'Connecting to FTP'
-          ftp_connection.ftp
-          cli.tick
-        end
       end
 
       def select_dump(database_name:, keep_dumps: nil)
@@ -80,7 +70,6 @@ class PgExport
       end
 
       def import(dump:, database_name:)
-        t = Thread.new { ftp_connection.close }
         puts 'To which database you would like to restore the downloaded dump?'
         if database_name.nil?
           print 'Enter a local database name: '
@@ -103,7 +92,6 @@ class PgExport
           ret = persist_dump.call(dump, name)
           cli.tick
         end
-        t.join
 
         ret
       end

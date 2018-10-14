@@ -10,7 +10,8 @@ describe PgExport::Configuration do
       ftp_host: 'host',
       ftp_user: 'user',
       ftp_password: 'password',
-      logger_format: :plain
+      logger_format: :plain,
+      keep_dumps: '10'
     }
   end
 

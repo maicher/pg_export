@@ -14,6 +14,7 @@ describe PgExport do
     ENV['BACKUP_FTP_PASSWORD'] = 'pass'
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
+    ENV['KEEP_DUMPS'] = '10'
   end
   let(:pg_export) { PgExport.plain }
 
@@ -22,7 +23,7 @@ describe PgExport do
   end
 
   describe '#call' do
-    subject { pg_export.call(database, keep_dumps) }
+    subject { pg_export.call(database) }
     let(:mock) { FtpMock.new }
     let(:sql_dump) { Object.new }
     let(:enc_dump) { Object.new }
@@ -34,7 +35,6 @@ describe PgExport do
 
     context 'when arguments are valid' do
       let(:database) { 'some_database' }
-      let(:keep_dumps) { 10 }
 
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:from_database).and_return(sql_dump)
@@ -46,38 +46,15 @@ describe PgExport do
       end
     end
 
-    context 'when one of the argument is invalid' do
+    context 'when argument is invalid' do
       context 'when database is nil' do
         let(:database) { nil }
-        let(:keep_dumps) { 10 }
 
         it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end
 
       context 'when database is empty string' do
         let(:database) { '' }
-        let(:keep_dumps) { 10 }
-
-        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
-      end
-
-      context 'when keep_dumps nil' do
-        let(:database) { 'a_database' }
-        let(:keep_dumps) { nil }
-
-        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
-      end
-
-      context 'when keep_dumps is negative' do
-        let(:database) { 'a_database' }
-        let(:keep_dumps) { -10 }
-
-        it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
-      end
-
-      context 'when keep_dumps is not numeric' do
-        let(:database) { 'a_database' }
-        let(:keep_dumps) { 'something' }
 
         it { expect(subject).to be_a(Dry::Monads::Result::Failure) }
       end

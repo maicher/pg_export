@@ -18,6 +18,5 @@ RSpec.describe PgExport::Adapters::FtpAdapter do
   it { expect(subject).to respond_to(:delete) }
   it { expect(subject).to respond_to(:persist) }
   it { expect(subject).to respond_to(:get) }
-  it { expect(subject).to respond_to(:ftp) }
   it { expect(subject).to respond_to(:to_s) }
 end

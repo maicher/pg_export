@@ -28,8 +28,8 @@ class PgExport
     @transaction = transaction
   end
 
-  def call(database_name, keep_dumps, &block)
-    transaction.call(database_name: database_name, keep_dumps: keep_dumps, &block)
+  def call(database_name, &block)
+    transaction.call(database_name: database_name, &block)
   end
 
   private

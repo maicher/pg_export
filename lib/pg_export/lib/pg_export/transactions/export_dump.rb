@@ -12,7 +12,8 @@ class PgExport
         'factories.dump_factory',
         'operations.encrypt_dump',
         'repositories.ftp_dump_repository',
-        'logger'
+        'logger',
+        'config'
       ]
 
       step :prepare_params
@@ -22,37 +23,31 @@ class PgExport
 
       private
 
-      def prepare_params(database_name:, keep_dumps:)
+      def prepare_params(database_name:)
         database_name = database_name.to_s
 
         return Failure(message: 'Invalid database name') if database_name.empty?
 
-        begin
-          keep_dumps = Integer(keep_dumps)
-        rescue TypeError, ArgumentError
-          return Failure(message: 'Invalid keep_dumps')
-        end
-
-        Success(database_name: database_name, keep_dumps: keep_dumps)
+        Success(database_name: database_name)
       end
 
-      def build_dump(database_name:, keep_dumps:)
+      def build_dump(database_name:)
         dump = dump_factory.from_database(database_name)
 
-        Success(dump: dump, database_name: database_name, keep_dumps: keep_dumps)
+        Success(dump: dump, database_name: database_name)
       rescue Services::Bash::PgDumpError => e
         Failure(message: e.to_s)
       end
 
-      def export(database_name:, keep_dumps:, dump:)
+      def export(database_name:, dump:)
         encrypted_dump = encrypt_dump.call(dump)
         ftp_dump_repository.persist(encrypted_dump)
         logger.info "Persist #{encrypted_dump} #{encrypted_dump.timestamped_name} to #{ftp_dump_repository.ftp_adapter}"
-        Success(database_name: database_name, keep_dumps: keep_dumps)
+        Success(database_name: database_name)
       end
 
-      def remove_old(database_name:, keep_dumps:)
-        ftp_dump_repository.by_name(database_name).drop(keep_dumps).each do |filename|
+      def remove_old(database_name:)
+        ftp_dump_repository.by_name(database_name).drop(config.keep_dumps).each do |filename|
           ftp_dump_repository.delete(filename)
           logger.info "Remove #{filename} from #{ftp_dump_repository.ftp_adapter}"
         end

@@ -10,18 +10,10 @@ class PgExport
       def initialize(host:, user:, password:, logger:)
         @host, @user, @password, @logger = host, user, password, logger
         open_ftp_thread
-        ObjectSpace.define_finalizer(self, proc { ftp.close; logger.info 'Close FTP' })
-      end
-
-      def open_ftp_thread
-        @open_ftp_thread ||= Thread.new { open_ftp }
-      end
-
-      def open_ftp
-        @ftp = Net::FTP.new(host, user, password)
-        @ftp.passive = true
-        logger.info "Connect to #{host}"
-        self
+        ObjectSpace.define_finalizer(self, proc do
+                                             ftp.close
+                                             logger.info 'Close FTP'
+                                           end)
       end
 
       def list(regex_string)
@@ -40,11 +32,6 @@ class PgExport
         ftp.getbinaryfile(timestamped_name, path, CHUNK_SIZE)
       end
 
-      def ftp
-        open_ftp_thread.join
-        @ftp
-      end
-
       def to_s
         host
       end
@@ -52,6 +39,22 @@ class PgExport
       private
 
       attr_reader :host, :user, :password, :logger
+
+      def open_ftp_thread
+        @open_ftp_thread ||= Thread.new { open_ftp }
+      end
+
+      def open_ftp
+        @ftp = Net::FTP.new(host, user, password)
+        @ftp.passive = true
+        logger.info "Connect to #{host}"
+        self
+      end
+
+      def ftp
+        open_ftp_thread.join
+        @ftp
+      end
     end
   end
 end
