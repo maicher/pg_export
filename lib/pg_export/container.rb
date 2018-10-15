@@ -16,18 +16,14 @@ class PgExport
 
     boot(:ftp) do
       init do
-        require 'pg_export/lib/pg_export/adapters/ftp_adapter'
+        require 'pg_export/lib/pg_export/factories/ftp_adapter_factory'
       end
 
       start do
         use :config
 
-        register(:ftp_adapter) do
-          ::PgExport::Adapters::FtpAdapter.new(
-            host: target[:config][:ftp_host],
-            user: target[:config][:ftp_user],
-            password: target[:config][:ftp_password]
-          )
+        register('factories.ftp_adapter_factory') do
+          ::PgExport::Factories::FtpAdapterFactory.new
         end
       end
     end

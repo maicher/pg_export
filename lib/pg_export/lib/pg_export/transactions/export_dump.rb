@@ -12,7 +12,7 @@ class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction(container: PgExport::Container)
-      include Import['factories.dump_factory', 'adapters.bash_adapter', 'ftp_adapter']
+      include Import['factories.dump_factory', 'adapters.bash_adapter', 'factories.ftp_adapter_factory']
 
       step :prepare_params
       step :build_dump
@@ -43,6 +43,7 @@ class PgExport
       end
 
       def open_ftp_connection(dump:)
+        ftp_adapter = ftp_adapter_factory.ftp_adapter
         ftp_adapter.open_ftp
         Success(dump: dump, ftp_adapter: ftp_adapter)
       end
@@ -54,7 +55,7 @@ class PgExport
 
       def close_ftp_connection(removed_dumps:, ftp_adapter:)
         ftp_adapter.close_ftp
-        Success(removed_dumps: removed_dumps, ftp_adapter: ftp_adapter)
+        Success(ftp_adapter: ftp_adapter)
       end
     end
   end

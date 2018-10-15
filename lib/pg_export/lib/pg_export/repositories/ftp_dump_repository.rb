@@ -8,9 +8,7 @@ require 'pg_export/lib/pg_export/value_objects/dump_file'
 class PgExport
   module Repositories
     class FtpDumpRepository
-      include Import['ftp_adapter']
-
-      def get(name)
+      def get(name, ftp_adapter:)
         file = ValueObjects::DumpFile.new
         ftp_adapter.get(file, name)
 
@@ -22,7 +20,7 @@ class PgExport
         )
       end
 
-      def all
+      def all(ftp_adapter:)
         ftp_adapter.list('*')
       end
     end

@@ -15,7 +15,8 @@ class PgExport
       include Import[
         'operations.decrypt_dump',
         'operations.bash.persist_dump',
-        'repositories.ftp_dump_repository'
+        'repositories.ftp_dump_repository',
+        'factories.ftp_adapter_factory'
       ]
 
       tee  :info
@@ -30,7 +31,8 @@ class PgExport
       end
 
       def select_dump(database_name:, keep_dumps: nil)
-        dumps = ftp_dump_repository.all
+        ftp_adapter = ftp_adapter_factory.ftp_adapter
+        dumps = ftp_dump_repository.all(ftp_adapter: ftp_adapter)
         dumps.each.with_index(1) do |name, i|
           print "(#{i}) "
           puts name.to_s.gray
@@ -47,15 +49,15 @@ class PgExport
 
         selected_dump = dumps.fetch(number - 1)
 
-        Success(database_name: database_name, selected_dump: selected_dump)
+        Success(database_name: database_name, selected_dump: selected_dump, ftp_adapter: ftp_adapter)
       end
 
-      def download_dump(database_name:, selected_dump:)
+      def download_dump(database_name:, selected_dump:, ftp_adapter:)
         dump = nil
 
         with_spinner do |cli|
           cli.print "Downloading dump #{selected_dump}"
-          encrypted_dump = ftp_dump_repository.get(selected_dump)
+          encrypted_dump = ftp_dump_repository.get(selected_dump, ftp_adapter: ftp_adapter)
           cli.print " (#{encrypted_dump.file.size_human})"
           cli.tick
           cli.print "Decrypting dump #{selected_dump}"
