@@ -10,6 +10,8 @@ class PgExport
       def initialize(host:, user:, password:, logger:)
         @host, @user, @password, @logger = host, user, password, logger
         ObjectSpace.define_finalizer(self, proc do
+                                             return unless @ftp
+
                                              ftp.close
                                              logger.info 'Close FTP'
                                            end)
@@ -30,12 +32,12 @@ class PgExport
         ftp.delete(filename)
       end
 
-      def persist(path, timestamped_name)
-        ftp.putbinaryfile(path, timestamped_name, CHUNK_SIZE)
+      def persist(file, name)
+        ftp.putbinaryfile(file.path, name, CHUNK_SIZE)
       end
 
-      def get(path, timestamped_name)
-        ftp.getbinaryfile(timestamped_name, path, CHUNK_SIZE)
+      def get(file, name)
+        ftp.getbinaryfile(name, file.path, CHUNK_SIZE)
       end
 
       def to_s

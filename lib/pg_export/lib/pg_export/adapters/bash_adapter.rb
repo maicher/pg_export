@@ -8,14 +8,16 @@ class PgExport
       class PgRestoreError < StandardError; end
       class PgDumpError < StandardError; end
 
-      def pg_dump(path, db_name)
-        popen("pg_dump -Fc --file #{path} #{db_name}") do |errors|
+      def pg_dump(file, db_name)
+        popen("pg_dump -Fc --file #{file.path} #{db_name}") do |errors|
           raise PgDumpError, errors unless errors.empty?
         end
+
+        file
       end
 
-      def pg_restore(path, db_name)
-        popen("pg_restore -c -d #{db_name} #{path}") do |errors|
+      def pg_restore(file, db_name)
+        popen("pg_restore -c -d #{db_name} #{file.path}") do |errors|
           raise PgRestoreError, errors if /FATAL/ =~ errors
         end
       end

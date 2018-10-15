@@ -1,21 +1,29 @@
 # frozen_string_literal: true
 
 require 'open3'
+require 'pg_export/import'
 require 'pg_export/lib/pg_export/entities/dump'
+require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 class PgExport
   module Repositories
     class FtpDumpRepository
       include Import['ftp_adapter']
 
-      def get(db_name)
-        dump = Entities::Dump.new(name: 'Encrypted Dump', db_name: db_name)
-        ftp_adapter.get(dump.path, dump.db_name)
-        dump
+      def get(name)
+        file = ValueObjects::DumpFile.new
+        ftp_adapter.get(file, name)
+
+        Entities::Dump.new(
+          name: name,
+          database: '???',
+          file: file,
+          type: :encrypted
+        )
       end
 
       def persist(dump)
-        ftp_adapter.persist(dump.path, dump.timestamped_name)
+        ftp_adapter.persist(dump.file, dump.name)
 
         self
       end

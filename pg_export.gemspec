@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.3.0'
 
   spec.add_dependency 'cli_spinnable', '~> 0.2'
+  spec.add_dependency 'dry-initializer', '~> 2.5.0'
   spec.add_dependency 'dry-system', '~> 0.10.0'
   spec.add_dependency 'dry-transaction', '~> 0.13.0'
 

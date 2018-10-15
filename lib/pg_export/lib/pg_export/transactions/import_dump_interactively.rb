@@ -56,11 +56,11 @@ class PgExport
         with_spinner do |cli|
           cli.print "Downloading dump #{selected_dump}"
           encrypted_dump = ftp_dump_repository.get(selected_dump)
-          cli.print " (#{encrypted_dump.size_human})"
+          cli.print " (#{encrypted_dump.file.size_human})"
           cli.tick
           cli.print "Decrypting dump #{selected_dump}"
           dump = decrypt_dump.call(encrypted_dump)
-          cli.print " (#{dump.size_human})"
+          cli.print " (#{dump.file.size_human})"
           cli.tick
         end
 

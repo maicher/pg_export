@@ -11,7 +11,7 @@ class PgExport
         include Import['logger', 'adapters.bash_adapter']
 
         def call(dump, db_name)
-          bash_adapter.pg_restore(dump.path, db_name)
+          bash_adapter.pg_restore(dump.file, db_name)
           logger.info "Persist #{dump} #{db_name}"
           Success({})
         rescue Adapters::BashAdapter::PgRestoreError => e

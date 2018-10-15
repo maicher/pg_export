@@ -4,12 +4,13 @@ require 'dry/transaction'
 
 require 'pg_export/import'
 require 'pg_export/container'
+require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction(container: PgExport::Container)
-      include Import['factories.dump_factory']
+      include Import['factories.dump_factory', 'adapters.bash_adapter', 'logger']
 
       step :prepare_params
       step :build_dump
@@ -28,8 +29,11 @@ class PgExport
       end
 
       def build_dump(database_name:)
-        dump = dump_factory.from_database(database_name)
-
+        dump = dump_factory.plain(
+          database: database_name,
+          file: bash_adapter.pg_dump(ValueObjects::DumpFile.new, database_name)
+        )
+        logger.info "Create #{dump}"
         Success(dump: dump, database_name: database_name)
       rescue Adapters::BashAdapter::PgDumpError => e
         Failure(message: e.to_s)

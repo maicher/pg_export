@@ -13,7 +13,7 @@ class PgExport
 
       def call(database_name:, dump:)
         ftp_dump_repository.persist(dump)
-        logger.info "Persist #{dump} #{dump.timestamped_name} to #{ftp_dump_repository.ftp_adapter}"
+        logger.info "Persist #{dump} to #{ftp_dump_repository.ftp_adapter}"
         Success(database_name: database_name)
       end
     end

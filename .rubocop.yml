@@ -12,5 +12,8 @@ Metrics/LineLength:
 Style/ParallelAssignment:
   Enabled: false
 
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
 Documentation:
   Enabled: false

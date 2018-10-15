@@ -1,79 +1,54 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-require 'tempfile'
+require 'dry-initializer'
+require 'dry-types'
 
-require 'pg_export/roles/human_readable'
+require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 class PgExport
   module Entities
     class Dump
-      TIMESTAMP = '_%Y%m%d_%H%M%S'
+      extend Dry::Initializer[undefined: false]
 
-      extend Forwardable
-      include Roles::HumanReadable
+      TYPE_ENUM_TYPE = Dry::Types['coercible.string'].enum('plain', 'encrypted')
+      DUMP_FILE_TYPE = Dry::Types.module.Instance(PgExport::ValueObjects::DumpFile)
+      private_constant :TYPE_ENUM_TYPE, :DUMP_FILE_TYPE
 
-      CHUNK_SIZE = (2**16).freeze
+      option :name,     Dry::Types['strict.string'].constrained(format: /.+_20[0-9]{6}_[0-9]{6}\Z/)
+      option :database, Dry::Types['strict.string'].constrained(filled: true)
+      option :type,     TYPE_ENUM_TYPE
+      option :file,     DUMP_FILE_TYPE, default: proc { PgExport::ValueObjects::DumpFile.new }
 
-      def_delegators :file, :path, :read, :write, :<<, :rewind, :close, :size, :eof?
+      def encrypt(cipher_factory:)
+        self.file = file.copy(cipher: cipher_factory.encryptor)
+        self.type = :encrypted
 
-      attr_reader :name, :db_name
-
-      def initialize(name:, db_name:)
-        @name, @db_name = name, db_name
-        @timestamp = Time.now.strftime(TIMESTAMP)
+        self
       end
 
-      def ext
-        ''
-      end
+      def decrypt(cipher_factory:)
+        self.file = file.copy(cipher: cipher_factory.decryptor)
+        self.type = :plain
 
-      def open(operation_type, &block)
-        case operation_type.to_sym
-        when :read then File.open(path, 'r', &block)
-        when :write then File.open(path, 'w', &block)
-        else raise ArgumentError, 'Operation type can be only :read or :write'
-        end
-      end
-
-      def each_chunk
-        open(:read) do |file|
-          yield file.read(CHUNK_SIZE) until file.eof?
-        end
-      end
-
-      def timestamped_name
-        db_name + timestamp + ext
-      end
-
-      def copy(name:, cipher:)
-        cipher.reset
-        new_dump = self.class.new(name: name, db_name: db_name)
-        new_dump.open(:write) do |f|
-          each_chunk do |chunk|
-            f << cipher.update(chunk)
-          end
-          f << cipher.final
-        end
-
-        new_dump
+        self
       end
 
       def to_s
-        "#{name} (#{size_human})"
+        "#{type} dump (#{name} - #{file.size_human})"
       end
 
-      private
+      protected
 
-      attr_reader :timestamp
-
-      def file
-        @file ||= Tempfile.new(file_name)
+      def file=(f)
+        @file = DUMP_FILE_TYPE[f]
       end
 
-      def file_name
-        name.downcase.gsub(/[^0-9a-z]/, '_')
+      def type=(t)
+        @type = TYPE_ENUM_TYPE[t]
       end
+
+      TIMESTAMP_FORMAT = '%Y%m%d_%H%M%S'
+      private_constant :TIMESTAMP_FORMAT
     end
   end
 end

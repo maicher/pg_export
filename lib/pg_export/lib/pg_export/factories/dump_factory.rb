@@ -1,19 +1,30 @@
 # frozen_string_literal: true
 
 require 'open3'
+require 'tempfile'
+
 require 'pg_export/lib/pg_export/entities/dump'
 require 'pg_export/import'
 
 class PgExport
   module Factories
     class DumpFactory
-      include Import['logger', 'adapters.bash_adapter']
+      def plain(database:, file:)
+        Entities::Dump.new(
+          name: [database, timestamp].join('_'),
+          database: database,
+          file: file,
+          type: :plain
+        )
+      end
 
-      def from_database(db_name)
-        dump = Entities::Dump.new(name: 'Dump', db_name: db_name)
-        bash_adapter.pg_dump(dump.path, dump.db_name)
-        logger.info "Create #{dump}"
-        dump
+      private
+
+      TIMESTAMP_FORMAT = '%Y%m%d_%H%M%S'
+      private_constant :TIMESTAMP_FORMAT
+
+      def timestamp
+        Time.now.strftime(TIMESTAMP_FORMAT)
       end
     end
   end

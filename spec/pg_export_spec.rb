@@ -16,7 +16,7 @@ describe PgExport do
     ENV['INTERACTIVE'] = 'false'
     ENV['KEEP_DUMPS'] = '10'
   end
-  let(:pg_export) { PgExport.plain }
+  let!(:pg_export) { PgExport.plain }
 
   it 'has a version number' do
     expect(PgExport::VERSION).not_to be nil
@@ -25,12 +25,11 @@ describe PgExport do
   describe '#call' do
     subject { pg_export.call(database) }
     let(:mock) { FtpMock.new }
-    let(:sql_dump) { Object.new }
-    let(:enc_dump) { Object.new }
+    let(:dump) { Object.new }
 
     before(:each) do
-      allow(enc_dump).to receive(:timestamped_name).and_return('timestamped_name')
-      allow(sql_dump).to receive(:copy).and_return(enc_dump)
+      allow(dump).to receive(:name).and_return('name')
+      allow(dump).to receive(:encrypt)
       allow(Net::FTP).to receive(:new).and_return(mock)
     end
 
@@ -38,8 +37,9 @@ describe PgExport do
       let(:database) { 'some_database' }
 
       it 'creates dump and exports it to ftp' do
-        expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:from_database).and_return(sql_dump)
-        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:persist).with(enc_dump)
+        expect_any_instance_of(PgExport::Adapters::BashAdapter).to receive(:pg_dump)
+        expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:plain).and_return(dump)
+        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:persist).with(dump)
         expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:by_name).and_return(['a'] * 11)
         expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:delete).with('a')
         subject

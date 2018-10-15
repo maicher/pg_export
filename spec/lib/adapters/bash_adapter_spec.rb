@@ -3,6 +3,7 @@
 require 'pg'
 require 'pg_export/lib/pg_export/factories/dump_factory'
 require 'pg_export/lib/pg_export/adapters/bash_adapter'
+require 'pg_export/lib/pg_export/value_objects/dump_file'
 require 'null_logger'
 
 RSpec.describe PgExport::Adapters::BashAdapter do
@@ -16,13 +17,14 @@ RSpec.describe PgExport::Adapters::BashAdapter do
     let(:database_from_conn) { PG.connect(dbname: database_from) }
     let(:database_to_conn) { PG.connect(dbname: database_to) }
     let(:database) { database_from }
-    let(:dump) { PgExport::Factories::DumpFactory.new(bash: bash_adapter, logger: NullLogger).from_database(database) }
+    let(:file) { PgExport::ValueObjects::DumpFile.new }
     before(:each) do
       postgres_conn.exec("CREATE DATABASE #{database_from}")
       postgres_conn.exec("CREATE DATABASE #{database_to}")
       c = PG.connect(dbname: database_from)
       c.exec('CREATE TABLE IF NOT EXISTS a_table (a_column VARCHAR)')
       c.close
+      bash_adapter.pg_dump(file, database)
     end
     after(:each) do
       database_from_conn.close
@@ -32,12 +34,12 @@ RSpec.describe PgExport::Adapters::BashAdapter do
     end
 
     context 'when specified database does not exist' do
-      subject { bash_adapter.pg_restore(dump.path, 'pg_export_not_existing_database') }
+      subject { bash_adapter.pg_restore(file, 'pg_export_not_existing_database') }
       it { expect { subject }.to raise_error(PgExport::Adapters::BashAdapter::PgRestoreError) }
     end
 
     context 'when specified database exists' do
-      subject! { bash_adapter.pg_restore(dump.path, database_to) }
+      subject! { bash_adapter.pg_restore(file, database_to) }
       it { expect { subject }.not_to raise_error }
 
       it 'doesn\'t copy not existing table' do
@@ -55,8 +57,8 @@ RSpec.describe PgExport::Adapters::BashAdapter do
   end
 
   describe '#pg_dump' do
-    let(:file) { Tempfile.new('test') }
-    subject { bash_adapter.pg_dump(file.path, database) }
+    let(:file) { PgExport::ValueObjects::DumpFile.new }
+    subject { bash_adapter.pg_dump(file, database) }
 
     context 'when specified database does not exist' do
       let(:database) { 'pg_export_not_existing_database' }
