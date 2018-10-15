@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'dry/system/container'
+require 'pg_export/lib/pg_export/types'
 
 class PgExport
   class Container < Dry::System::Container

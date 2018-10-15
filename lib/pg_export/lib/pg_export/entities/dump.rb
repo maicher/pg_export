@@ -1,23 +1,17 @@
 # frozen_string_literal: true
 
 require 'dry-initializer'
-require 'dry-types'
-
-require 'pg_export/lib/pg_export/value_objects/dump_file'
+require 'pg_export/lib/pg_export/types'
 
 class PgExport
   module Entities
     class Dump
       extend Dry::Initializer[undefined: false]
 
-      TYPE_ENUM_TYPE = Dry::Types['coercible.string'].enum('plain', 'encrypted')
-      DUMP_FILE_TYPE = Dry::Types.module.Instance(PgExport::ValueObjects::DumpFile)
-      private_constant :TYPE_ENUM_TYPE, :DUMP_FILE_TYPE
-
-      option :name,     Dry::Types['strict.string'].constrained(format: /.+_20[0-9]{6}_[0-9]{6}\Z/)
-      option :database, Dry::Types['strict.string'].constrained(filled: true)
-      option :type,     TYPE_ENUM_TYPE
-      option :file,     DUMP_FILE_TYPE, default: proc { PgExport::ValueObjects::DumpFile.new }
+      option :name,     Types::DumpName
+      option :type,     Types::DumpType
+      option :database, Types::Strict::String.constrained(filled: true)
+      option :file,     Types::DumpFile, default: proc { PgExport::ValueObjects::DumpFile.new }
 
       def encrypt(cipher_factory:)
         self.file = file.copy(cipher: cipher_factory.encryptor)
@@ -40,15 +34,12 @@ class PgExport
       protected
 
       def file=(f)
-        @file = DUMP_FILE_TYPE[f]
+        @file = Types::DumpFile[f]
       end
 
       def type=(t)
-        @type = TYPE_ENUM_TYPE[t]
+        @type = Types::DumpType[t]
       end
-
-      TIMESTAMP_FORMAT = '%Y%m%d_%H%M%S'
-      private_constant :TIMESTAMP_FORMAT
     end
   end
 end
