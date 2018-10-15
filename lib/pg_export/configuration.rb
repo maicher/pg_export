@@ -25,5 +25,9 @@ class PgExport
     rescue Dry::Struct::Error => e
       raise PgExport::InitializationError, e
     end
+
+    def logger_muted?
+      logger_format == 'muted'
+    end
   end
 end

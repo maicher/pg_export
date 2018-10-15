@@ -22,22 +22,8 @@ class PgExport
         )
       end
 
-      def persist(dump)
-        ftp_adapter.persist(dump.file, dump.name)
-
-        self
-      end
-
-      def by_name(name)
-        ftp_adapter.list(name + '_*')
-      end
-
       def all
         ftp_adapter.list('*')
-      end
-
-      def delete(filename)
-        ftp_adapter.delete(filename)
       end
     end
   end

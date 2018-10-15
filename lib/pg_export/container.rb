@@ -11,20 +11,21 @@ class PgExport
       config.auto_register = %w[lib]
     end
 
+    load_paths!('lib')
+
     boot(:ftp) do
       init do
         require 'pg_export/lib/pg_export/adapters/ftp_adapter'
       end
 
       start do
-        use :config, :logger
+        use :config
 
         register(:ftp_adapter) do
           ::PgExport::Adapters::FtpAdapter.new(
             host: target[:config][:ftp_host],
             user: target[:config][:ftp_user],
-            password: target[:config][:ftp_password],
-            logger: logger
+            password: target[:config][:ftp_password]
           )
         end
       end
@@ -34,17 +35,19 @@ class PgExport
       init do
         require 'pg_export/lib/pg_export/operations/encrypt_dump'
         require 'pg_export/lib/pg_export/operations/remove_old_dumps_from_ftp'
-        require 'pg_export/lib/pg_export/operations/upload_dump_to_ftp'
       end
 
       start do
         use :ftp
         register('operations.encrypt_dump') { ::PgExport::Operations::EncryptDump.new }
         register('operations.remove_old_dumps_from_ftp') { ::PgExport::Operations::RemoveOldDumpsFromFtp.new }
-        register('operations.upload_dump_to_ftp') { ::PgExport::Operations::UploadDumpToFtp.new }
       end
     end
 
-    load_paths!('lib')
+    boot(:interactive) do
+      start do
+        use :main
+      end
+    end
   end
 end

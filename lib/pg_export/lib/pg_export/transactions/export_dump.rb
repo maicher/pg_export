@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# auto_register: false
+
 require 'dry/transaction'
 
 require 'pg_export/import'
@@ -10,13 +12,15 @@ class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction(container: PgExport::Container)
-      include Import['factories.dump_factory', 'adapters.bash_adapter', 'logger']
+      include Import['factories.dump_factory', 'adapters.bash_adapter', 'ftp_adapter']
 
       step :prepare_params
       step :build_dump
-      step :encrypt_dump,              with: 'operations.encrypt_dump'
-      step :upload_dump_to_ftp,        with: 'operations.upload_dump_to_ftp'
+      step :encrypt_dump, with: 'operations.encrypt_dump'
+      step :open_ftp_connection
+      step :upload_dump_to_ftp
       step :remove_old_dumps_from_ftp, with: 'operations.remove_old_dumps_from_ftp'
+      step :close_ftp_connection
 
       private
 
@@ -33,10 +37,24 @@ class PgExport
           database: database_name,
           file: bash_adapter.pg_dump(ValueObjects::DumpFile.new, database_name)
         )
-        logger.info "Create #{dump}"
-        Success(dump: dump, database_name: database_name)
-      rescue Adapters::BashAdapter::PgDumpError => e
-        Failure(message: e.to_s)
+        Success(dump: dump)
+      rescue bash_adapter.class::PgDumpError => e
+        Failure(message: 'Error dumping database: ' + e.to_s)
+      end
+
+      def open_ftp_connection(dump:)
+        ftp_adapter.open_ftp
+        Success(dump: dump, ftp_adapter: ftp_adapter)
+      end
+
+      def upload_dump_to_ftp(dump:, ftp_adapter:)
+        ftp_adapter.persist(dump.file, dump.name)
+        Success(dump: dump, ftp_adapter: ftp_adapter)
+      end
+
+      def close_ftp_connection(removed_dumps:, ftp_adapter:)
+        ftp_adapter.close_ftp
+        Success(removed_dumps: removed_dumps, ftp_adapter: ftp_adapter)
       end
     end
   end

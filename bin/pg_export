@@ -10,12 +10,13 @@ require 'pg_export/roles/colourable_string'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 interactive = false
+database = nil
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
 
-  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |database|
-    ENV['DATABASE'] = database
+  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |d|
+    database = d
   end
 
   opts.on('-k', '--keep [KEEP]', String, "[Optional] Number of dump files to keep on FTP (default: #{ENV['KEEP_DUMPS']})") do |keep|
@@ -26,8 +27,11 @@ option_parser = OptionParser.new do |opts|
     ENV['LOGGER_FORMAT'] = 'timestamped'
   end
 
-  opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
+  opts.on('-m', '--muted', '[Optional] Mutes log messages (overrides -t option)') do
     ENV['LOGGER_FORMAT'] = 'muted'
+  end
+
+  opts.on('-i', '--interactive', '[Optional] Interactive command line mode - for restoring dumps into databases') do
     interactive = true
   end
 
@@ -61,14 +65,14 @@ begin
       PgExport.plain
     end
 
-  pg_export.call(ENV['DATABASE']) do |result|
-    result.success do |_output|
-      puts 'Success'
+  pg_export.call(database) do |result|
+    result.success do
+      # success
     end
 
     result.failure do |output|
       using PgExport::Roles::ColourableString
-      puts "Error: #{output[:message]}".red
+      puts "#{output[:message]}".red
       puts option_parser
     end
   end

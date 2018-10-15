@@ -8,19 +8,13 @@ class PgExport
 
   class << self
     def interactive
-      boot_main
+      PgExport::Container.start(:interactive)
       new(transaction: PgExport::Container['transactions.import_dump_interactively'])
     end
 
     def plain
-      boot_main
+      PgExport::Container.start(:plain)
       new(transaction: PgExport::Container['transactions.export_dump'])
-    end
-
-    private
-
-    def boot_main
-      PgExport::Container.start(:main)
     end
   end
 

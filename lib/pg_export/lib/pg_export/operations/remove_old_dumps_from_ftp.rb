@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# auto_register: false
-
 require 'dry/transaction/operation'
 require 'pg_export/import'
 
@@ -9,15 +7,15 @@ class PgExport
   module Operations
     class RemoveOldDumpsFromFtp
       include Dry::Transaction::Operation
-      include Import['repositories.ftp_dump_repository', 'logger', 'config']
+      include Import['repositories.ftp_dump_repository', 'config']
 
-      def call(database_name:)
-        ftp_dump_repository.by_name(database_name).drop(config.keep_dumps).each do |filename|
-          ftp_dump_repository.delete(filename)
-          logger.info "Remove #{filename} from #{ftp_dump_repository.ftp_adapter}"
+      def call(dump:, ftp_adapter:)
+        dumps = ftp_adapter.list(dump.database + '_*').drop(config.keep_dumps)
+        dumps.each do |filename|
+          ftp_adapter.delete(filename)
         end
 
-        Success({})
+        Success(removed_dumps: dumps, ftp_adapter: ftp_adapter)
       end
     end
   end

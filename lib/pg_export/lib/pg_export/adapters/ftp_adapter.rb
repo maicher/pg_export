@@ -7,21 +7,19 @@ class PgExport
     class FtpAdapter
       CHUNK_SIZE = (2**16).freeze
 
-      def initialize(host:, user:, password:, logger:)
-        @host, @user, @password, @logger = host, user, password, logger
-        ObjectSpace.define_finalizer(self, proc do
-                                             return unless @ftp
-
-                                             ftp.close
-                                             logger.info 'Close FTP'
-                                           end)
+      def initialize(host:, user:, password:)
+        @host, @user, @password, @logger = host, user, password
+        ObjectSpace.define_finalizer(self, proc { ftp.close if @ftp })
       end
 
       def open_ftp
         @ftp = Net::FTP.new(host, user, password)
         @ftp.passive = true
-        logger.info "Connect to #{host}"
         @ftp
+      end
+
+      def close_ftp
+        @ftp&.close
       end
 
       def list(regex_string)
@@ -50,7 +48,7 @@ class PgExport
 
       private
 
-      attr_reader :host, :user, :password, :logger
+      attr_reader :host, :user, :password
     end
   end
 end

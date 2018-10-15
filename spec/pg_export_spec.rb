@@ -30,6 +30,8 @@ describe PgExport do
     before(:each) do
       allow(dump).to receive(:name).and_return('name')
       allow(dump).to receive(:encrypt)
+      allow(dump).to receive(:file)
+      allow(dump).to receive(:database).and_return('some_database')
       allow(Net::FTP).to receive(:new).and_return(mock)
     end
 
@@ -39,9 +41,9 @@ describe PgExport do
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Adapters::BashAdapter).to receive(:pg_dump)
         expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:plain).and_return(dump)
-        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:persist).with(dump)
-        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:by_name).and_return(['a'] * 11)
-        expect_any_instance_of(PgExport::Repositories::FtpDumpRepository).to receive(:delete).with('a')
+        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:persist)
+        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:list).and_return(['a'] * 11)
+        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:delete).with('a')
         subject
       end
     end

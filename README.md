@@ -54,7 +54,8 @@ Or install it yourself as:
         -d, --database DATABASE          [Required] Name of the database to export
         -k, --keep [KEEP]                [Optional] Number of dump files to keep on FTP (default: 10)
         -t, --timestamped                [Optional] Enables log messages with timestamps
-        -i, --interactive                Interactive, command line mode, for restoring dumps into databases
+        -m, --muted                      [Optional] Mutes log messages (overrides -t option)
+        -i, --interactive                [Optional] Interactive command line mode - for restoring dumps into databases
         -h, --help                       Show this message
     
     Setting can be verified by running following commands:
