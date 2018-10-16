@@ -7,7 +7,6 @@ class PgExport
     module Interactive
       class Input
         def select_dump(dumps)
-          prompt = TTY::Prompt.new
           idx = prompt.select('Select dump to import:') do |menu|
             menu.enum '.'
             dumps.each_with_index do |d, i|
@@ -19,12 +18,17 @@ class PgExport
         end
 
         def enter_database_name(default = nil)
-          prompt = TTY::Prompt.new
           puts 'To which database would you like to restore the downloaded dump?'
           prompt.ask('Enter a local database name:') do |q|
             q.required(true)
             q.default(default) if default
           end
+        end
+
+        private
+
+        def prompt
+          TTY::Prompt.new
         end
       end
     end

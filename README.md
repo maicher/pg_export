@@ -64,50 +64,48 @@ Or install it yourself as:
 
 ## How to start
 
-__Step 1.__ Prepare FTP account and put configuration into env variables. Dumps will be exported into that location.
+__Step 1.__ Prepare ENV variables.
 
-    # /etc/environment
-    BACKUP_FTP_HOST="yourftp.example.com"
-    BACKUP_FTP_USER="user"
-    BACKUP_FTP_PASSWORD="password"
+    /* FTP storage for database dumps. */
+    BACKUP_FTP_HOST=yourftp.example.com
+    BACKUP_FTP_USER=user
+    BACKUP_FTP_PASSWORD=password
     
-__Step 2.__ Put dump encryption key into env variable (exactly 16 characters). Dumps will be SSL(AES-128-CBC) encrypted using that key.
- 
-    # /etc/environment
-    DUMP_ENCRYPTION_KEY="1234567890abcdef"
+    /* Encryption key shoul have exactly 16 characters. */
+    /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
+    DUMP_ENCRYPTION_KEY=1234567890abcdef
     
-Variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
+    /* How many dumps for given database should be kept on ftp? */
+    /* Optional, defaults to 10 */
+    KEEP_DUMPS=5
+    
+Note, that variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value). 
 
-__Step 3.__ Configure how many dumps should be kept in FTP (optional).
-
-    # /etc/environment
-    KEEP_DUMPS=5   # default: 10
-
-__Step 4.__ Print the configuration to verify whether env variables has been loaded.
+__Step 2.__ Print the configuration to verify if env variables has been loaded properly.
 
     $ pg_export --configuration
-    => {:database=>"undefined", :keep_dumps=>10, :dump_encryption_key=>"k4***", :ftp_host=>"yourftp.example.com", 
-      :ftp_user=>"user", :ftp_password=>"pass***", :logger_format=>:plain} 
+    => {:dump_encryption_key=>"k4***", :ftp_host=>"yourftp.example.com", :ftp_user=>"your_ftp_user", 
+       :ftp_password=>"pass***", :logger_format=>"plain", :keep_dumps=>2} 
        
-__Step 5.__ Try connecting to FTP to verify the connection.
+__Step 3.__ Try connecting to FTP to verify the connection.
 
     $ pg_export --ftp
-    => Connect to yourftp.example.com
+    => 230 User your_ftp_user logged in
     
-__Step 6.__ Perform database export.
+__Step 4.__ Perform database export.
 
-    $ pg_export -d your_database
-    => Create Dump Tempfile (1.36MB)
-       Create Encrypted Dump Tempfile (1.34MB)
+    $ pg_export -d your_database [-k 5]
+    => Dump database your_database to your_database_20181016_121314 (1.36MB)
+       Encrypt your_database_20181016_121314 (1.34MB)
        Connect to yourftp.example.com
-       Export Encrypted Dump Tempfile (1.34MB) your_database_20161020_125747 to yourftp.example.com
+       Upload your_database_20181016_121314 (1.34MB) to yourftp.example.com
        Close FTP
        
 ## How to restore a dump?
 
-Go to interactive mode and follow the instructions:
+Run interactive mode and follow the instructions:
 
-    pg_export -i
+    pg_export [-d your_database] -i
 
 ## Development
 
