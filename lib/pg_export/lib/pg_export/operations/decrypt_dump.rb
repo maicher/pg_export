@@ -6,7 +6,7 @@ require 'pg_export/import'
 class PgExport
   module Operations
     class DecryptDump
-      include Import['factories.cipher_factory', 'factories.dump_factory']
+      include Import['factories.cipher_factory']
 
       def call(source_dump)
         source_dump.decrypt(cipher_factory: cipher_factory)

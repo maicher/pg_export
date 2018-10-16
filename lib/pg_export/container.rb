@@ -40,11 +40,5 @@ class PgExport
         register('operations.remove_old_dumps_from_ftp') { ::PgExport::Operations::RemoveOldDumpsFromFtp.new }
       end
     end
-
-    boot(:interactive) do
-      start do
-        use :main
-      end
-    end
   end
 end

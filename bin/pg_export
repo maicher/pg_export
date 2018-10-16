@@ -74,7 +74,7 @@ begin
 
     result.failure do |output|
       using PgExport::Roles::ColourableString
-      puts (output[:message]).to_s.red
+      puts output[:message].to_s.red
       puts option_parser
     end
   end

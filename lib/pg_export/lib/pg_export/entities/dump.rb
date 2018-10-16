@@ -28,14 +28,14 @@ class PgExport
       end
 
       def to_s
-        "#{type} dump (#{name} - #{file.size_human})"
+        "#{name} (#{file.size_human})"
       end
-
-      protected
 
       def file=(f)
         @file = Types::DumpFile[f]
       end
+
+      protected
 
       def type=(t)
         @type = Types::DumpType[t]

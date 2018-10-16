@@ -3,25 +3,28 @@
 require 'open3'
 require 'pg_export/import'
 require 'pg_export/lib/pg_export/entities/dump'
-require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 class PgExport
   module Repositories
     class FtpDumpRepository
-      def get(name, ftp_adapter:)
-        file = ValueObjects::DumpFile.new
-        ftp_adapter.get(file, name)
-
-        Entities::Dump.new(
-          name: name,
-          database: '???',
-          file: file,
-          type: :encrypted
-        )
+      def all(database_name:, ftp_adapter:)
+        ftp_adapter.list([database_name, '*'].compact.join('_')).map do |name|
+          begin
+            dump(name, database_name)
+          rescue Dry::Types::ConstraintError
+            nil
+          end
+        end.compact
       end
 
-      def all(ftp_adapter:)
-        ftp_adapter.list('*')
+      private
+
+      def dump(name, database_name)
+        Entities::Dump.new(
+          name: name,
+          database: database_name,
+          type: :encrypted
+        )
       end
     end
   end
