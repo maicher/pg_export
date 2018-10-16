@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
-require 'null_logger'
 require 'ostruct'
 require 'pg_export/lib/pg_export/factories/cipher_factory'
 require 'pg_export/lib/pg_export/operations/decrypt_dump'
 require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 RSpec.describe PgExport::Operations::DecryptDump do
-  let(:decrypt_dump) { PgExport::Operations::DecryptDump.new(cipher_factory: cipher_factory, logger: NullLogger) }
+  let(:decrypt_dump) { PgExport::Operations::DecryptDump.new(cipher_factory: cipher_factory) }
   let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(dump_encryption_key: encryption_key)) }
   let(:encryption_key) { '1234567890abcdef' }
 

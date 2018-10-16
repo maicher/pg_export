@@ -4,7 +4,6 @@ require 'pg'
 require 'pg_export/lib/pg_export/factories/dump_factory'
 require 'pg_export/lib/pg_export/adapters/bash_adapter'
 require 'pg_export/lib/pg_export/value_objects/dump_file'
-require 'null_logger'
 
 RSpec.describe PgExport::Adapters::BashAdapter do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
