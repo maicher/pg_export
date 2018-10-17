@@ -3,20 +3,26 @@
 # auto_register: false
 
 require 'pg_export/import'
-require 'pg_export/roles/colourable_string'
 require 'tty-spinner'
 
 class PgExport
   module Listeners
     class InteractiveListener
-      using Roles::ColourableString
 
-      include Import['logger']
+      class << self
+        def green(s)
+          "\e[0;32;49m#{s}\e[0m"
+        end
+
+        def red(s)
+          "\e[31m#{s}\e[0m"
+        end
+      end
 
       private
 
-      SUCCESS_MARK = "\u2713".green.freeze
-      ERROR_MARK = "\u00d7".red.freeze
+      SUCCESS_MARK = green("\u2713").freeze
+      ERROR_MARK = red("\u00d7").freeze
       private_constant :SUCCESS_MARK, :ERROR_MARK
 
       def build_spinner(message)
@@ -29,11 +35,11 @@ class PgExport
       end
 
       def success
-        '(success)'.green
+        self.class.green('(success)')
       end
 
       def error
-        '(error)'.red
+        self.class.red('(error)')
       end
     end
   end
