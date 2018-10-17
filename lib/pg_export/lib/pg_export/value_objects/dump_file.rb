@@ -5,6 +5,10 @@ require 'tempfile'
 class PgExport
   module ValueObjects
     class DumpFile
+      def initialize(file = Tempfile.new)
+        @file = file
+      end
+
       def path
         file.path
       end
@@ -60,9 +64,7 @@ class PgExport
       }.freeze
       private_constant :CHUNK_SIZE, :MAPPING
 
-      def file
-        @file ||= Tempfile.new
-      end
+      attr_reader :file
     end
   end
 end

@@ -10,7 +10,7 @@ class PgExport
           idx = prompt.select('Select dump to import:') do |menu|
             menu.enum '.'
             dumps.each_with_index do |d, i|
-              menu.choice(d.name, i)
+              menu.choice(d.to_s, i)
             end
           end
 

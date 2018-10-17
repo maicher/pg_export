@@ -58,8 +58,8 @@ end
 begin
   option_parser.parse!
 rescue OptionParser::ParseError => e
-  $stderr.puts e.message.capitalize
-  $stderr.puts 'Type "pg_export -h" for available options'
+  warn e.message.capitalize
+  warn 'Type "pg_export -h" for available options'
   exit
 end
 
@@ -71,12 +71,12 @@ begin
       PgExport.plain
     end
 rescue PgExport::InitializationError => e
-  $stderr.puts 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
-  $stderr.puts "Detailed message: #{e.message}"
+  warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
+  warn "Detailed message: #{e.message}"
   exit
 end
 
 pg_export.call(database) do |result|
   result.success { puts 'Success' }
-  result.failure { |message:| $stderr.puts message }
+  result.failure { |message:| warn message }
 end

@@ -25,7 +25,10 @@ class PgExport
       end
 
       def list(regex_string)
-        ftp.list(regex_string).map { |item| item.split(' ').last }.sort.reverse
+        ftp.list(regex_string).map do |item|
+          row = item.split(' ')
+          { name: row[8], size: row[4] }
+        end.sort_by { |h| h[:name] }.reverse
       end
 
       def delete(filename)
