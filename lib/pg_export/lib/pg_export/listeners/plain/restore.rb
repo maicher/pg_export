@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+require_relative '../plain_listener'
+
+class PgExport
+  module Listeners
+    class Plain
+      class Restore < PlainListener
+        def on_step_succeeded(step_name:, args:, value:)
+          logger.info("Restore dump to database #{args.first[:database]}")
+        end
+      end
+    end
+  end
+end

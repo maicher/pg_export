@@ -13,6 +13,9 @@ PgExport::Container.boot(:interactive) do
     unless target[:config].logger_muted?
       use :logger
 
+      # type = 'plain'
+      type = 'interactive'
+
       %i[
         open_ftp_connection
         fetch_dumps_from_ftp
@@ -20,7 +23,7 @@ PgExport::Container.boot(:interactive) do
         decrypt_dump
         restore
       ].each do |step|
-        transaction.subscribe(step => target["listeners.interactive.#{step}"])
+        transaction.subscribe(step => target["listeners.#{type}.#{step}"])
       end
     end
 
