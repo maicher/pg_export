@@ -1,4 +1,4 @@
-### 0.7.0 - 2018.10.17
+### 0.7.0 - 2018.10.18
 
 - Change required ruby version from 2.2.0 to 2.3.0.
 - Refactor architecture to be more functional using dry-system

@@ -25,10 +25,11 @@ class PgExport
       end
 
       def list(regex_string)
-        ftp.list(regex_string).map do |item|
-          row = item.split(' ')
-          { name: row[8], size: row[4] }
-        end.sort_by { |h| h[:name] }.reverse
+        ftp
+          .list(regex_string)
+          .map { |row| extracted_meaningful_attributes(row) }
+          .sort_by { |item| item[:name] }
+          .reverse
       end
 
       def delete(filename)
@@ -54,6 +55,13 @@ class PgExport
       private
 
       attr_reader :host, :user, :password
+
+      def extracted_meaningful_attributes(item)
+        MEANINGFUL_KEYS.zip(item.split(' ').values_at(8, 4)).to_h
+      end
+
+      MEANINGFUL_KEYS = %i[name size].freeze
+      private_constant :MEANINGFUL_KEYS
     end
   end
 end

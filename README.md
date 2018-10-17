@@ -75,7 +75,7 @@ __Step 1.__ Prepare ENV variables.
     /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
     DUMP_ENCRYPTION_KEY=1234567890abcdef
     
-    /* How many dumps for given database should be kept on ftp? */
+    /* Dumps to be kept on FTP */
     /* Optional, defaults to 10 */
     KEEP_DUMPS=5
     
