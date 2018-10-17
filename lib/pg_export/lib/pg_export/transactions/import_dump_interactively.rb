@@ -31,6 +31,7 @@ class PgExport
 
       def fetch_dumps_from_ftp(database_name:, ftp_adapter:)
         dumps = ftp_dump_repository.all(database_name: database_name, ftp_adapter: ftp_adapter)
+        return Failure(message: 'No dumps') if dumps.none?
         Success(ftp_adapter: ftp_adapter, dumps: dumps)
       end
 

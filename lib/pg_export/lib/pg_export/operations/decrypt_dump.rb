@@ -13,7 +13,7 @@ class PgExport
         dump.decrypt(cipher_factory: cipher_factory)
         Success(dump: dump)
       rescue OpenSSL::Cipher::CipherError => e
-        Failure(message: "Problem decrypting dump file: #{e}. Try again.".red)
+        Failure(message: "Problem decrypting dump file: #{e}. Try again.")
       end
     end
   end

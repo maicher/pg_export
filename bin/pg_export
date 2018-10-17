@@ -6,7 +6,6 @@ require 'ostruct'
 
 require 'pg_export'
 require 'pg_export/container'
-require 'pg_export/roles/colourable_string'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 interactive = false
@@ -59,26 +58,20 @@ end
 
 begin
   option_parser.parse!
+rescue OptionParser::MissingArgument => e
+  puts "Error: #{e}"
+  puts option_parser
+end
 
+begin
   pg_export =
     if interactive
       PgExport.interactive
     else
       PgExport.plain
     end
-
-  pg_export.call(database) do |result|
-    result.success do
-      # success
-    end
-
-    result.failure do |output|
-      using PgExport::Roles::ColourableString
-      puts output[:message].to_s.red
-    end
-  end
-rescue OptionParser::MissingArgument, PgExport::InitializationError => e
-  using PgExport::Roles::ColourableString
-  puts "Error: #{e}".red
-  puts option_parser
+rescue PgExport::InitializationError => e
+  puts "Error: #{e}"
 end
+
+pg_export.call(database)
