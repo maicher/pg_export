@@ -24,7 +24,7 @@ class PgExport
         keep_dumps: env['KEEP_DUMPS'] || 10
       )
     rescue Dry::Struct::Error => e
-      raise PgExport::InitializationError, e
+      raise PgExport::InitializationError, e.message.gsub('[PgExport::Configuration.new] ', '')
     end
 
     def logger_muted?

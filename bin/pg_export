@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require 'ostruct'
 
 require 'pg_export'
 require 'pg_export/container'
@@ -58,9 +57,10 @@ end
 
 begin
   option_parser.parse!
-rescue OptionParser::MissingArgument => e
-  puts "Error: #{e}"
-  puts option_parser
+rescue OptionParser::ParseError => e
+  $stderr.puts e.message.capitalize
+  $stderr.puts 'Type "pg_export -h" for available options'
+  exit
 end
 
 begin
@@ -71,7 +71,12 @@ begin
       PgExport.plain
     end
 rescue PgExport::InitializationError => e
-  puts "Error: #{e}"
+  $stderr.puts 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
+  $stderr.puts "Detailed message: #{e.message}"
+  exit
 end
 
-pg_export.call(database)
+pg_export.call(database) do |result|
+  result.success { puts 'Success' }
+  result.failure { |message:| $stderr.puts message }
+end

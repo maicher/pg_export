@@ -39,7 +39,7 @@ class PgExport
         )
         Success(dump: dump)
       rescue bash_adapter.class::PgDumpError => e
-        Failure(message: 'Error dumping database: ' + e.to_s)
+        Failure(message: 'Unable to dump database: ' + e.to_s)
       end
 
       def upload_dump_to_ftp(dump:, ftp_adapter:)

@@ -9,6 +9,10 @@ class PgExport
   module Listeners
     class InteractiveListener
 
+      def on_step_failed(step_name:, args:, value:)
+        @spinner.error([error, self.class.red(value[:message])].join("\n"))
+      end
+
       class << self
         def green(s)
           "\e[0;32;49m#{s}\e[0m"

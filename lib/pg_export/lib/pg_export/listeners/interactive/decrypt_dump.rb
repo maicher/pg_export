@@ -13,10 +13,6 @@ class PgExport
         def on_step_succeeded(step_name:, args:, value:)
           @spinner.success([success, value[:dump]].join(' '))
         end
-
-        def on_step_failed(*)
-          @spinner.error(error)
-        end
       end
     end
   end

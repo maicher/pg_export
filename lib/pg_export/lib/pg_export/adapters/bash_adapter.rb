@@ -10,7 +10,7 @@ class PgExport
 
       def pg_dump(file, db_name)
         popen("pg_dump -Fc --file #{file.path} #{db_name}") do |errors|
-          raise PgDumpError, errors unless errors.empty?
+          raise PgDumpError, errors.chomp unless errors.empty?
         end
 
         file
@@ -18,7 +18,7 @@ class PgExport
 
       def pg_restore(file, db_name)
         popen("pg_restore -c -d #{db_name} #{file.path}") do |errors|
-          raise PgRestoreError, errors if /FATAL/ =~ errors
+          raise PgRestoreError, errors.chomp if /FATAL/ =~ errors
         end
       end
 
