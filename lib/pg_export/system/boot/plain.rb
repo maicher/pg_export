@@ -6,17 +6,23 @@ PgExport::Container.boot(:plain) do
   end
 
   start do
-    use :main, :config
+    use :main
 
     transaction = PgExport::Transactions::ExportDump.new
 
     unless target[:config].logger_muted?
-      require 'pg_export/lib/pg_export/listeners/plain_listener'
-      require 'pg_export/build_logger'
+      use :logger
 
-      logger = PgExport::BuildLogger.call(stream: $stdout, format: target[:config].logger_format)
-      listener = PgExport::Listeners::PlainListener.new(logger)
-      transaction.subscribe(listener)
+      %i[
+        build_dump
+        encrypt_dump
+        open_ftp_connection
+        upload_dump_to_ftp
+        remove_old_dumps_from_ftp
+        close_ftp_connection
+      ].each do |step|
+        transaction.subscribe(step => target["listeners.plain.#{step}"])
+      end
     end
 
     register('transactions.export_dump', memoize: true) { transaction }

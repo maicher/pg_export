@@ -18,9 +18,9 @@ RSpec.describe PgExport::Operations::DecryptDump do
   end
 
   describe '#call' do
-    subject { decrypt_dump.call(encrypted_dump) }
+    subject { decrypt_dump.call(dump: encrypted_dump) }
 
-    it { expect(subject.name).to eq('datbase_20180101_121212') }
-    it { expect(subject.file.read).to eq('abc') }
+    it { expect(subject.success[:dump].name).to eq('datbase_20180101_121212') }
+    it { expect(subject.success[:dump].file.read).to eq('abc') }
   end
 end

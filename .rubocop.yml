@@ -17,3 +17,6 @@ Naming/UncommunicativeMethodParamName:
 
 Documentation:
   Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false

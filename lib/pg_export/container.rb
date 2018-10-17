@@ -31,13 +31,17 @@ class PgExport
     boot(:main) do
       init do
         require 'pg_export/lib/pg_export/operations/encrypt_dump'
+        require 'pg_export/lib/pg_export/operations/decrypt_dump'
         require 'pg_export/lib/pg_export/operations/remove_old_dumps_from_ftp'
+        require 'pg_export/lib/pg_export/operations/open_ftp_connection'
       end
 
       start do
         use :ftp
         register('operations.encrypt_dump') { ::PgExport::Operations::EncryptDump.new }
+        register('operations.decrypt_dump') { ::PgExport::Operations::DecryptDump.new }
         register('operations.remove_old_dumps_from_ftp') { ::PgExport::Operations::RemoveOldDumpsFromFtp.new }
+        register('operations.open_ftp_connection') { ::PgExport::Operations::OpenFtpConnection.new }
       end
     end
   end

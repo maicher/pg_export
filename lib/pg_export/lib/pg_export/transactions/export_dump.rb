@@ -12,12 +12,12 @@ class PgExport
   module Transactions
     class ExportDump
       include Dry::Transaction(container: PgExport::Container)
-      include Import['factories.dump_factory', 'adapters.bash_adapter', 'factories.ftp_adapter_factory']
+      include Import['factories.dump_factory', 'adapters.bash_adapter']
 
       step :prepare_params
       step :build_dump
       step :encrypt_dump, with: 'operations.encrypt_dump'
-      step :open_ftp_connection
+      step :open_ftp_connection, with: 'operations.open_ftp_connection'
       step :upload_dump_to_ftp
       step :remove_old_dumps_from_ftp, with: 'operations.remove_old_dumps_from_ftp'
       step :close_ftp_connection
@@ -40,12 +40,6 @@ class PgExport
         Success(dump: dump)
       rescue bash_adapter.class::PgDumpError => e
         Failure(message: 'Error dumping database: ' + e.to_s)
-      end
-
-      def open_ftp_connection(dump:)
-        ftp_adapter = ftp_adapter_factory.ftp_adapter
-        ftp_adapter.open_ftp
-        Success(dump: dump, ftp_adapter: ftp_adapter)
       end
 
       def upload_dump_to_ftp(dump:, ftp_adapter:)
