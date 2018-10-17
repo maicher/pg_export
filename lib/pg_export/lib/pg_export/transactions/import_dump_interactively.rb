@@ -15,7 +15,7 @@ class PgExport
         'adapters.bash_adapter',
         'repositories.ftp_dump_repository',
         'repositories.ftp_dump_file_repository',
-        'ui.interactive.input'
+        'ui_input'
       ]
 
       step :open_ftp_connection, with: 'operations.open_ftp_connection'
@@ -35,7 +35,7 @@ class PgExport
       end
 
       def select_dump(dumps:, ftp_adapter:)
-        dump = input.select_dump(dumps)
+        dump = ui_input.select_dump(dumps)
         Success(dump: dump, ftp_adapter: ftp_adapter)
       end
 
@@ -50,7 +50,7 @@ class PgExport
       end
 
       def select_database(dump:)
-        name = input.enter_database_name(dump.database)
+        name = ui_input.enter_database_name(dump.database)
         Success(dump: dump, database: name)
       end
 

@@ -8,13 +8,13 @@ PgExport::Container.boot(:interactive) do
   start do
     use :main
 
-    transaction = PgExport::Transactions::ImportDumpInteractively.new
+    # type = 'plain'
+    type = 'interactive'
+
+    transaction = PgExport::Transactions::ImportDumpInteractively.new(ui_input: target["ui.#{type}.input"])
 
     unless target[:config].logger_muted?
       use :logger
-
-      # type = 'plain'
-      type = 'interactive'
 
       %i[
         open_ftp_connection
