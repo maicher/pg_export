@@ -1,26 +1,22 @@
 AllCops:
-  TargetRubyVersion: 2.1
-  Exclude:
-    - 'spec/spec_helper.rb'
+  TargetRubyVersion: 2.3
 
-Style/BlockLength:
+Metrics/BlockLength:
   Exclude:
     - 'bin/pg_export'
-    - 'spec/**/*.rb'
+  ExcludedMethods: ['describe', 'context']
 
 Metrics/LineLength:
   Max: 200
 
-Lint/AmbiguousOperator:
-  Exclude:
-    - 'lib/pg_export/configuration.rb'
-
-Style/AlignArray:
-  Exclude:
-    - 'spec/configuration_spec.rb'
-
 Style/ParallelAssignment:
   Enabled: false
 
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
 Documentation:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
   Enabled: false

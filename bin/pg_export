@@ -1,40 +1,36 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'optparse'
-require 'ostruct'
 
 require 'pg_export'
-require 'pg_export/roles/colourable_string'
+require 'pg_export/container'
 
-config = {
-  database: 'undefined',
-  keep_dumps: ENV['KEEP_DUMPS'],
-  dump_encryption_key: ENV['DUMP_ENCRYPTION_KEY'],
-  ftp_host: ENV['BACKUP_FTP_HOST'],
-  ftp_user: ENV['BACKUP_FTP_USER'],
-  ftp_password: ENV['BACKUP_FTP_PASSWORD'],
-  logger_format: :plain,
-  interactive: false
-}
+ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
+interactive = false
+database = nil
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
 
-  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |database|
-    config[:database] = database
+  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |d|
+    database = d
   end
 
-  opts.on('-k', '--keep [KEEP]', Integer, "[Optional] Number of dump files to keep on FTP (default: #{config[:keep_dumps]})") do |keep|
-    config[:keep_dumps] = keep
+  opts.on('-k', '--keep [KEEP]', String, "[Optional] Number of dump files to keep on FTP (default: #{ENV['KEEP_DUMPS']})") do |keep|
+    ENV['KEEP_DUMPS'] = keep
   end
 
   opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
-    config[:logger_format] = :timestamped
+    ENV['LOGGER_FORMAT'] = 'timestamped'
   end
 
-  opts.on('-i', '--interactive', 'Interactive, command line mode, for restoring dumps into databases') do
-    config[:logger_format] = :muted
-    config[:interactive] = true
+  opts.on('-m', '--muted', '[Optional] Mutes log messages (overrides -t option)') do
+    ENV['LOGGER_FORMAT'] = 'muted'
+  end
+
+  opts.on('-i', '--interactive', '[Optional] Interactive command line mode - for restoring dumps into databases') do
+    interactive = true
   end
 
   opts.on('-h', '--help', 'Show this message') do
@@ -45,39 +41,42 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nSetting can be verified by running following commands:"
 
   opts.on('-c', '--configuration', 'Prints the configuration') do
-    puts config
+    PgExport::Container.start(:config)
+    puts PgExport::Container['config'].to_h
     exit
   end
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::Ftp::Connection.new(
-      host: config[:ftp_host],
-      user: config[:ftp_user],
-      password: config[:ftp_password],
-      logger: PgExport::BuildLogger.call(stream: $stdout, format: :plain)
-    ).open
+    PgExport::Container.start(:ftp)
+    ftp_adapter = PgExport::Container['factories.ftp_adapter_factory'].ftp_adapter
+    ftp = ftp_adapter.open_ftp
+    puts ftp.welcome
     exit
   end
 end
 
 begin
   option_parser.parse!
+rescue OptionParser::ParseError => e
+  warn e.message.capitalize
+  warn 'Type "pg_export -h" for available options'
+  exit
+end
 
-  PgExport.new(
-    dump_encryption_key: config[:dump_encryption_key],
-    ftp_host: config[:ftp_host],
-    ftp_user: config[:ftp_user],
-    ftp_password: config[:ftp_password],
-    logger_format: config[:logger_format],
-    interactive: config[:interactive]
-  ).call(
-    config[:database],
-    config[:keep_dumps]
-  )
-rescue OptionParser::MissingArgument, PgExport::PgExportError, ArgumentError => e
-  using PgExport::Roles::ColourableString
-  puts "Error: #{e}".red
-  puts option_parser
-rescue PgExport::PgDumpError => e
-  puts e
+begin
+  pg_export =
+    if interactive
+      PgExport.interactive
+    else
+      PgExport.plain
+    end
+rescue PgExport::InitializationError => e
+  warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
+  warn "Detailed message: #{e.message}"
+  exit
+end
+
+pg_export.call(database) do |result|
+  result.success { puts 'Success' }
+  result.failure { |message:| warn message }
 end

@@ -1,3 +1,12 @@
+### 0.7.0 - 2018.10.18
+
+- Change required ruby version from 2.2.0 to 2.3.0.
+- Refactor architecture to be more functional using dry-system
+- Use tty for interactive CLI (instead of cli_spinnable)
+- Improve configuration parsing
+- Add -m option for muting log messages
+- Make log messages more verbose
+
 ### 0.6.1 - 2017.08.20
 
 - Change required ruby version from 2.1.0 to 2.2.0.

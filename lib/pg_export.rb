@@ -1,29 +1,32 @@
-require 'pg_export/version'
-require 'pg_export/configuration'
-require 'pg_export/boot_container'
-require 'pg_export/roles/interactive'
-require 'pg_export/errors'
-require 'pg_export/roles/validatable'
+# frozen_string_literal: true
+
+require 'pry'
+require 'pg_export/container'
 
 class PgExport
-  include Roles::Validatable
+  class InitializationError < StandardError; end
 
-  def initialize(**args)
-    config = Configuration.new(**args)
-    extend Roles::Interactive if config.interactive
-    @container = BootContainer.call(config.to_h)
-  rescue Dry::Struct::Error => e
-    raise ArgumentError, e
+  class << self
+    def interactive
+      PgExport::Container.start(:interactive)
+      new(transaction: PgExport::Container['transactions.import_dump_interactively'])
+    end
+
+    def plain
+      PgExport::Container.start(:plain)
+      new(transaction: PgExport::Container['transactions.export_dump'])
+    end
   end
 
-  def call(database_name, keep_dumps)
-    container[:create_and_export_dump].call(
-      validate_database_name(database_name),
-      validate_keep_dumps(keep_dumps)
-    )
+  def initialize(transaction:)
+    @transaction = transaction
+  end
+
+  def call(database_name, &block)
+    transaction.call(database_name: database_name, &block)
   end
 
   private
 
-  attr_reader :container
+  attr_reader :transaction
 end
