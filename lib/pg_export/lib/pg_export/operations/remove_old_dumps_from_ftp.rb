@@ -10,9 +10,13 @@ class PgExport
       include Import['repositories.ftp_dump_repository', 'config']
 
       def call(dump:, ftp_adapter:)
-        dumps = ftp_adapter.list(dump.database + '_*').drop(config.keep_dumps)
-        dumps.each do |filename|
-          ftp_adapter.delete(filename)
+        dumps = ftp_dump_repository.by_database_name(
+          database_name: dump.database,
+          ftp_adapter: ftp_adapter,
+          offset: config.keep_dumps
+        )
+        dumps.each do |d|
+          ftp_adapter.delete(d.name)
         end
 
         Success(removed_dumps: dumps, ftp_adapter: ftp_adapter)

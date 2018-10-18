@@ -32,8 +32,8 @@ class PgExport
           .reverse
       end
 
-      def delete(filename)
-        ftp.delete(filename)
+      def delete(name)
+        ftp.delete(name)
       end
 
       def persist(file, name)

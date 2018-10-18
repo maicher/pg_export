@@ -18,6 +18,16 @@ class PgExport
         end.compact
       end
 
+      def by_database_name(database_name:, ftp_adapter:, offset:)
+        ftp_adapter.list(database_name + '_*').drop(offset).map do |name:, size:|
+          begin
+            dump(name, database_name, size)
+          rescue Dry::Types::ConstraintError
+            nil
+          end
+        end.compact
+      end
+
       private
 
       FilePlaceholder = Struct.new(:size)
