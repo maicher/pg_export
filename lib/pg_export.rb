@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
 require 'pg_export/container'
 
 class PgExport
