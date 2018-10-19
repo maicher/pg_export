@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.3.0'
 
   spec.add_dependency 'dry-initializer', '~> 2.5.0'
+  spec.add_dependency 'dry-types', '~> 0.12.0'
   spec.add_dependency 'dry-struct', '~> 0.4.0'
   spec.add_dependency 'dry-system', '~> 0.9.0'
   spec.add_dependency 'dry-transaction', '~> 0.13.0'
