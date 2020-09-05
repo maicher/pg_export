@@ -1,3 +1,7 @@
+### 0.7.6 - 2020.09.05
+
+- Upgrade dry-types, dry-struct dry-system 
+
 ### 0.7.0 - 2018.10.18
 
 - Change required ruby version from 2.2.0 to 2.3.0.

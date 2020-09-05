@@ -5,14 +5,14 @@ require 'dry-struct'
 
 class PgExport
   class Configuration < Dry::Struct
-    include Dry::Types.module
+    include Dry::Types()
 
     attribute :dump_encryption_key, Strict::String.constrained(size: 16)
     attribute :ftp_host,            Strict::String
     attribute :ftp_user,            Strict::String
     attribute :ftp_password,        Strict::String
     attribute :logger_format,       Coercible::String.enum('plain', 'timestamped', 'muted')
-    attribute :keep_dumps,          Coercible::Int.constrained(gteq: 0)
+    attribute :keep_dumps,          Coercible::Integer.constrained(gteq: 0)
 
     def self.build(env)
       new(
