@@ -1,3 +1,7 @@
+### 0.7.7 - 2020.09.07
+
+- Upgrade dry-initializer 
+
 ### 0.7.6 - 2020.09.05
 
 - Upgrade dry-types, dry-struct dry-system 
