@@ -78,5 +78,5 @@ end
 
 pg_export.call(database) do |result|
   result.success { puts 'Success' }
-  result.failure { |message:| warn message }
+  result.failure { |outcome| warn outcome[:message] }
 end

@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Plain
       class DownloadDumpFromFtp < PlainListener
-        def on_step_succeeded(step_name:, args:, value:)
-          logger.info("Download #{value[:dump]}")
+        def on_step_succeeded(event)
+          logger.info("Download #{event[:value][:dump]}")
         end
       end
     end

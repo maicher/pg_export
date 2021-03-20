@@ -19,9 +19,9 @@ class PgExport
       end
 
       def by_database_name(database_name:, ftp_adapter:, offset:)
-        ftp_adapter.list(database_name + '_*').drop(offset).map do |name:, size:|
+        ftp_adapter.list(database_name + '_*').drop(offset).map do |item|
           begin
-            dump(name, database_name, size)
+            dump(item[:name], database_name, item[:size])
           rescue Dry::Types::ConstraintError
             nil
           end

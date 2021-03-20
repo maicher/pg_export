@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Plain
       class BuildDump < PlainListener
-        def on_step_succeeded(step_name:, args:, value:)
-          logger.info("Dump database #{value[:dump].database} to #{value[:dump]}")
+        def on_step_succeeded(event)
+          logger.info("Dump database #{event[:value][:dump].database} to #{event[:value][:dump]}")
         end
       end
     end

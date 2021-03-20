@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Plain
       class DecryptDump < PlainListener
-        def on_step_succeeded(step_name:, args:, value:)
-          logger.info("Decrypt #{value[:dump]}")
+        def on_step_succeeded(event)
+          logger.info("Decrypt #{event[:value][:dump]}")
         end
       end
     end

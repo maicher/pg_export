@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Plain
       class OpenFtpConnection < PlainListener
-        def on_step_succeeded(step_name:, args:, value:)
-          logger.info("Connect to #{value[:ftp_adapter]}")
+        def on_step_succeeded(event)
+          logger.info("Connect to #{event[:value][:ftp_adapter]}")
         end
       end
     end

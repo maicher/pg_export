@@ -10,8 +10,8 @@ class PgExport
           @spinner = build_spinner('Downloading')
         end
 
-        def on_step_succeeded(step_name:, args:, value:)
-          @spinner.success([success, value[:dump]].join(' '))
+        def on_step_succeeded(event)
+          @spinner.success([success, event[:value][:dump]].join(' '))
         end
       end
     end

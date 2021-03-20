@@ -3,5 +3,5 @@
 require_relative 'container'
 
 class PgExport
-  Import = PgExport::Container.injector.hash
+  Import = PgExport::Container.injector
 end

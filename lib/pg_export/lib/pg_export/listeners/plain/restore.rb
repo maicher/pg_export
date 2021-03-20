@@ -6,7 +6,7 @@ class PgExport
   module Listeners
     class Plain
       class Restore < PlainListener
-        def on_step_succeeded(step_name:, args:, value:)
+        def on_step_succeeded(event)
           logger.info("Restore dump to database #{args.first[:database]}")
         end
       end

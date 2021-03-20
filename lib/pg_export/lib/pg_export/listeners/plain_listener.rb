@@ -9,8 +9,8 @@ class PgExport
     class PlainListener
       include Import['logger']
 
-      def on_step_failed(step_name:, args:, value:)
-        logger.info("Error: #{value[:message]}")
+      def on_step_failed(event)
+        logger.info("Error: #{event[:value][:message]}")
       end
     end
   end

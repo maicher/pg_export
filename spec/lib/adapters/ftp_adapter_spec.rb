@@ -12,7 +12,7 @@ RSpec.describe PgExport::Adapters::FtpAdapter do
     allow(mock).to receive(:passive=).with(true)
   end
 
-  subject { described_class.new(params) }
+  subject { described_class.new(**params) }
 
   it { expect(subject).to respond_to(:list) }
   it { expect(subject).to respond_to(:delete) }
