@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'dry-struct', '~> 1.0'
   spec.add_dependency 'dry-system', '~> 0.18'
   spec.add_dependency 'dry-transaction', '~> 0.13'
+  spec.add_dependency 'net-ssh'
+  spec.add_dependency 'net-scp'
   spec.add_dependency 'tty-prompt'
   spec.add_dependency 'tty-spinner'
 

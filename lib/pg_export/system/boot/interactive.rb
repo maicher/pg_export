@@ -17,7 +17,7 @@ PgExport::Container.boot(:interactive) do
       use :logger
 
       %i[
-        open_ftp_connection
+        open_connection
         fetch_dumps_from_ftp
         download_dump_from_ftp
         decrypt_dump

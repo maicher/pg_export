@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Interactive
       class Restore < InteractiveListener
-        def on_step(step_name:, args:)
-          @spinner = build_spinner("Restoring dump to database #{args.first[:database]}")
+        def on_step(event)
+          @spinner = build_spinner("Restoring dump to database #{event[:args].first[:database]}")
         end
 
         def on_step_succeeded(*)

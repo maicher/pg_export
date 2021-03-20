@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class PgExport
-  VERSION = '0.7.7'
+  VERSION = '1.0.0.rc1'
 end

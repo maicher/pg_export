@@ -17,10 +17,10 @@ class PgExport
       step :prepare_params
       step :build_dump
       step :encrypt_dump, with: 'operations.encrypt_dump'
-      step :open_ftp_connection, with: 'operations.open_ftp_connection'
+      step :open_connection, with: 'operations.open_connection'
       step :upload_dump_to_ftp
       step :remove_old_dumps_from_ftp, with: 'operations.remove_old_dumps_from_ftp'
-      step :close_ftp_connection
+      step :close_connection
 
       private
 
@@ -47,8 +47,8 @@ class PgExport
         Success(dump: dump, gateway: gateway)
       end
 
-      def close_ftp_connection(removed_dumps:, gateway:)
-        gateway.close_ftp
+      def close_connection(removed_dumps:, gateway:)
+        gateway.close
         Success(gateway: gateway)
       end
     end

@@ -5,13 +5,13 @@ require 'pg_export/import'
 
 class PgExport
   module Operations
-    class OpenFtpConnection
+    class OpenConnection
       include Dry::Transaction::Operation
       include Import['factories.gateway_factory']
 
       def call(inputs)
         gateway = gateway_factory.gateway
-        gateway.open_ftp
+        gateway.open
         Success(inputs.merge(gateway: gateway))
       end
     end

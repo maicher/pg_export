@@ -2,11 +2,12 @@
 
 # auto_register: false
 
-require 'net/ftp'
+require 'net/ssh'
+require 'net/scp'
 
 class PgExport
   module Gateways
-    class Ftp
+    class Ssh
       CHUNK_SIZE = (2**16).freeze
 
       def initialize(host:, user:, password:)
@@ -14,52 +15,55 @@ class PgExport
       end
 
       def open
-        @ftp = Net::FTP.new(host, user, password)
-        @ftp.passive = true
-        @ftp
+        if password.nil?
+          @ssh = Net::SSH.start(host, user)
+        else
+          @ssh = Net::SSH.start(host, user, password)
+        end
       end
 
       def welcome
-        open.welcome
+        open.exec!('hostname')
       end
 
       def close
-        @ftp&.close
+        @ssh&.close
       end
 
       def list(regex_string)
-        ftp
-          .list(regex_string)
-          .map { |row| extracted_meaningful_attributes(row) }
+        ssh
+          .exec!("ls -l | grep #{regex_string.gsub('*', '')}")
+          .split("\n")
+          .map { |row| extract_meaningful_attributes(row) }
           .sort_by { |item| item[:name] }
           .reverse
       end
 
       def delete(name)
-        ftp.delete(name)
+        # @TODO
       end
 
       def persist(file, name)
-        ftp.putbinaryfile(file.path, name, CHUNK_SIZE)
+        ssh.scp.upload(file.path, name).wait
       end
 
       def get(file, name)
-        ftp.getbinaryfile(name, file.path, CHUNK_SIZE)
+        ssh.scp.download(name, file.path).wait
       end
 
       def to_s
         host
       end
 
-      def ftp
-        @ftp ||= open
+      def ssh
+        @ssh ||= open
       end
 
       private
 
       attr_reader :host, :user, :password
 
-      def extracted_meaningful_attributes(item)
+      def extract_meaningful_attributes(item)
         MEANINGFUL_KEYS.zip(item.split(' ').values_at(8, 4)).to_h
       end
 

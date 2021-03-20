@@ -7,9 +7,9 @@ describe PgExport::Configuration do
   let(:valid_params) do
     {
       dump_encryption_key: '1234567890abcdef',
-      ftp_host: 'host',
-      ftp_user: 'user',
-      ftp_password: 'password',
+      gateway_host: 'host',
+      gateway_user: 'user',
+      gateway_password: 'password',
       logger_format: :plain,
       keep_dumps: '10'
     }
@@ -21,7 +21,7 @@ describe PgExport::Configuration do
       it { expect { subject }.not_to raise_error }
     end
 
-    %i[dump_encryption_key ftp_host ftp_user ftp_password logger_format].each do |param_name|
+    %i[dump_encryption_key gateway_host gateway_user gateway_password logger_format].each do |param_name|
       context "when #{param_name} parameter are missing" do
         let(:params) { valid_params.tap { |p| p.delete(param_name) } }
         it { expect { subject }.to raise_error(Dry::Struct::Error) }

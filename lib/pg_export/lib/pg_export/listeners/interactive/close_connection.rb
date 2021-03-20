@@ -5,9 +5,9 @@ require_relative '../interactive_listener'
 class PgExport
   module Listeners
     class Interactive
-      class OpenFtpConnection < InteractiveListener
+      class CloseConnection < InteractiveListener
         def on_step(*)
-          @spinner = build_spinner('Opening ftp connection')
+          @spinner = build_spinner('Closing FTP')
         end
 
         def on_step_succeeded(*)

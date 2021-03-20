@@ -5,9 +5,9 @@ require_relative '../plain_listener'
 class PgExport
   module Listeners
     class Plain
-      class CloseFtpConnection < PlainListener
-        def on_step_succeeded(*)
-          logger.info('Close FTP')
+      class OpenConnection < PlainListener
+        def on_step_succeeded(event)
+          logger.info("Connect to #{event[:value][:gateway]}")
         end
       end
     end

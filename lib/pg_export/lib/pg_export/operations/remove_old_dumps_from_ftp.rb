@@ -7,10 +7,10 @@ class PgExport
   module Operations
     class RemoveOldDumpsFromFtp
       include Dry::Transaction::Operation
-      include Import['repositories.ftp_dump_repository', 'config']
+      include Import['repositories.gateway_dump_repository', 'config']
 
       def call(dump:, gateway:)
-        dumps = ftp_dump_repository.by_database_name(
+        dumps = gateway_dump_repository.by_database_name(
           database_name: dump.database,
           gateway: gateway,
           offset: config.keep_dumps

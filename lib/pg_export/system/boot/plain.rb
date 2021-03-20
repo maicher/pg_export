@@ -19,10 +19,10 @@ PgExport::Container.boot(:plain) do
       %i[
         build_dump
         encrypt_dump
-        open_ftp_connection
+        open_connection
         upload_dump_to_ftp
         remove_old_dumps_from_ftp
-        close_ftp_connection
+        close_connection
       ].each do |step|
         transaction.subscribe(step => target["listeners.#{type}.#{step}"])
       end

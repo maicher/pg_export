@@ -13,16 +13,16 @@ class PgExport
       include Dry::Transaction(container: PgExport::Container)
       include Import[
         'adapters.bash_adapter',
-        'repositories.ftp_dump_repository',
-        'repositories.ftp_dump_file_repository',
+        'repositories.gateway_dump_repository',
+        'repositories.gateway_dump_file_repository',
         'ui_input'
       ]
 
-      step :open_ftp_connection, with: 'operations.open_ftp_connection'
+      step :open_connection, with: 'operations.open_connection'
       step :fetch_dumps_from_ftp
       step :select_dump
       step :download_dump_from_ftp
-      step :close_ftp_connection
+      step :close_connection
       step :decrypt_dump, with: 'operations.decrypt_dump'
       step :select_database
       step :restore
@@ -30,7 +30,7 @@ class PgExport
       private
 
       def fetch_dumps_from_ftp(database_name:, gateway:)
-        dumps = ftp_dump_repository.all(database_name: database_name, gateway: gateway)
+        dumps = gateway_dump_repository.all(database_name: database_name, gateway: gateway)
         return Failure(message: 'No dumps') if dumps.none?
 
         Success(gateway: gateway, dumps: dumps)
@@ -42,12 +42,12 @@ class PgExport
       end
 
       def download_dump_from_ftp(dump:, gateway:)
-        dump.file = ftp_dump_file_repository.by_name(name: dump.name, gateway: gateway)
+        dump.file = gateway_dump_file_repository.by_name(name: dump.name, gateway: gateway)
         Success(dump: dump, gateway: gateway)
       end
 
-      def close_ftp_connection(dump:, gateway:)
-        Thread.new { gateway.close_ftp }
+      def close_connection(dump:, gateway:)
+        Thread.new { gateway.close }
         Success(dump: dump)
       end
 

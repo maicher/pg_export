@@ -21,27 +21,36 @@ class PgExport
 
       start do
         use :config
-
-        register('factories.gateway_factory') do
-          ::PgExport::Factories::FtpGatewayFactory.new
-        end
+        register('factories.gateway_factory') { ::PgExport::Factories::FtpGatewayFactory.new }
       end
     end
 
-    boot(:main) do
+    boot(:ssh) do
+      init do
+        require 'pg_export/lib/pg_export/factories/ssh_gateway_factory'
+      end
+
+      start do
+        use :config
+        register('factories.gateway_factory') { ::PgExport::Factories::SshGatewayFactory.new }
+      end
+    end
+
+    boot(:main) do |system|
       init do
         require 'pg_export/lib/pg_export/operations/encrypt_dump'
         require 'pg_export/lib/pg_export/operations/decrypt_dump'
         require 'pg_export/lib/pg_export/operations/remove_old_dumps_from_ftp'
-        require 'pg_export/lib/pg_export/operations/open_ftp_connection'
+        require 'pg_export/lib/pg_export/operations/open_connection'
       end
 
       start do
-        use :ftp
+        use(system[:config].gateway)
+
         register('operations.encrypt_dump') { ::PgExport::Operations::EncryptDump.new }
         register('operations.decrypt_dump') { ::PgExport::Operations::DecryptDump.new }
         register('operations.remove_old_dumps_from_ftp') { ::PgExport::Operations::RemoveOldDumpsFromFtp.new }
-        register('operations.open_ftp_connection') { ::PgExport::Operations::OpenFtpConnection.new }
+        register('operations.open_connection') { ::PgExport::Operations::OpenConnection.new }
       end
     end
   end

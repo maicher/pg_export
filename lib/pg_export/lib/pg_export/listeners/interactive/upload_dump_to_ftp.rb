@@ -6,8 +6,8 @@ class PgExport
   module Listeners
     class Interactive
       class UploadDumpToFtp < InteractiveListener
-        def on_step(step_name:, args:)
-          @spinner = build_spinner("Uploading #{args.first[:dump]} to #{args.first[:gateway]}")
+        def on_step(event)
+          @spinner = build_spinner("Uploading #{event[:args].first[:dump]} to #{event[:args].first[:gateway]}")
         end
 
         def on_step_succeeded(*)

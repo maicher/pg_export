@@ -26,7 +26,7 @@ Features:
 
 ## Dependencies
 
-  * Ruby >= 2.3.0
+  * Ruby >= 2.4 (works with Ruby 3.0)
   * $ pg_dump
   * $ pg_restore
 
@@ -51,16 +51,19 @@ Or install it yourself as:
     $ pg_export -h
 
     Usage: pg_export [options]
+        -g, --gateway GATEWAY            [Optional] ssh or ftp (default: ftp)
         -d, --database DATABASE          [Required] Name of the database to export
         -k, --keep [KEEP]                [Optional] Number of dump files to keep on FTP (default: 10)
         -t, --timestamped                [Optional] Enables log messages with timestamps
         -m, --muted                      [Optional] Mutes log messages (overrides -t option)
         -i, --interactive                [Optional] Interactive command line mode - for restoring dumps into databases
+        -v, --version                    Show version
         -h, --help                       Show this message
-    
+
     Setting can be verified by running following commands:
         -c, --configuration              Prints the configuration
-        -f, --ftp                        Tries connecting to FTP to verify the connection
+        -w, --welcome                    Tries connecting to the gateway (FTP or SSH) to verify the connection
+
 
 ## How to start
 
@@ -84,12 +87,12 @@ Note, that variables cannot include `#` sign, [more info](http://serverfault.com
 __Step 2.__ Print the configuration to verify if env variables has been loaded properly.
 
     $ pg_export --configuration
-    => {:dump_encryption_key=>"k4***", :ftp_host=>"yourftp.example.com", :ftp_user=>"your_ftp_user", 
-       :ftp_password=>"pass***", :logger_format=>"plain", :keep_dumps=>2} 
+    => {:dump_encryption_key=>"k4***", :gateway_host=>"yourftp.example.com", :gateway_user=>"your_gateway_user",
+       :gateway_password=>"pass***", :logger_format=>"plain", :keep_dumps=>2}
        
 __Step 3.__ Try connecting to FTP to verify the connection.
 
-    $ pg_export --ftp
+    $ pg_export --gateway ftp --welcome
     => 230 User your_ftp_user logged in
     
 __Step 4.__ Perform database export.

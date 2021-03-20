@@ -7,11 +7,11 @@ require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 class PgExport
   module Repositories
-    class FtpDumpRepository
+    class GatewayDumpRepository
       def all(database_name:, gateway:)
-        gateway.list([database_name, '*'].compact.join('_')).map do |name:, size:|
+        gateway.list([database_name, '*'].compact.join('_')).map do |item|
           begin
-            dump(name, database_name, size)
+            dump(item[:name], database_name, item[:size])
           rescue Dry::Types::ConstraintError
             nil
           end

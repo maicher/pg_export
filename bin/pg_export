@@ -4,14 +4,19 @@
 require 'optparse'
 
 require 'pg_export'
-require 'pg_export/container'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
+ENV['GATEWAY'] = 'ftp'
+
 interactive = false
 database = nil
 
 option_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: pg_export [options]'
+
+  opts.on('-g', '--gateway GATEWAY', String, '[Optional] ssh or ftp (default: ftp)') do |g|
+    ENV['GATEWAY'] = g
+  end
 
   opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |d|
     database = d
@@ -33,6 +38,11 @@ option_parser = OptionParser.new do |opts|
     interactive = true
   end
 
+  opts.on('-v', '--version', 'Show version') do
+    puts PgExport::VERSION
+    exit
+  end
+
   opts.on('-h', '--help', 'Show this message') do
     puts opts
     exit
@@ -41,16 +51,17 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nSetting can be verified by running following commands:"
 
   opts.on('-c', '--configuration', 'Prints the configuration') do
+    require 'pg_export/container'
     PgExport::Container.start(:config)
     puts PgExport::Container['config'].to_h
     exit
   end
 
-  opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
-    PgExport::Container.start(:ftp)
+  opts.on('-w', '--welcome', 'Tries connecting to the gateway (FTP or SSH) to verify the connection') do
+    require 'pg_export/container'
+    PgExport::Container.start(ENV['GATEWAY'].to_sym)
     gateway = PgExport::Container['factories.gateway_factory'].gateway
-    ftp = gateway.open_ftp
-    puts ftp.welcome
+    puts gateway.welcome
     exit
   end
 end
@@ -62,6 +73,8 @@ rescue OptionParser::ParseError => e
   warn 'Type "pg_export -h" for available options'
   exit
 end
+
+require 'pg_export/container'
 
 begin
   pg_export =

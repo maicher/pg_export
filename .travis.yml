@@ -1,9 +1,12 @@
-sudo: false
 language: ruby
 rvm:
-  - 2.3.0
+  - 3.0.0
+  - 2.7.2
+  - 2.4.10
+services:
+  - postgresql
 addons:
   code_climate:
     repo_token: db03e5968c5bcd68b12ca50f5d41ae07dd74fe80d4e1421d754e31c316e7477a
-before_install: gem install bundler -v 1.16.6
+before_install: gem install bundler -v 2.2.3
 after_success: codeclimate-test-reporter
