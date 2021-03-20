@@ -30,11 +30,18 @@ class PgExport
         @ssh&.close
       end
 
-      def list(regex_string)
+      def list(name)
+        grep =
+          if name.nil? || name.empty?
+            ''
+          else
+            " | grep #{name}"
+          end
+
         ssh
-          .exec!("ls -l | grep #{regex_string.gsub('*', '')}")
-          .split("\n")
-          .map { |row| extract_meaningful_attributes(row) }
+          .exec!("ls -l#{grep}")
+          .split("\n").map { |row| extract_meaningful_attributes(row) }
+          .reject { |item| item[:name].nil? }
           .sort_by { |item| item[:name] }
           .reverse
       end

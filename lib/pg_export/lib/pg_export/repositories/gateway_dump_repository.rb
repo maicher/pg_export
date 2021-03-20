@@ -9,7 +9,7 @@ class PgExport
   module Repositories
     class GatewayDumpRepository
       def all(database_name:, gateway:)
-        gateway.list([database_name, '*'].compact.join('_')).map do |item|
+        gateway.list(database_name).map do |item|
           begin
             dump(item[:name], database_name, item[:size])
           rescue Dry::Types::ConstraintError
@@ -19,7 +19,7 @@ class PgExport
       end
 
       def by_database_name(database_name:, gateway:, offset:)
-        gateway.list(database_name + '_*').drop(offset).map do |item|
+        gateway.list(database_name).drop(offset).map do |item|
           begin
             dump(item[:name], database_name, item[:size])
           rescue Dry::Types::ConstraintError

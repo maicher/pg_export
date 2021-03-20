@@ -27,9 +27,9 @@ class PgExport
         @ftp&.close
       end
 
-      def list(regex_string)
+      def list(name)
         ftp
-          .list(regex_string)
+          .list([name, '*'].join('_'))
           .map { |row| extracted_meaningful_attributes(row) }
           .sort_by { |item| item[:name] }
           .reverse
