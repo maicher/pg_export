@@ -8,10 +8,10 @@ require 'ftp_mock'
 
 describe PgExport do
   before do
-    ENV['DUMP_ENCRYPTION_KEY'] = '1234567890abcdef'
-    ENV['BACKUP_FTP_HOST'] = 'ftp.example.com'
-    ENV['BACKUP_FTP_USER'] = 'user'
-    ENV['BACKUP_FTP_PASSWORD'] = 'pass'
+    ENV['PG_EXPORT_ENCRYPTION_KEY'] = '1234567890abcdef'
+    ENV['PG_EXPORT_GATEWAY_HOST'] = 'ftp.example.com'
+    ENV['PG_EXPORT_GATEWAY_USER'] = 'user'
+    ENV['PG_EXPORT_GATEWAY_PASSWORD'] = 'pass'
     ENV['LOGGER_FORMAT'] = 'muted'
     ENV['INTERACTIVE'] = 'false'
     ENV['KEEP_DUMPS'] = '10'
@@ -41,9 +41,9 @@ describe PgExport do
       it 'creates dump and exports it to ftp' do
         expect_any_instance_of(PgExport::Adapters::BashAdapter).to receive(:pg_dump)
         expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:plain).and_return(dump)
-        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:persist)
-        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:list).and_return([{ name: 'db_20151010_121212', size: '123' }] * 11)
-        expect_any_instance_of(PgExport::Adapters::FtpAdapter).to receive(:delete).with('db_20151010_121212')
+        expect_any_instance_of(PgExport::Gateways::Ftp).to receive(:persist)
+        expect_any_instance_of(PgExport::Gateways::Ftp).to receive(:list).and_return([{ name: 'db_20151010_121212', size: '123' }] * 11)
+        expect_any_instance_of(PgExport::Gateways::Ftp).to receive(:delete).with('db_20151010_121212')
         subject
       end
     end

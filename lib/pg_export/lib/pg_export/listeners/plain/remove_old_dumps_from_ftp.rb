@@ -8,7 +8,7 @@ class PgExport
       class RemoveOldDumpsFromFtp < PlainListener
         def on_step_succeeded(event)
           event[:value][:removed_dumps].each do |filename|
-            logger.info("Remove #{filename} from #{event[:value][:ftp_adapter]}")
+            logger.info("Remove #{filename} from #{event[:value][:ftp_gateway]}")
           end
         end
       end

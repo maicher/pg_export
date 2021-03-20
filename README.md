@@ -67,13 +67,13 @@ Or install it yourself as:
 __Step 1.__ Prepare ENV variables.
 
     /* FTP storage for database dumps. */
-    BACKUP_FTP_HOST=yourftp.example.com
-    BACKUP_FTP_USER=user
-    BACKUP_FTP_PASSWORD=password
+    PG_EXPORT_GATEWAY_HOST=yourftp.example.com
+    PG_EXPORT_GATEWAY_USER=user
+    PG_EXPORT_GATEWAY_PASSWORD=password
     
     /* Encryption key shoul have exactly 16 characters. */
     /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
-    DUMP_ENCRYPTION_KEY=1234567890abcdef
+    PG_EXPORT_ENCRYPTION_KEY=1234567890abcdef
     
     /* Dumps to be kept on FTP */
     /* Optional, defaults to 10 */

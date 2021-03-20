@@ -1,3 +1,11 @@
+### 1.0.0 - 2021.03.20
+- Make it compatible with Ruby 3.0
+- Change configuration envs:
+  - BACKUP_FTP_HOST -> PG_EXPORT_GATEWAY_HOST
+  - BACKUP_FTP_USER -> PG_EXPORT_GATEWAY_USER
+  - BACKUP_FTP_PASSWORD -> PG_EXPORT_GATEWAY_PASSWORD
+  - DUMP_ENCRYPTION_KEY -> PG_EXPORT_ENCRYPTION_KEY
+
 ### 0.7.7 - 2020.09.07
 
 - Upgrade dry-initializer 

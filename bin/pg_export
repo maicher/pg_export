@@ -48,8 +48,8 @@ option_parser = OptionParser.new do |opts|
 
   opts.on('-f', '--ftp', 'Tries connecting to FTP to verify the connection') do
     PgExport::Container.start(:ftp)
-    ftp_adapter = PgExport::Container['factories.ftp_adapter_factory'].ftp_adapter
-    ftp = ftp_adapter.open_ftp
+    ftp_gateway = PgExport::Container['factories.ftp_gateway_factory'].ftp_gateway
+    ftp = ftp_gateway.open_ftp
     puts ftp.welcome
     exit
   end

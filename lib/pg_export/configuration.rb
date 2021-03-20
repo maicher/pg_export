@@ -16,10 +16,10 @@ class PgExport
 
     def self.build(env)
       new(
-        dump_encryption_key: env['DUMP_ENCRYPTION_KEY'],
-        ftp_host: env['BACKUP_FTP_HOST'],
-        ftp_user: env['BACKUP_FTP_USER'],
-        ftp_password: env['BACKUP_FTP_PASSWORD'],
+        dump_encryption_key: env['PG_EXPORT_ENCRYPTION_KEY'],
+        ftp_host: env['PG_EXPORT_GATEWAY_HOST'],
+        ftp_user: env['PG_EXPORT_GATEWAY_USER'],
+        ftp_password: env['PG_EXPORT_GATEWAY_PASSWORD'],
         logger_format: env['LOGGER_FORMAT'] || 'plain',
         keep_dumps: env['KEEP_DUMPS'] || 10
       )

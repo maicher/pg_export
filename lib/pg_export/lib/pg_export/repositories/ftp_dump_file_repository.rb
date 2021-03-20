@@ -8,9 +8,9 @@ require 'pg_export/lib/pg_export/value_objects/dump_file'
 class PgExport
   module Repositories
     class FtpDumpFileRepository
-      def by_name(name:, ftp_adapter:)
+      def by_name(name:, ftp_gateway:)
         file = ValueObjects::DumpFile.new
-        ftp_adapter.get(file, name)
+        ftp_gateway.get(file, name)
 
         file
       end

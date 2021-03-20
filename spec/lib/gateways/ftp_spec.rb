@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/adapters/ftp_adapter'
+require 'pg_export/lib/pg_export/gateways/ftp'
 require 'ftp_mock'
 
-RSpec.describe PgExport::Adapters::FtpAdapter do
+RSpec.describe PgExport::Gateways::Ftp do
   let(:params) { { host: 'ftp.example.com', user: 'user', password: 'password' } }
   let(:mock) { FtpMock.new }
 
