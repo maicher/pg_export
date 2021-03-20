@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Krzysztof Maicher']
   spec.email         = ['krzysztof.maicher@gmail.com']
 
-  spec.summary       = 'CLI for creating and exporting PostgreSQL dumps to FTP.'
-  spec.description   = "CLI for creating and exporting PostgreSQL dumps to FTP.\
+  spec.summary       = 'CLI for exporting/importing PostgreSQL dumps via FTP/SSH.'
+  spec.description   = "CLI for exporting/importing PostgreSQL dumps via FTP/SSH.\
                         Can be used for backups or synchronizing databases between production and development environments."
   spec.homepage      = 'https://github.com/maicher/pg_export'
   spec.license       = 'MIT'

@@ -74,7 +74,7 @@ __Step 1.__ Prepare ENV variables.
     PG_EXPORT_GATEWAY_USER=user
     PG_EXPORT_GATEWAY_PASSWORD=password
     
-    /* Encryption key shoul have exactly 16 characters. */
+    /* Encryption key should have exactly 16 characters. */
     /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
     PG_EXPORT_ENCRYPTION_KEY=1234567890abcdef
     

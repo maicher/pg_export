@@ -11,30 +11,58 @@ ENV['GATEWAY'] = 'ftp'
 interactive = false
 database = nil
 
-option_parser = OptionParser.new do |opts|
-  opts.banner = 'Usage: pg_export [options]'
 
-  opts.on('-g', '--gateway GATEWAY', String, '[Optional] ssh or ftp (default: ftp)') do |g|
+option_parser = OptionParser.new do |opts|
+  opts.banner = <<~TXT
+NAME
+    pg_export - CLI for exporting/importing PostgreSQL dumps via FTP/SSH
+
+SYNOPSIS (default mode)      
+    pg_export DATABASE [options]
+
+SYNOPSIS (interactive mode)      
+    pg_export --interactive [DATABASE] [options]
+
+ARGUMENTS
+    DATABASE - database name to export (when default mode)
+             - phrase to filter database dumps by (when interactive mode)
+
+OPTIONS
+  TXT
+
+  opts.on('-g', '--gateway GATEWAY', String, 'ssh or ftp (default: ftp) - credentials need to be set via ENVs') do |g|
     ENV['GATEWAY'] = g
   end
 
-  opts.on('-d', '--database DATABASE', String, '[Required] Name of the database to export') do |d|
+  opts.on('-s', '--ssh', 'Same as "--gateway ssh"') do
+    ENV['GATEWAY'] = 'ssh'
+  end
+
+  opts.on('-f', '--ftp', 'Same as "--gateway ftp"') do
+    ENV['GATEWAY'] = 'ftp'
+  end
+
+  opts.on('-d', '--database DATABASE', String, 'Alternative way of specifying name of the database to export or phrase to filter by') do |d|
     database = d
   end
 
-  opts.on('-k', '--keep [KEEP]', String, "[Optional] Number of dump files to keep on FTP (default: #{ENV['KEEP_DUMPS']})") do |keep|
+  opts.on('-e', '--encryption_key KEY', String, 'Dumps will be SSL(AES-128-CBC) encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env') do |key|
+    ENV['PG_EXPORT_ENCRYPTION_KEY'] = key
+  end
+
+  opts.on('-k', '--keep KEEP', String, "Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env") do |keep|
     ENV['KEEP_DUMPS'] = keep
   end
 
-  opts.on('-t', '--timestamped', '[Optional] Enables log messages with timestamps') do
+  opts.on('-t', '--timestamped', 'Enables log messages with timestamps') do
     ENV['LOGGER_FORMAT'] = 'timestamped'
   end
 
-  opts.on('-m', '--muted', '[Optional] Mutes log messages (overrides -t option)') do
+  opts.on('-m', '--muted', 'Mutes log messages (overrides -t option)') do
     ENV['LOGGER_FORMAT'] = 'muted'
   end
 
-  opts.on('-i', '--interactive', '[Optional] Interactive command line mode - for restoring dumps into databases') do
+  opts.on('-i', '--interactive', 'Interactive mode, for importing dumps') do
     interactive = true
   end
 
@@ -48,29 +76,44 @@ option_parser = OptionParser.new do |opts|
     exit
   end
 
-  opts.separator "\nSetting can be verified by running following commands:"
+  opts.separator <<~TXT
 
-  opts.on('-c', '--configuration', 'Prints the configuration') do
+ENV
+    PG_EXPORT_GATEWAY_HOST           required
+    PG_EXPORT_GATEWAY_USER           required
+    PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
+    PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
+  TXT
+
+  opts.separator "\nTEST RUN"
+
+  opts.on('-c', '--configuration', 'Print the configuration') do
     require 'pg_export/container'
     PgExport::Container.start(:config)
     puts PgExport::Container['config'].to_h
     exit
   end
 
-  opts.on('-w', '--welcome', 'Tries connecting to the gateway (FTP or SSH) to verify the connection') do
+  opts.on('-w', '--welcome', 'Try connecting to the gateway (FTP or SSH) to verify the connection') do
     require 'pg_export/container'
     PgExport::Container.start(ENV['GATEWAY'].to_sym)
     gateway = PgExport::Container['factories.gateway_factory'].gateway
     puts gateway.welcome
     exit
   end
+
+  if ARGV.empty?
+    puts opts
+    exit
+  end
 end
 
 begin
   option_parser.parse!
+  database = ARGV.first unless ARGV.empty?
 rescue OptionParser::ParseError => e
   warn e.message.capitalize
-  warn 'Type "pg_export -h" for available options'
+  warn 'Type "pg_export" for available options'
   exit
 end
 
