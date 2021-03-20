@@ -29,25 +29,25 @@ class PgExport
 
       private
 
-      def fetch_dumps_from_ftp(database_name:, ftp_gateway:)
-        dumps = ftp_dump_repository.all(database_name: database_name, ftp_gateway: ftp_gateway)
+      def fetch_dumps_from_ftp(database_name:, gateway:)
+        dumps = ftp_dump_repository.all(database_name: database_name, gateway: gateway)
         return Failure(message: 'No dumps') if dumps.none?
 
-        Success(ftp_gateway: ftp_gateway, dumps: dumps)
+        Success(gateway: gateway, dumps: dumps)
       end
 
-      def select_dump(dumps:, ftp_gateway:)
+      def select_dump(dumps:, gateway:)
         dump = ui_input.select_dump(dumps)
-        Success(dump: dump, ftp_gateway: ftp_gateway)
+        Success(dump: dump, gateway: gateway)
       end
 
-      def download_dump_from_ftp(dump:, ftp_gateway:)
-        dump.file = ftp_dump_file_repository.by_name(name: dump.name, ftp_gateway: ftp_gateway)
-        Success(dump: dump, ftp_gateway: ftp_gateway)
+      def download_dump_from_ftp(dump:, gateway:)
+        dump.file = ftp_dump_file_repository.by_name(name: dump.name, gateway: gateway)
+        Success(dump: dump, gateway: gateway)
       end
 
-      def close_ftp_connection(dump:, ftp_gateway:)
-        Thread.new { ftp_gateway.close_ftp }
+      def close_ftp_connection(dump:, gateway:)
+        Thread.new { gateway.close_ftp }
         Success(dump: dump)
       end
 

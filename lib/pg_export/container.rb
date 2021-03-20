@@ -22,7 +22,7 @@ class PgExport
       start do
         use :config
 
-        register('factories.ftp_gateway_factory') do
+        register('factories.gateway_factory') do
           ::PgExport::Factories::FtpGatewayFactory.new
         end
       end

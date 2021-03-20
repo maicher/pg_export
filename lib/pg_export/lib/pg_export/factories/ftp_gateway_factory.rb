@@ -10,7 +10,7 @@ class PgExport
     class FtpGatewayFactory
       include Import['config']
 
-      def ftp_gateway
+      def gateway
         ::PgExport::Gateways::Ftp.new(
           host: config.ftp_host,
           user: config.ftp_user,

@@ -9,17 +9,17 @@ class PgExport
       include Dry::Transaction::Operation
       include Import['repositories.ftp_dump_repository', 'config']
 
-      def call(dump:, ftp_gateway:)
+      def call(dump:, gateway:)
         dumps = ftp_dump_repository.by_database_name(
           database_name: dump.database,
-          ftp_gateway: ftp_gateway,
+          gateway: gateway,
           offset: config.keep_dumps
         )
         dumps.each do |d|
-          ftp_gateway.delete(d.name)
+          gateway.delete(d.name)
         end
 
-        Success(removed_dumps: dumps, ftp_gateway: ftp_gateway)
+        Success(removed_dumps: dumps, gateway: gateway)
       end
     end
   end

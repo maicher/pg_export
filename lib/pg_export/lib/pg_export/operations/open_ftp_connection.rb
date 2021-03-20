@@ -7,12 +7,12 @@ class PgExport
   module Operations
     class OpenFtpConnection
       include Dry::Transaction::Operation
-      include Import['factories.ftp_gateway_factory']
+      include Import['factories.gateway_factory']
 
       def call(inputs)
-        ftp_gateway = ftp_gateway_factory.ftp_gateway
-        ftp_gateway.open_ftp
-        Success(inputs.merge(ftp_gateway: ftp_gateway))
+        gateway = gateway_factory.gateway
+        gateway.open_ftp
+        Success(inputs.merge(gateway: gateway))
       end
     end
   end

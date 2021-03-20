@@ -42,14 +42,14 @@ class PgExport
         Failure(message: 'Unable to dump database: ' + e.to_s)
       end
 
-      def upload_dump_to_ftp(dump:, ftp_gateway:)
-        ftp_gateway.persist(dump.file, dump.name)
-        Success(dump: dump, ftp_gateway: ftp_gateway)
+      def upload_dump_to_ftp(dump:, gateway:)
+        gateway.persist(dump.file, dump.name)
+        Success(dump: dump, gateway: gateway)
       end
 
-      def close_ftp_connection(removed_dumps:, ftp_gateway:)
-        ftp_gateway.close_ftp
-        Success(ftp_gateway: ftp_gateway)
+      def close_ftp_connection(removed_dumps:, gateway:)
+        gateway.close_ftp
+        Success(gateway: gateway)
       end
     end
   end

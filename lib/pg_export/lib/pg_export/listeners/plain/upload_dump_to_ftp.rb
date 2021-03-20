@@ -7,7 +7,7 @@ class PgExport
     class Plain
       class UploadDumpToFtp < PlainListener
         def on_step_succeeded(event)
-          logger.info("Upload #{event[:value][:dump]} to #{event[:value][:ftp_gateway]}")
+          logger.info("Upload #{event[:value][:dump]} to #{event[:value][:gateway]}")
         end
       end
     end
