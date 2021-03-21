@@ -10,12 +10,10 @@ PgExport::Container.boot(:interactive) do
     transaction = PgExport::Transactions::ImportDumpInteractively.new(ui_input: target["ui.#{type}.input"])
 
     unless target[:config].logger_muted?
-      use :logger
-
       %i[
         open_connection
-        fetch_dumps_from_ftp
-        download_dump_from_ftp
+        fetch_dumps
+        download_dump
         decrypt_dump
         restore
       ].each do |step|

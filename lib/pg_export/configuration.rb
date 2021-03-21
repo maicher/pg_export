@@ -1,18 +1,16 @@
 # frozen_string_literal: true
 
-require 'dry-types'
+require 'pg_export/lib/pg_export/types'
 require 'dry-struct'
 
 class PgExport
   class Configuration < Dry::Struct
-    include Dry::Types()
-
-    attribute :dump_encryption_key, Strict::String.constrained(size: 16)
-    attribute :gateway_host,        Strict::String
-    attribute :gateway_user,        Strict::String
-    attribute :gateway_password,    Strict::String.optional
-    attribute :logger_format,       Coercible::String.enum('plain', 'timestamped', 'muted')
-    attribute :keep_dumps,          Coercible::Integer.constrained(gteq: 0)
+    attribute :dump_encryption_key, PgExport::Types::Strict::String.constrained(size: 16)
+    attribute :gateway_host,        PgExport::Types::Strict::String
+    attribute :gateway_user,        PgExport::Types::Strict::String
+    attribute :gateway_password,    PgExport::Types::Strict::String.optional
+    attribute :logger_format,       PgExport::Types::Coercible::String.enum('plain', 'timestamped', 'muted')
+    attribute :keep_dumps,          PgExport::Types::Coercible::Integer.constrained(gteq: 0)
 
     def self.build(env)
       new(

@@ -5,9 +5,9 @@ require_relative '../plain_listener'
 class PgExport
   module Listeners
     class Plain
-      class UploadDumpToFtp < PlainListener
+      class DownloadDump < PlainListener
         def on_step_succeeded(event)
-          logger.info("Upload #{event[:value][:dump]} to #{event[:value][:gateway]}")
+          logger.info("Download #{event[:value][:dump]}")
         end
       end
     end

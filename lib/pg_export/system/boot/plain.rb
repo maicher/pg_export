@@ -9,15 +9,13 @@ PgExport::Container.boot(:plain) do
     transaction = PgExport::Transactions::ExportDump.new
 
     unless target[:config].logger_muted?
-      use :logger
-
       type = 'plain'
       %i[
         build_dump
         encrypt_dump
         open_connection
-        upload_dump_to_ftp
-        remove_old_dumps_from_ftp
+        upload_dump
+        remove_old_dumps
         close_connection
       ].each do |step|
         transaction.subscribe(step => target["listeners.#{type}.#{step}"])

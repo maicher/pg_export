@@ -5,7 +5,7 @@ require_relative '../interactive_listener'
 class PgExport
   module Listeners
     class Interactive
-      class RemoveOldDumpsFromFtp < InteractiveListener
+      class RemoveOldDumps < InteractiveListener
         def on_step(event)
           @spinner = build_spinner("Checking for old dumps on #{event[:args].first[:gateway]}")
         end

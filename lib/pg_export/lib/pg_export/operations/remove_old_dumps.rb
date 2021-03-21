@@ -5,7 +5,7 @@ require 'pg_export/import'
 
 class PgExport
   module Operations
-    class RemoveOldDumpsFromFtp
+    class RemoveOldDumps
       include Dry::Transaction::Operation
       include Import['repositories.gateway_dump_repository', 'config']
 

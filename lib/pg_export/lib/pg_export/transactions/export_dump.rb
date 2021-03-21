@@ -18,8 +18,8 @@ class PgExport
       step :build_dump
       step :encrypt_dump, with: 'operations.encrypt_dump'
       step :open_connection, with: 'operations.open_connection'
-      step :upload_dump_to_ftp
-      step :remove_old_dumps_from_ftp, with: 'operations.remove_old_dumps_from_ftp'
+      step :upload_dump
+      step :remove_old_dumps, with: 'operations.remove_old_dumps'
       step :close_connection
 
       private
@@ -42,7 +42,7 @@ class PgExport
         Failure(message: 'Unable to dump database: ' + e.to_s)
       end
 
-      def upload_dump_to_ftp(dump:, gateway:)
+      def upload_dump(dump:, gateway:)
         gateway.persist(dump.file, dump.name)
         Success(dump: dump, gateway: gateway)
       end

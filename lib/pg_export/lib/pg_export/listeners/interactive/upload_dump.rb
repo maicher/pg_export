@@ -5,7 +5,7 @@ require_relative '../interactive_listener'
 class PgExport
   module Listeners
     class Interactive
-      class UploadDumpToFtp < InteractiveListener
+      class UploadDump < InteractiveListener
         def on_step(event)
           @spinner = build_spinner("Uploading #{event[:args].first[:dump]} to #{event[:args].first[:gateway]}")
         end

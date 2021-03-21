@@ -29,7 +29,10 @@ ARGUMENTS
 OPTIONS
   TXT
 
-  opts.on('-g', '--gateway GATEWAY', String, 'ssh or ftp (default: ftp) - credentials need to be set via ENVs') do |g|
+  opts.program_name = 'pg_export'
+  opts.version = PgExport::VERSION
+
+  opts.on('-g', '--gateway GATEWAY', %w[ftp ssh], 'Allowed values: ftp, ssh. Default: ftp. Credentials need to be set via ENVs') do |g|
     ENV['GATEWAY'] = g
   end
 
@@ -112,6 +115,8 @@ begin
   database = ARGV.first unless ARGV.empty?
 rescue OptionParser::ParseError => e
   warn e.message.capitalize
+  warn 'Details:'
+  warn option_parser.to_s.split("\n").grep(/ #{e.args.first}/).join("/n")
   warn 'Type "pg_export" for available options'
   exit
 end

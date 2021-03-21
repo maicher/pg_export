@@ -19,9 +19,9 @@ class PgExport
       ]
 
       step :open_connection, with: 'operations.open_connection'
-      step :fetch_dumps_from_ftp
+      step :fetch_dumps
       step :select_dump
-      step :download_dump_from_ftp
+      step :download_dump
       step :close_connection
       step :decrypt_dump, with: 'operations.decrypt_dump'
       step :select_database
@@ -29,7 +29,7 @@ class PgExport
 
       private
 
-      def fetch_dumps_from_ftp(database_name:, gateway:)
+      def fetch_dumps(database_name:, gateway:)
         dumps = gateway_dump_repository.all(database_name: database_name, gateway: gateway)
         return Failure(message: 'No dumps') if dumps.none?
 
@@ -41,7 +41,7 @@ class PgExport
         Success(dump: dump, gateway: gateway)
       end
 
-      def download_dump_from_ftp(dump:, gateway:)
+      def download_dump(dump:, gateway:)
         dump.file = gateway_dump_file_repository.by_name(name: dump.name, gateway: gateway)
         Success(dump: dump, gateway: gateway)
       end
