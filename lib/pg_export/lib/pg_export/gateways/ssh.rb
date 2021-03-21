@@ -2,6 +2,7 @@
 
 # auto_register: false
 
+require 'ed25519'
 require 'net/ssh'
 require 'net/scp'
 
