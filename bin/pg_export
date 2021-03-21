@@ -7,10 +7,9 @@ require 'pg_export'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 ENV['GATEWAY'] = 'ftp'
+ENV['PG_EXPORT_MODE'] = 'plain'
 
-interactive = false
 database = nil
-
 
 option_parser = OptionParser.new do |opts|
   opts.banner = <<~TXT
@@ -63,7 +62,7 @@ OPTIONS
   end
 
   opts.on('-i', '--interactive', 'Interactive mode, for importing dumps') do
-    interactive = true
+    ENV['PG_EXPORT_MODE'] = 'interactive'
   end
 
   opts.on('-v', '--version', 'Show version') do
@@ -120,12 +119,7 @@ end
 require 'pg_export/container'
 
 begin
-  pg_export =
-    if interactive
-      PgExport.interactive
-    else
-      PgExport.plain
-    end
+  pg_export = PgExport.boot
 rescue PgExport::InitializationError => e
   warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
   warn "Detailed message: #{e.message}"

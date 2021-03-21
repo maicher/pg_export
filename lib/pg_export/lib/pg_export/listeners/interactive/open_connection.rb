@@ -7,7 +7,7 @@ class PgExport
     class Interactive
       class OpenConnection < InteractiveListener
         def on_step(*)
-          @spinner = build_spinner('Opening ftp connection')
+          @spinner = build_spinner('Opening connection')
         end
 
         def on_step_succeeded(*)

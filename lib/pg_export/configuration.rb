@@ -31,6 +31,10 @@ class PgExport
       ENV['GATEWAY'].to_sym
     end
 
+    def mode
+      ENV['PG_EXPORT_MODE'].to_sym
+    end
+
     def logger_muted?
       logger_format == 'muted'
     end

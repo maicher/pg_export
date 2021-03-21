@@ -16,6 +16,7 @@ ENV['PG_EXPORT_ENCRYPTION_KEY'] = '1234567890abcdef'
 ENV['PG_EXPORT_GATEWAY_HOST'] = 'example.com'
 ENV['PG_EXPORT_GATEWAY_USER'] = 'user'
 ENV['PG_EXPORT_GATEWAY_PASSWORD'] = 'pass'
+ENV['PG_EXPORT_MODE'] = 'plain'
 ENV['LOGGER_FORMAT'] = 'muted'
 ENV['INTERACTIVE'] = 'false'
 ENV['KEEP_DUMPS'] = '10'
@@ -27,7 +28,7 @@ describe PgExport do
   end
 
   describe '#call' do
-    subject { described_class.plain.call(database) }
+    subject { described_class.boot.call(database) }
 
     before do
       allow(dump).to receive(:name).and_return('name')

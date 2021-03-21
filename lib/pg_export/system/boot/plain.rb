@@ -6,16 +6,12 @@ PgExport::Container.boot(:plain) do
   end
 
   start do
-    use :main
-
     transaction = PgExport::Transactions::ExportDump.new
 
     unless target[:config].logger_muted?
       use :logger
 
       type = 'plain'
-      # type = 'interactive'
-
       %i[
         build_dump
         encrypt_dump
@@ -28,6 +24,6 @@ PgExport::Container.boot(:plain) do
       end
     end
 
-    register('transactions.export_dump', memoize: true) { transaction }
+    register('transaction', memoize: true) { transaction }
   end
 end

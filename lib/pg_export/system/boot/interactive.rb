@@ -6,11 +6,7 @@ PgExport::Container.boot(:interactive) do
   end
 
   start do
-    use :main
-
-    # type = 'plain'
     type = 'interactive'
-
     transaction = PgExport::Transactions::ImportDumpInteractively.new(ui_input: target["ui.#{type}.input"])
 
     unless target[:config].logger_muted?
@@ -27,6 +23,6 @@ PgExport::Container.boot(:interactive) do
       end
     end
 
-    register('transactions.import_dump_interactively', memoize: true) { transaction }
+    register('transaction', memoize: true) { transaction }
   end
 end

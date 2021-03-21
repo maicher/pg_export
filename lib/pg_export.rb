@@ -1,24 +1,16 @@
 # frozen_string_literal: true
 
 require 'pg_export/container'
+require 'pg_export/import'
 
 class PgExport
   class InitializationError < StandardError; end
 
-  class << self
-    def interactive
-      PgExport::Container.start(:interactive)
-      new(transaction: PgExport::Container['transactions.import_dump_interactively'])
-    end
+  include Import['transaction']
 
-    def plain
-      PgExport::Container.start(:plain)
-      new(transaction: PgExport::Container['transactions.export_dump'])
-    end
-  end
-
-  def initialize(transaction:)
-    @transaction = transaction
+  def self.boot
+    PgExport::Container.start(:main)
+    new
   end
 
   def call(database_name, &block)
