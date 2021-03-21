@@ -8,25 +8,26 @@ require 'pg_export'
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 ENV['GATEWAY'] = 'ftp'
 ENV['PG_EXPORT_MODE'] = 'plain'
+ENV['PG_EXPORT_ENCRYPTION_ALGORITHM'] = 'AES-128-CBC'
 
 database = nil
 
 option_parser = OptionParser.new do |opts|
   opts.banner = <<~TXT
-NAME
-    pg_export - CLI for exporting/importing PostgreSQL dumps via FTP/SSH
+    NAME
+        pg_export - CLI for exporting/importing PostgreSQL dumps via FTP/SSH
 
-SYNOPSIS (default mode)      
-    pg_export DATABASE [options]
+    SYNOPSIS (default mode)
+        pg_export DATABASE [options]
 
-SYNOPSIS (interactive mode)      
-    pg_export --interactive [DATABASE] [options]
+    SYNOPSIS (interactive mode)
+        pg_export --interactive [DATABASE] [options]
 
-ARGUMENTS
-    DATABASE - database name to export (when default mode)
-             - phrase to filter database dumps by (when interactive mode)
+    ARGUMENTS
+        DATABASE - database name to export (when default mode)
+                 - phrase to filter database dumps by (when interactive mode)
 
-OPTIONS
+    OPTIONS
   TXT
 
   opts.program_name = 'pg_export'
@@ -48,11 +49,15 @@ OPTIONS
     database = d
   end
 
-  opts.on('-e', '--encryption_key KEY', String, 'Dumps will be SSL(AES-128-CBC) encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env') do |key|
+  opts.on('-e', '--encryption_key KEY', String, 'Dumps will be SSL encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env') do |key|
     ENV['PG_EXPORT_ENCRYPTION_KEY'] = key
   end
 
-  opts.on('-k', '--keep KEEP', String, "Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env") do |keep|
+  opts.on('-a', '--algorithm ALGORITHM', String, 'Encryption cipher algorithm (default: AES-128-CBC). Overwrites PG_EXPORT_ENCRYPTION_ALGORITHM env. For available option see `$ openssl list -cipher-algorithms`') do |key|
+    ENV['PG_EXPORT_ENCRYPTION_KEY'] = key
+  end
+
+  opts.on('-k', '--keep KEEP', String, 'Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env') do |keep|
     ENV['KEEP_DUMPS'] = keep
   end
 
@@ -80,11 +85,12 @@ OPTIONS
 
   opts.separator <<~TXT
 
-ENV
-    PG_EXPORT_GATEWAY_HOST           required
-    PG_EXPORT_GATEWAY_USER           required
-    PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
-    PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
+    ENV
+        PG_EXPORT_GATEWAY_HOST           required
+        PG_EXPORT_GATEWAY_USER           required
+        PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
+        PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
+        PG_EXPORT_ENCRYPTION_ALGORITHM   required or set by --algorithm)
   TXT
 
   opts.separator "\nTEST RUN"
@@ -116,7 +122,7 @@ begin
 rescue OptionParser::ParseError => e
   warn e.message.capitalize
   warn 'Details:'
-  warn option_parser.to_s.split("\n").grep(/ #{e.args.first}/).join("/n")
+  warn option_parser.to_s.split("\n").grep(/ #{e.args.first}/).join("\n")
   warn 'Type "pg_export" for available options'
   exit
 end
@@ -131,7 +137,11 @@ rescue PgExport::InitializationError => e
   exit
 end
 
-pg_export.call(database) do |result|
-  result.success { puts 'Success' }
-  result.failure { |outcome| warn outcome[:message] }
+begin
+  pg_export.call(database) do |result|
+    result.success { puts 'Success' }
+    result.failure { |outcome| warn outcome[:message] }
+  end
+rescue Interrupt
+  puts
 end

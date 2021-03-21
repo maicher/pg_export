@@ -7,6 +7,7 @@
   - DUMP_ENCRYPTION_KEY -> PG_EXPORT_ENCRYPTION_KEY
 - Drop Ruby 2.3 support
 - Add SSH option
+- Add +encryption_algorith+ moption to interface
 
 ### 0.7.7 - 2020.09.07
 

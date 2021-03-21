@@ -16,11 +16,12 @@ class PgExport
       end
 
       def open
-        if password.nil?
-          @ssh = Net::SSH.start(host, user)
-        else
-          @ssh = Net::SSH.start(host, user, password)
-        end
+        @ssh =
+          if password.nil?
+            Net::SSH.start(host, user)
+          else
+            Net::SSH.start(host, user, password)
+          end
       end
 
       def welcome

@@ -4,9 +4,11 @@ require 'pg_export/configuration'
 
 describe PgExport::Configuration do
   subject { PgExport::Configuration.new(**params) }
+
   let(:valid_params) do
     {
-      dump_encryption_key: '1234567890abcdef',
+      encryption_key: '1234567890abcdef',
+      encryption_algorithm: 'AES-128-CBC',
       gateway_host: 'host',
       gateway_user: 'user',
       gateway_password: 'password',
@@ -21,15 +23,15 @@ describe PgExport::Configuration do
       it { expect { subject }.not_to raise_error }
     end
 
-    %i[dump_encryption_key gateway_host gateway_user gateway_password logger_format].each do |param_name|
+    %i[encryption_key gateway_host gateway_user gateway_password logger_format].each do |param_name|
       context "when #{param_name} parameter are missing" do
         let(:params) { valid_params.tap { |p| p.delete(param_name) } }
         it { expect { subject }.to raise_error(Dry::Struct::Error) }
       end
     end
 
-    context 'when dump_encryption_key has invalid length' do
-      let(:params) { valid_params.tap { |p| p[:dump_encryption_key] = '123' } }
+    context 'when encryption_key has invalid length' do
+      let(:params) { valid_params.tap { |p| p[:encryption_key] = '123' } }
       it { expect { subject }.to raise_error(Dry::Struct::Error) }
     end
   end

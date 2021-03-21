@@ -7,7 +7,7 @@ require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 RSpec.describe PgExport::Adapters::BashAdapter do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
-  let(:dump_encryption_key) { '1234567890abcdef' }
+  let(:encryption_key) { '1234567890abcdef' }
   let(:bash_adapter) { described_class.new }
 
   describe '#pg_restore' do

@@ -87,7 +87,7 @@ Note, that variables cannot include `#` sign, [more info](http://serverfault.com
 __Step 2.__ Print the configuration to verify if env variables has been loaded properly.
 
     $ pg_export --configuration
-    => {:dump_encryption_key=>"k4***", :gateway_host=>"yourftp.example.com", :gateway_user=>"your_gateway_user",
+    => {:encryption_key=>"k4***", :gateway_host=>"yourftp.example.com", :gateway_user=>"your_gateway_user",
        :gateway_password=>"pass***", :logger_format=>"plain", :keep_dumps=>2}
        
 __Step 3.__ Try connecting to FTP to verify the connection.

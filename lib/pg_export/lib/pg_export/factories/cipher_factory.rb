@@ -9,23 +9,20 @@ class PgExport
       include Import['config']
 
       def encryptor
-        cipher(:encrypt)
+        build_cipher(:encrypt)
       end
 
       def decryptor
-        cipher(:decrypt)
+        build_cipher(:decrypt)
       end
 
       private
 
-      ALGORITHM = 'AES-128-CBC'
-      private_constant :ALGORITHM
-
-      def cipher(type)
-        OpenSSL::Cipher.new(ALGORITHM).tap do |cipher|
-          cipher.public_send(type)
-          cipher.key = config.dump_encryption_key
-        end
+      def build_cipher(type)
+        cipher = OpenSSL::Cipher.new(config.encryption_algorithm)
+        cipher.public_send(type)
+        cipher.key = config.encryption_key
+        cipher
       end
     end
   end

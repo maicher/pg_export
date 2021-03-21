@@ -8,8 +8,9 @@ require 'pg_export/lib/pg_export/operations/encrypt_dump'
 
 RSpec.describe PgExport::Operations::EncryptDump do
   let(:encrypt_dump) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory) }
-  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(dump_encryption_key: encryption_key)) }
+  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(encryption_key: encryption_key, encryption_algorithm: encryption_algorithm)) }
   let(:encryption_key) { '1234567890abcdef' }
+  let(:encryption_algorithm) { 'AES-128-CBC' }
 
   let(:plain_dump) do
     file = PgExport::ValueObjects::DumpFile.new

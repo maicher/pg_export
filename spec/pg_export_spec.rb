@@ -13,6 +13,7 @@ require 'pg_export/lib/pg_export/gateways/ssh'
 require 'pg_export/lib/pg_export/factories/ssh_gateway_factory'
 
 ENV['PG_EXPORT_ENCRYPTION_KEY'] = '1234567890abcdef'
+ENV['PG_EXPORT_ENCRYPTION_ALGORITHM'] = 'AES-128-CBC'
 ENV['PG_EXPORT_GATEWAY_HOST'] = 'example.com'
 ENV['PG_EXPORT_GATEWAY_USER'] = 'user'
 ENV['PG_EXPORT_GATEWAY_PASSWORD'] = 'pass'
