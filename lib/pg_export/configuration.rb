@@ -10,8 +10,10 @@ class PgExport
     attribute :gateway_host,         PgExport::Types::Strict::String
     attribute :gateway_user,         PgExport::Types::Strict::String
     attribute :gateway_password,     PgExport::Types::Strict::String.optional
-    attribute :logger_format,        PgExport::Types::Coercible::String.enum('plain', 'timestamped', 'muted')
+    attribute :logger_format,        PgExport::Types::Coercible::Symbol.enum(:plain, :timestamped, :muted)
     attribute :keep_dumps,           PgExport::Types::Coercible::Integer.constrained(gteq: 0)
+    attribute :gateway,              PgExport::Types::Coercible::Symbol.enum(:ftp, :ssh)
+    attribute :mode,                 PgExport::Types::Coercible::Symbol.enum(:plain, :interactive)
 
     def self.build(env)
       new(
@@ -21,22 +23,12 @@ class PgExport
         gateway_user: env['PG_EXPORT_GATEWAY_USER'],
         gateway_password: env['PG_EXPORT_GATEWAY_PASSWORD'] == '' ? nil : env['PG_EXPORT_GATEWAY_PASSWORD'],
         logger_format: env['LOGGER_FORMAT'] || 'plain',
-        keep_dumps: env['KEEP_DUMPS'] || 10
+        keep_dumps: env['KEEP_DUMPS'] || 10,
+        gateway: env['GATEWAY'],
+        mode: env['PG_EXPORT_MODE']
       )
     rescue Dry::Struct::Error => e
       raise PgExport::InitializationError, e.message.gsub('[PgExport::Configuration.new] ', '')
-    end
-
-    def gateway
-      ENV['GATEWAY'].to_sym
-    end
-
-    def mode
-      ENV['PG_EXPORT_MODE'].to_sym
-    end
-
-    def logger_muted?
-      logger_format == 'muted'
     end
   end
 end

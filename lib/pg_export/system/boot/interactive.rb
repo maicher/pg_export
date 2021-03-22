@@ -6,19 +6,9 @@ PgExport::Container.boot(:interactive) do
   end
 
   start do
-    type = 'interactive'
-    transaction = PgExport::Transactions::ImportDumpInteractively.new(ui_input: target["ui.#{type}.input"])
-
-    unless target[:config].logger_muted?
-      %i[
-        open_connection
-        fetch_dumps
-        download_dump
-        decrypt_dump
-        restore
-      ].each do |step|
-        transaction.subscribe(step => target["listeners.#{type}.#{step}"])
-      end
+    transaction = PgExport::Transactions::ImportDumpInteractively.new
+    transaction.steps.each do |step|
+      transaction.subscribe(step.name => target["listeners.interactive.#{step.name}"])
     end
 
     register('transaction', memoize: true) { transaction }

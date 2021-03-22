@@ -12,10 +12,10 @@ class PgExport
     class ImportDumpInteractively
       include Dry::Transaction(container: PgExport::Container)
       include Import[
+        'ui.interactive.input',
         'adapters.bash_adapter',
         'repositories.gateway_dump_repository',
-        'repositories.gateway_dump_file_repository',
-        'ui_input'
+        'repositories.gateway_dump_file_repository'
       ]
 
       step :open_connection, with: 'operations.open_connection'
@@ -37,7 +37,7 @@ class PgExport
       end
 
       def select_dump(dumps:, gateway:)
-        dump = ui_input.select_dump(dumps)
+        dump = input.select_dump(dumps)
         Success(dump: dump, gateway: gateway)
       end
 
@@ -52,7 +52,7 @@ class PgExport
       end
 
       def select_database(dump:)
-        name = ui_input.enter_database_name(dump.database)
+        name = input.enter_database_name(dump.database)
         Success(dump: dump, database: name)
       end
 

@@ -4,6 +4,7 @@
 require 'optparse'
 
 require 'pg_export'
+require 'pg_export/version'
 
 ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
 ENV['GATEWAY'] = 'ftp'

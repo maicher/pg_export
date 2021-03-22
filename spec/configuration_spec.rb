@@ -13,7 +13,9 @@ describe PgExport::Configuration do
       gateway_user: 'user',
       gateway_password: 'password',
       logger_format: :plain,
-      keep_dumps: '10'
+      keep_dumps: '10',
+      gateway: :ssh,
+      mode: :plain
     }
   end
 

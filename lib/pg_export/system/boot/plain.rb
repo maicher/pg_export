@@ -7,19 +7,8 @@ PgExport::Container.boot(:plain) do
 
   start do
     transaction = PgExport::Transactions::ExportDump.new
-
-    unless target[:config].logger_muted?
-      type = 'plain'
-      %i[
-        build_dump
-        encrypt_dump
-        open_connection
-        upload_dump
-        remove_old_dumps
-        close_connection
-      ].each do |step|
-        transaction.subscribe(step => target["listeners.#{type}.#{step}"])
-      end
+    transaction.steps.each do |step|
+      transaction.subscribe(step.name => target["listeners.plain.#{step.name}"])
     end
 
     register('transaction', memoize: true) { transaction }
