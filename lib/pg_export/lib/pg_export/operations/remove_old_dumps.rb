@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'dry/transaction/operation'
-require 'pg_export/import'
+require 'pg_export/lib/pg_export/value_objects/result'
 
 class PgExport
   module Operations
     class RemoveOldDumps
-      include Dry::Transaction::Operation
-      include Import['repositories.gateway_dump_repository', 'config']
+      def initialize(gateway_dump_repository:, config:)
+        @gateway_dump_repository, @config = gateway_dump_repository, config
+      end
 
       def call(dump:, gateway:)
         dumps = gateway_dump_repository.by_database_name(
@@ -19,8 +19,12 @@ class PgExport
           gateway.delete(d.name)
         end
 
-        Success(removed_dumps: dumps, gateway: gateway)
+        ValueObjects::Success.new(removed_dumps: dumps, gateway: gateway)
       end
+
+      private
+
+      attr_reader :gateway_dump_repository, :config
     end
   end
 end

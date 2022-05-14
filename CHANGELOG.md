@@ -1,4 +1,4 @@
-### 1.0.0 - 2021.03.20
+### 1.0.0 - 2022.05.14
 - Make it compatible with Ruby 3.0
 - Change configuration envs:
   - BACKUP_FTP_HOST -> PG_EXPORT_GATEWAY_HOST
@@ -7,15 +7,16 @@
   - DUMP_ENCRYPTION_KEY -> PG_EXPORT_ENCRYPTION_KEY
 - Drop Ruby 2.3 support
 - Add SSH option
-- Add +encryption_algorith+ moption to interface
+- Add `encryption_algorithm` option to interface
+- Remove dry libraries dependencies
 
 ### 0.7.7 - 2020.09.07
 
-- Upgrade dry-initializer 
+- Upgrade dry-initializer
 
 ### 0.7.6 - 2020.09.05
 
-- Upgrade dry-types, dry-struct dry-system 
+- Upgrade dry-types, dry-struct dry-system
 
 ### 0.7.0 - 2018.10.18
 
@@ -41,7 +42,7 @@
 
 ### 0.5.0 - 2017.03.11
 
-- Add restriction on DUMP_ENCRYPTION_KEY, to be exactly 16 characters length 
+- Add restriction on DUMP_ENCRYPTION_KEY, to be exactly 16 characters length
 - Make interactive mode more verbose by adding more messages
 - Fix concurrently opening ftp connection
 - Add closing ftp connection while importing dump in interactive mode

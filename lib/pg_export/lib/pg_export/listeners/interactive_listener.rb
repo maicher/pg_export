@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# auto_register: false
-
-require 'pg_export/import'
 require 'tty-spinner'
 
 class PgExport

@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require 'openssl'
-require 'pg_export/import'
 
 class PgExport
   module Factories
     class CipherFactory
-      include Import['config']
+      def initialize(config:)
+        @config = config
+      end
 
       def encryptor
         build_cipher(:encrypt)
@@ -17,6 +18,8 @@ class PgExport
       end
 
       private
+
+      attr_reader :config
 
       def build_cipher(type)
         cipher = OpenSSL::Cipher.new(config.encryption_algorithm)

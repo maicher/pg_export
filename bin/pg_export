@@ -1,28 +1,23 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+lib = File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 require 'optparse'
-
 require 'pg_export'
-require 'pg_export/version'
-
-ENV['KEEP_DUMPS'] = ENV['KEEP_DUMPS'] || '10'
-ENV['GATEWAY'] = 'ftp'
-ENV['PG_EXPORT_MODE'] = 'plain'
-ENV['PG_EXPORT_ENCRYPTION_ALGORITHM'] = 'AES-128-CBC'
 
 database = nil
+x = nil
 
 option_parser = OptionParser.new do |opts|
   opts.banner = <<~TXT
     NAME
         pg_export - CLI for exporting/importing PostgreSQL dumps via FTP/SSH
 
-    SYNOPSIS (default mode)
-        pg_export DATABASE [options]
-
-    SYNOPSIS (interactive mode)
-        pg_export --interactive [DATABASE] [options]
+    SYNOPSIS
+        pg_export DATABASE [OPTION..]
+        pg_export --interactive DATABASE [OPTION..]
 
     ARGUMENTS
         DATABASE - database name to export (when default mode)
@@ -97,18 +92,11 @@ option_parser = OptionParser.new do |opts|
   opts.separator "\nTEST RUN"
 
   opts.on('-c', '--configuration', 'Print the configuration') do
-    require 'pg_export/container'
-    PgExport::Container.start(:config)
-    puts PgExport::Container['config'].to_h
-    exit
+    x = -> { puts PgExport.new.config }
   end
 
   opts.on('-w', '--welcome', 'Try connecting to the gateway (FTP or SSH) to verify the connection') do
-    require 'pg_export/container'
-    PgExport::Container.start(ENV['GATEWAY'].to_sym)
-    gateway = PgExport::Container['factories.gateway_factory'].gateway
-    puts gateway.welcome
-    exit
+    x = -> { puts PgExport.new.gateway_welcome }
   end
 
   if ARGV.empty?
@@ -119,6 +107,10 @@ end
 
 begin
   option_parser.parse!
+  if x
+    x.call
+    exit
+  end
   database = ARGV.first unless ARGV.empty?
 rescue OptionParser::ParseError => e
   warn e.message.capitalize
@@ -131,7 +123,7 @@ end
 require 'pg_export/container'
 
 begin
-  pg_export = PgExport.boot
+  pg_export = PgExport.new
 rescue PgExport::InitializationError => e
   warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
   warn "Detailed message: #{e.message}"

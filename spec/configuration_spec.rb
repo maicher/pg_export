@@ -25,16 +25,16 @@ describe PgExport::Configuration do
       it { expect { subject }.not_to raise_error }
     end
 
-    %i[encryption_key gateway_host gateway_user gateway_password logger_format].each do |param_name|
-      context "when #{param_name} parameter are missing" do
+    %i[encryption_key gateway_host gateway_user].each do |param_name|
+      context "when #{param_name} parameter is missing" do
         let(:params) { valid_params.tap { |p| p.delete(param_name) } }
-        it { expect { subject }.to raise_error(Dry::Struct::Error) }
+        it { expect { subject }.to raise_error(ArgumentError) }
       end
     end
 
     context 'when encryption_key has invalid length' do
       let(:params) { valid_params.tap { |p| p[:encryption_key] = '123' } }
-      it { expect { subject }.to raise_error(Dry::Struct::Error) }
+      it { expect { subject }.to raise_error(ArgumentError) }
     end
   end
 end

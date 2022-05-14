@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'open3'
-require 'pg_export/import'
 require 'pg_export/lib/pg_export/entities/dump'
 require 'pg_export/lib/pg_export/value_objects/dump_file'
 
@@ -10,11 +9,7 @@ class PgExport
     class GatewayDumpRepository
       def all(database_name:, gateway:)
         gateway.list(database_name).map do |item|
-          begin
-            dump(item[:name], database_name, item[:size])
-          rescue Dry::Types::ConstraintError
-            nil
-          end
+          dump(item[:name], database_name, item[:size])
         end.compact
       end
 
@@ -22,7 +17,7 @@ class PgExport
         gateway.list(database_name).drop(offset).map do |item|
           begin
             dump(item[:name], database_name, item[:size])
-          rescue Dry::Types::ConstraintError
+          rescue ArgumentError
             nil
           end
         end.compact

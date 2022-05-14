@@ -11,7 +11,7 @@ Can be used for backups or synchronizing databases between production and develo
 Example:
 
     pg_export --database database_name --keep 5
-    
+
 Above command will perform database dump, encrypt it, upload it to FTP and remove old dumps from FTP, keeping newest 5.
 
 FTP connection params and encryption key are configured by env variables.
@@ -50,20 +50,38 @@ Or install it yourself as:
 
     $ pg_export -h
 
-    Usage: pg_export [options]
-        -g, --gateway GATEWAY            [Optional] ssh or ftp (default: ftp)
-        -d, --database DATABASE          [Required] Name of the database to export
-        -k, --keep [KEEP]                [Optional] Number of dump files to keep on FTP (default: 10)
-        -t, --timestamped                [Optional] Enables log messages with timestamps
-        -m, --muted                      [Optional] Mutes log messages (overrides -t option)
-        -i, --interactive                [Optional] Interactive command line mode - for restoring dumps into databases
-        -v, --version                    Show version
-        -h, --help                       Show this message
+    SYNOPSIS
+      pg_export DATABASE [OPTION..]
+      pg_export --interactive DATABASE [OPTION..]
 
-    Setting can be verified by running following commands:
-        -c, --configuration              Prints the configuration
-        -w, --welcome                    Tries connecting to the gateway (FTP or SSH) to verify the connection
+    ARGUMENTS
+      DATABASE - database name to export (when default mode)
+           - phrase to filter database dumps by (when interactive mode)
 
+    OPTIONS
+      -g, --gateway GATEWAY            Allowed values: ftp, ssh. Default: ftp. Credentials need to be set via ENVs
+      -s, --ssh                        Same as "--gateway ssh"
+      -f, --ftp                        Same as "--gateway ftp"
+      -d, --database DATABASE          Alternative way of specifying name of the database to export or phrase to filter by
+      -e, --encryption_key KEY         Dumps will be SSL encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env
+      -a, --algorithm ALGORITHM        Encryption cipher algorithm (default: AES-128-CBC). Overwrites PG_EXPORT_ENCRYPTION_ALGORITHM env. For available option see `$ openssl list -cipher-algorithms`
+      -k, --keep KEEP                  Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env
+      -t, --timestamped                Enables log messages with timestamps
+      -m, --muted                      Mutes log messages (overrides -t option)
+      -i, --interactive                Interactive mode, for importing dumps
+      -v, --version                    Show version
+      -h, --help                       Show this message
+
+    ENV
+      PG_EXPORT_GATEWAY_HOST           required
+      PG_EXPORT_GATEWAY_USER           required
+      PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
+      PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
+      PG_EXPORT_ENCRYPTION_ALGORITHM   required or set by --algorithm)
+
+    TEST RUN
+      -c, --configuration              Print the configuration
+      -w, --welcome                    Try connecting to the gateway (FTP or SSH) to verify the connection
 
 ## How to start
 
@@ -73,28 +91,32 @@ __Step 1.__ Prepare ENV variables.
     PG_EXPORT_GATEWAY_HOST=yourftp.example.com
     PG_EXPORT_GATEWAY_USER=user
     PG_EXPORT_GATEWAY_PASSWORD=password
-    
+
     /* Encryption key should have exactly 16 characters. */
     /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
     PG_EXPORT_ENCRYPTION_KEY=1234567890abcdef
-    
+
     /* Dumps to be kept on FTP */
     /* Optional, defaults to 10 */
     KEEP_DUMPS=5
-    
-Note, that variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value). 
+
+Note, that variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
 
 __Step 2.__ Print the configuration to verify if env variables has been loaded properly.
 
     $ pg_export --configuration
-    => {:encryption_key=>"k4***", :gateway_host=>"yourftp.example.com", :gateway_user=>"your_gateway_user",
-       :gateway_password=>"pass***", :logger_format=>"plain", :keep_dumps=>2}
-       
+    => encryption_key k4***
+       gateway_host yourftp.example.com
+       gateway_user your_gateway_user
+       gateway_password pass***
+       logger_format plain
+       keep_dumps 2
+
 __Step 3.__ Try connecting to FTP to verify the connection.
 
     $ pg_export --gateway ftp --welcome
     => 230 User your_ftp_user logged in
-    
+
 __Step 4.__ Perform database export.
 
     $ pg_export -d your_database [-k 5]
@@ -103,7 +125,7 @@ __Step 4.__ Perform database export.
        Connect to yourftp.example.com
        Upload your_database_20181016_121314 (1.34MB) to yourftp.example.com
        Close FTP
-       
+
 ## How to restore a dump?
 
 Run interactive mode and follow the instructions:

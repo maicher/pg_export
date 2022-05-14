@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# auto_register: false
-
 require 'ed25519'
 require 'net/ssh'
 require 'net/scp'
@@ -25,7 +23,7 @@ class PgExport
       end
 
       def welcome
-        open.exec!('hostname')
+        open.exec!('hostname; whoami')
       end
 
       def close

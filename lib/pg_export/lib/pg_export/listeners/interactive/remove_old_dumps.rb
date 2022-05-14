@@ -7,7 +7,7 @@ class PgExport
     class Interactive
       class RemoveOldDumps < InteractiveListener
         def on_step(event)
-          @spinner = build_spinner("Checking for old dumps on #{event[:args].first[:gateway]}")
+          @spinner = build_spinner("Checking for old dumps on #{event[:value][:gateway]}")
         end
 
         def on_step_succeeded(event)

@@ -7,7 +7,7 @@ class PgExport
     class Interactive
       class CloseConnection < InteractiveListener
         def on_step(*)
-          @spinner = build_spinner('Closing FTP')
+          @spinner = build_spinner('Closing connection')
         end
 
         def on_step_succeeded(*)

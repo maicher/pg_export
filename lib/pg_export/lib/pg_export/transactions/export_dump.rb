@@ -1,55 +1,91 @@
 # frozen_string_literal: true
 
-# auto_register: false
-
-require 'dry/transaction'
-
-require 'pg_export/import'
 require 'pg_export/container'
 require 'pg_export/lib/pg_export/value_objects/dump_file'
+require 'pg_export/lib/pg_export/value_objects/result'
 
 class PgExport
   module Transactions
     class ExportDump
-      include Dry::Transaction(container: PgExport::Container)
-      include Import['factories.dump_factory', 'adapters.bash_adapter']
+      OPERATIONS = %i[
+        prepare_params
+        build_dump
+        encrypt_dump
+        open_connection
+        upload_dump
+        remove_old_dumps
+        close_connection
+      ].freeze
 
-      step :prepare_params
-      step :build_dump
-      step :encrypt_dump, with: 'operations.encrypt_dump'
-      step :open_connection, with: 'operations.open_connection'
-      step :upload_dump
-      step :remove_old_dumps, with: 'operations.remove_old_dumps'
-      step :close_connection
+      attr_reader :dump_factory, :bash_adapter, *OPERATIONS, :listeners
+
+      def initialize(dump_factory:, bash_adapter:, encrypt_dump:, open_connection:, remove_old_dumps:, listeners:)
+        @dump_factory = dump_factory
+        @bash_adapter = bash_adapter
+        @prepare_params = method(:prepare_params_operation)
+        @build_dump = method(:build_dump_operation)
+        @encrypt_dump = encrypt_dump
+        @open_connection = open_connection
+        @upload_dump = method(:upload_dump_operation)
+        @remove_old_dumps = remove_old_dumps
+        @close_connection = method(:close_connection_operation)
+        @listeners = listeners
+      end
+
+      def call(**input)
+        result = ValueObjects::Success.new(input)
+
+        OPERATIONS.each do |operation_name|
+          listener = listeners[operation_name]
+
+          result = result.bind do
+            r = operation(operation_name).call(**result.value)
+
+            r.on_step_succeeded do
+              listener.on_step_succeeded({value: r.value})
+            end if listener
+
+            r
+          end
+        end
+
+        result
+      end
 
       private
 
-      def prepare_params(database_name:)
-        database_name = database_name.to_s
-
-        return Failure(message: 'Invalid database name') if database_name.empty?
-
-        Success(database_name: database_name)
+      def operation(operation_name)
+        public_send(operation_name)
+      rescue NoMethodError => e
+        raise ArgumentError, "Operation #{operation_name} does not exist"
       end
 
-      def build_dump(database_name:)
+      def prepare_params_operation(database_name:)
+        database_name = database_name.to_s
+
+        return ValueObjects::Failure.new(message: 'Invalid database name') if database_name.empty?
+
+        ValueObjects::Success.new(database_name: database_name)
+      end
+
+      def build_dump_operation(database_name:)
         dump = dump_factory.plain(
           database: database_name,
           file: bash_adapter.pg_dump(ValueObjects::DumpFile.new, database_name)
         )
-        Success(dump: dump)
+        ValueObjects::Success.new(dump: dump)
       rescue bash_adapter.class::PgDumpError => e
-        Failure(message: 'Unable to dump database: ' + e.to_s)
+        ValueObjects::Failure.new(message: 'Unable to dump database: ' + e.to_s)
       end
 
-      def upload_dump(dump:, gateway:)
+      def upload_dump_operation(dump:, gateway:)
         gateway.persist(dump.file, dump.name)
-        Success(dump: dump, gateway: gateway)
+        ValueObjects::Success.new(dump: dump, gateway: gateway)
       end
 
-      def close_connection(removed_dumps:, gateway:)
+      def close_connection_operation(removed_dumps:, gateway:)
         gateway.close
-        Success(gateway: gateway)
+        ValueObjects::Success.new(gateway: gateway)
       end
     end
   end

@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-# auto_register: false
-
 require 'pg_export/lib/pg_export/gateways/ssh'
-require 'pg_export/import'
 
 class PgExport
   module Factories
     class SshGatewayFactory
-      include Import['config']
+      def initialize(config:)
+        @config = config
+      end
 
       def gateway
         ::PgExport::Gateways::Ssh.new(
@@ -17,6 +16,10 @@ class PgExport
           password: config.gateway_password
         )
       end
+
+      private
+
+      attr_reader :config
     end
   end
 end

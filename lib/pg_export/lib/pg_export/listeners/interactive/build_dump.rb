@@ -7,7 +7,7 @@ class PgExport
     class Interactive
       class BuildDump < InteractiveListener
         def on_step(event)
-          @spinner = build_spinner("Dumping database #{event[:args].first[:database_name]}")
+          @spinner = build_spinner("Dumping database #{event[:value][:database_name]}")
         end
 
         def on_step_succeeded(event)

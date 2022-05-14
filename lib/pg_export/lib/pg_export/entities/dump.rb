@@ -1,17 +1,25 @@
 # frozen_string_literal: true
 
-require 'dry-initializer'
-require 'pg_export/lib/pg_export/types'
-
 class PgExport
   module Entities
     class Dump
-      extend Dry::Initializer[undefined: false]
+      attr_reader :name, :type, :database, :file
 
-      option :name,     Types::DumpName
-      option :type,     Types::DumpType
-      option :database, Types::Strict::String.constrained(filled: true)
-      option :file,     Types::DumpFile, default: proc { PgExport::ValueObjects::DumpFile.new }
+      def initialize(name: nil, type: nil, database: nil, file: nil)
+        @name = String(name)
+        raise ArgumentError, 'Dump name must not be empty' if @name.empty?
+        raise ArgumentError, 'Dump name does not match criteria' unless /.+_20[0-9]{6}_[0-9]{6}\Z/.match?(@name)
+
+        @type = String(type)
+        @type = 'plain' if @type.empty?
+        raise ArgumentError, 'Dump type must be one of: plain, encrypted' unless %w[plain encrypted].include?(@type)
+
+        @database = database
+
+        @file = file
+        @file = ValueObjects::DumpFile.new if @file.nil?
+        raise ArgumentError, "Invalid file type: #{@file.class}" unless @file.is_a?(ValueObjects::DumpFile)
+      end
 
       def encrypt(cipher_factory:)
         self.file = file.copy(cipher: cipher_factory.encryptor)
@@ -32,13 +40,17 @@ class PgExport
       end
 
       def file=(f)
-        @file = Types::DumpFile[f]
+        @file = f
+
+        raise ArgumentError, "Invalid file type: '#{f}'" unless @file.is_a?(ValueObjects::DumpFile)
       end
 
       protected
 
       def type=(t)
-        @type = Types::DumpType[t]
+        @type = t.to_s
+
+        raise ArgumentError, "Dump type '#{t}' must be one of: plain, encrypted" unless %w[plain encrypted].include?(@type)
       end
     end
   end

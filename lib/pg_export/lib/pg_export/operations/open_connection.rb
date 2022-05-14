@@ -1,19 +1,24 @@
 # frozen_string_literal: true
 
-require 'dry/transaction/operation'
-require 'pg_export/import'
+require 'pg_export/lib/pg_export/value_objects/result'
 
 class PgExport
   module Operations
     class OpenConnection
-      include Dry::Transaction::Operation
-      include Import['factories.gateway_factory']
+      def initialize(gateway_factory:)
+        @gateway_factory = gateway_factory
+      end
 
       def call(inputs)
         gateway = gateway_factory.gateway
         gateway.open
-        Success(inputs.merge(gateway: gateway))
+
+        ValueObjects::Success.new(inputs.merge(gateway: gateway))
       end
+
+      private
+
+      attr_reader :gateway_factory
     end
   end
 end
