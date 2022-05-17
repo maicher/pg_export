@@ -9,6 +9,10 @@ class PgExport
         @gateway_factory = gateway_factory
       end
 
+      def name
+        :open_connection
+      end
+
       def call(inputs)
         gateway = gateway_factory.gateway
         gateway.open

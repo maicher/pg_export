@@ -7,7 +7,7 @@ require 'pg_export/lib/pg_export/value_objects/dump_file'
 
 RSpec.describe PgExport::Operations::DecryptDump do
   let(:decrypt_dump) { PgExport::Operations::DecryptDump.new(cipher_factory: cipher_factory) }
-  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(config: OpenStruct.new(encryption_key: encryption_key, encryption_algorithm: encryption_algorithm)) }
+  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(encryption_key: encryption_key, encryption_algorithm: encryption_algorithm) }
   let(:encryption_key) { '1234567890abcdef' }
   let(:encryption_algorithm) { 'AES-128-CBC' }
 

@@ -5,7 +5,7 @@ require 'net/ftp'
 class PgExport
   module Gateways
     class Ftp
-      CHUNK_SIZE = (2**16).freeze
+      CHUNK_SIZE = (2**16)
 
       def initialize(host:, user:, password:)
         @host, @user, @password, @logger = host, user, password

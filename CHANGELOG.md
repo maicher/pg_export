@@ -1,4 +1,4 @@
-### 1.0.0 - 2022.05.14
+### 1.0.0 - 2022.05.17
 - Make it compatible with Ruby 3.0
 - Change configuration envs:
   - BACKUP_FTP_HOST -> PG_EXPORT_GATEWAY_HOST
@@ -9,6 +9,7 @@
 - Add SSH option
 - Add `encryption_algorithm` option to interface
 - Remove dry libraries dependencies
+- in case of failure bin/pg_export now returns with 1 exit value
 
 ### 0.7.7 - 2020.09.07
 

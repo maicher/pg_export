@@ -9,6 +9,10 @@ class PgExport
         @cipher_factory = cipher_factory
       end
 
+      def name
+        :encrypt_dump
+      end
+
       def call(dump:)
         dump.encrypt(cipher_factory: cipher_factory)
 

@@ -11,7 +11,7 @@ class PgExport
       logger_format
       keep_dumps
       gateway mode
-    ]
+    ].freeze
 
     attr_reader *ATTRS
 
@@ -75,8 +75,8 @@ class PgExport
       ATTRS.map do |name|
         value = public_send(name)
 
-        if [:encryption_key, :gateway_password].include?(name)
-          "  #{name} #{value.nil? ? '' : value[0..2] + '***' }"
+        if %i[encryption_key gateway_password].include?(name)
+          "  #{name} #{value.nil? ? '' : value[0..2] + '***'}"
         else
           "  #{name} #{value}"
         end

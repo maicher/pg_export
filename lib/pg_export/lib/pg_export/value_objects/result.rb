@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
-
 class PgExport
   module ValueObjects
     class Result
@@ -21,8 +19,14 @@ class PgExport
         yield
       end
 
-      def on_step_succeeded
-        yield
+      def on_success
+        yield value
+
+        self
+      end
+
+      def on_failure
+        self
       end
     end
 
@@ -31,7 +35,14 @@ class PgExport
         self
       end
 
-      def on_step_succeeded
+      def on_success
+        self
+      end
+
+      def on_failure
+        yield value
+
+        self
       end
     end
   end

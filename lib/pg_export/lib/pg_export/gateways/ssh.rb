@@ -7,8 +7,6 @@ require 'net/scp'
 class PgExport
   module Gateways
     class Ssh
-      CHUNK_SIZE = (2**16).freeze
-
       def initialize(host:, user:, password:)
         @host, @user, @password, @logger = host, user, password
       end
@@ -47,7 +45,7 @@ class PgExport
       end
 
       def delete(name)
-        # @TODO
+        ssh.exec!("rm #{name}")
       end
 
       def persist(file, name)

@@ -3,10 +3,10 @@
 require 'net/ftp'
 require 'net/ssh'
 require 'pg_export'
-require 'pg_export/container'
 require 'ftp_mock'
 require 'ssh_mock'
-require 'pg_export/lib/pg_export/adapters/bash_adapter'
+
+require 'pg_export/lib/pg_export/adapters/shell_adapter'
 require 'pg_export/lib/pg_export/factories/dump_factory'
 require 'pg_export/lib/pg_export/gateways/ftp'
 require 'pg_export/lib/pg_export/gateways/ssh'
@@ -50,7 +50,7 @@ describe PgExport do
         let(:database) { 'some_database' }
 
         it 'creates dump and exports it to ftp' do
-          expect_any_instance_of(PgExport::Adapters::BashAdapter).to receive(:pg_dump)
+          expect_any_instance_of(PgExport::Adapters::ShellAdapter).to receive(:pg_dump)
           expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:plain).and_return(dump)
           expect_any_instance_of(PgExport::Gateways::Ftp).to receive(:persist)
           expect_any_instance_of(PgExport::Gateways::Ftp).to receive(:list).and_return([{ name: 'db_20151010_121212', size: '123' }] * 11)
@@ -86,7 +86,7 @@ describe PgExport do
         let(:database) { 'some_database' }
 
         it 'creates dump and exports it to ssh' do
-          expect_any_instance_of(PgExport::Adapters::BashAdapter).to receive(:pg_dump)
+          expect_any_instance_of(PgExport::Adapters::ShellAdapter).to receive(:pg_dump)
           expect_any_instance_of(PgExport::Factories::DumpFactory).to receive(:plain).and_return(dump)
           expect_any_instance_of(PgExport::Gateways::Ssh).to receive(:persist)
           expect_any_instance_of(PgExport::Gateways::Ssh).to receive(:list).and_return([{ name: 'db_20151010_121212', size: '123' }] * 11)

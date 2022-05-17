@@ -19,6 +19,10 @@ option_parser = OptionParser.new do |opts|
         pg_export DATABASE [OPTION..]
         pg_export --interactive DATABASE [OPTION..]
 
+    EXIT VALUES
+        0 - Success
+        1 - Error
+
     ARGUMENTS
         DATABASE - database name to export (when default mode)
                  - phrase to filter database dumps by (when interactive mode)
@@ -117,24 +121,26 @@ rescue OptionParser::ParseError => e
   warn 'Details:'
   warn option_parser.to_s.split("\n").grep(/ #{e.args.first}/).join("\n")
   warn 'Type "pg_export" for available options'
-  exit
+  exit 1
 end
-
-require 'pg_export/container'
 
 begin
   pg_export = PgExport.new
 rescue PgExport::InitializationError => e
   warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
   warn "Detailed message: #{e.message}"
-  exit
+  exit 1
 end
 
 begin
-  pg_export.call(database) do |result|
-    result.success { puts 'Success' }
-    result.failure { |outcome| warn outcome[:message] }
-  end
+  pg_export
+    .call(database)
+    .on_success { exit 0 }
+    .on_failure do |outcome|
+      warn outcome[:message]
+      exit 1
+    end
+
 rescue Interrupt
   puts
 end

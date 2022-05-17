@@ -5,6 +5,10 @@ require 'tty-spinner'
 class PgExport
   module Listeners
     class InteractiveListener
+      def on_step(*); end
+
+      def on_step_succeeded(*); end
+
       def on_step_failed(event)
         @spinner.error([error, self.class.red(event[:value][:message])].join("\n"))
       end

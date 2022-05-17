@@ -5,8 +5,9 @@ require 'openssl'
 class PgExport
   module Factories
     class CipherFactory
-      def initialize(config:)
-        @config = config
+      def initialize(encryption_algorithm:, encryption_key:)
+        @encryption_algorithm = encryption_algorithm
+        @encryption_key = encryption_key
       end
 
       def encryptor
@@ -19,12 +20,12 @@ class PgExport
 
       private
 
-      attr_reader :config
+      attr_reader :encryption_algorithm, :encryption_key
 
       def build_cipher(type)
-        cipher = OpenSSL::Cipher.new(config.encryption_algorithm)
+        cipher = OpenSSL::Cipher.new(encryption_algorithm)
         cipher.public_send(type)
-        cipher.key = config.encryption_key
+        cipher.key = encryption_key
         cipher
       end
     end

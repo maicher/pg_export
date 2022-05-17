@@ -2,7 +2,7 @@
 
 require 'pg_export/version'
 require 'pg_export/configuration'
-require 'pg_export/container'
+require 'pg_export/factory'
 
 class PgExport
   class InitializationError < StandardError; end
@@ -11,11 +11,11 @@ class PgExport
 
   def initialize
     @config = PgExport::Configuration.build(ENV)
-    @container = PgExport::Container.new(config: config)
+    @factory = PgExport::Factory.new(config: config)
   end
 
   def call(database_name, &block)
-    container.transaction.call(database_name: database_name, &block)
+    factory.transaction.call(database_name: database_name, &block)
   end
 
   def gateway_welcome
@@ -24,5 +24,5 @@ class PgExport
 
   private
 
-  attr_reader :container
+  attr_reader :factory
 end

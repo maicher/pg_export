@@ -7,6 +7,10 @@ class PgExport
         @logger = logger
       end
 
+      def on_step(*); end
+
+      def on_step_succeeded(*); end
+
       def on_step_failed(event)
         logger.info("Error: #{event[:value][:message]}")
       end

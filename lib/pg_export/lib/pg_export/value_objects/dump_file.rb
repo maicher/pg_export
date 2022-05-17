@@ -54,9 +54,9 @@ class PgExport
 
       private
 
-      CHUNK_SIZE = (2**16).freeze
+      CHUNK_SIZE = (2**16)
       MAPPING = {
-        'B'  => 1024,
+        'B' => 1024,
         'kB' => 1024 * 1024,
         'MB' => 1024 * 1024 * 1024,
         'GB' => 1024 * 1024 * 1024 * 1024,

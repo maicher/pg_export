@@ -6,17 +6,32 @@ Metrics/BlockLength:
     - 'bin/pg_export'
   ExcludedMethods: ['describe', 'context']
 
-Metrics/LineLength:
-  Max: 200
+Layout/LineLength:
+  Max: 140
 
 Style/ParallelAssignment:
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
-Documentation:
+Style/Documentation:
   Enabled: false
 
 Lint/UnusedMethodArgument:
   Enabled: false
+
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/CyclomaticComplexity:
+  Max: 30
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/PerceivedComplexity:
+  Max: 30

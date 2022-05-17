@@ -2,10 +2,10 @@
 
 require 'pg'
 require 'pg_export/lib/pg_export/factories/dump_factory'
-require 'pg_export/lib/pg_export/adapters/bash_adapter'
+require 'pg_export/lib/pg_export/adapters/shell_adapter'
 require 'pg_export/lib/pg_export/value_objects/dump_file'
 
-RSpec.describe PgExport::Adapters::BashAdapter do
+RSpec.describe PgExport::Adapters::ShellAdapter do
   let!(:postgres_conn) { PG.connect(dbname: 'postgres') }
   let(:encryption_key) { '1234567890abcdef' }
   let(:bash_adapter) { described_class.new }
@@ -34,7 +34,7 @@ RSpec.describe PgExport::Adapters::BashAdapter do
 
     context 'when specified database does not exist' do
       subject { bash_adapter.pg_restore(file, 'pg_export_not_existing_database') }
-      it { expect { subject }.to raise_error(PgExport::Adapters::BashAdapter::PgRestoreError) }
+      it { expect { subject }.to raise_error(PgExport::Adapters::ShellAdapter::PgRestoreError) }
     end
 
     context 'when specified database exists' do
@@ -61,7 +61,7 @@ RSpec.describe PgExport::Adapters::BashAdapter do
 
     context 'when specified database does not exist' do
       let(:database) { 'pg_export_not_existing_database' }
-      it { expect { subject }.to raise_error(PgExport::Adapters::BashAdapter::PgDumpError) }
+      it { expect { subject }.to raise_error(PgExport::Adapters::ShellAdapter::PgDumpError) }
     end
 
     context 'when specified database exists' do

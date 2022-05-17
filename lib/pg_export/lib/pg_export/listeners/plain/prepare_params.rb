@@ -7,7 +7,7 @@ class PgExport
     class Plain
       class PrepareParams < PlainListener
         def on_step_succeeded(event)
-          logger.info("Init")
+          logger.info('Init')
         end
       end
     end
