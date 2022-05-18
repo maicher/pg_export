@@ -1,4 +1,4 @@
-### 1.0.0 - 2022.05.17
+### 1.0.0 - 2022.05.18
 - Make it compatible with Ruby 3.0
 - Change configuration envs:
   - BACKUP_FTP_HOST -> PG_EXPORT_GATEWAY_HOST
@@ -7,9 +7,12 @@
   - DUMP_ENCRYPTION_KEY -> PG_EXPORT_ENCRYPTION_KEY
 - Drop Ruby 2.3 support
 - Add SSH option
-- Add `encryption_algorithm` option to interface
+- Add `encryption_algorithm` option
+- All command line options has now their equivalents in ENVs (and vice-versa)
 - Remove dry libraries dependencies
-- in case of failure bin/pg_export now returns with 1 exit value
+- In case of failure bin/pg_export now returns exit value 1
+- Improve performance
+- Improve error handling
 
 ### 0.7.7 - 2020.09.07
 

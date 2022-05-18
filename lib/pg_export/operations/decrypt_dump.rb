@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'pg_export'
-require 'pg_export/lib/pg_export/value_objects/result'
+require 'pg_export/value_objects/result'
 
 class PgExport
   module Operations

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/entities/dump'
+require 'pg_export/entities/dump'
 
 describe PgExport::Entities::Dump do
   subject do

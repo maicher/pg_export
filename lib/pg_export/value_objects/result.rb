@@ -5,7 +5,7 @@ class PgExport
     class Result
       attr_reader :value
 
-      def initialize(value)
+      def initialize(value = nil)
         @value = value
       end
     end

@@ -6,23 +6,8 @@ require 'pg_export'
 require 'ftp_mock'
 require 'ssh_mock'
 
-require 'pg_export/lib/pg_export/adapters/shell_adapter'
-require 'pg_export/lib/pg_export/factories/dump_factory'
-require 'pg_export/lib/pg_export/gateways/ftp'
-require 'pg_export/lib/pg_export/gateways/ssh'
-require 'pg_export/lib/pg_export/value_objects/result'
-require 'pg_export/lib/pg_export/factories/ssh_gateway_factory'
-
-ENV['PG_EXPORT_ENCRYPTION_KEY'] = '1234567890abcdef'
-ENV['PG_EXPORT_ENCRYPTION_ALGORITHM'] = 'AES-128-CBC'
-ENV['PG_EXPORT_GATEWAY_HOST'] = 'example.com'
-ENV['PG_EXPORT_GATEWAY_USER'] = 'user'
-ENV['PG_EXPORT_GATEWAY_PASSWORD'] = 'pass'
-ENV['PG_EXPORT_MODE'] = 'plain'
-ENV['LOGGER_FORMAT'] = 'muted'
-ENV['INTERACTIVE'] = 'false'
-ENV['KEEP_DUMPS'] = '10'
-ENV['GATEWAY'] = 'ftp'
+require 'pg_export/gateways/ftp'
+require 'pg_export/gateways/ssh'
 
 describe PgExport do
   it 'has a version number' do
@@ -30,7 +15,22 @@ describe PgExport do
   end
 
   describe '#call' do
-    subject { described_class.new.call(database) }
+    subject { described_class.new(config).call }
+
+    let(:config) do
+      PgExport::Configuration.new(
+        encryption_key: '1234567890abcdef',
+        encryption_algorithm: 'AES-128-CBC',
+        gateway_host: 'example.com',
+        gateway_user: 'user',
+        gateway_password: 'pass',
+        mode: 'plain',
+        logger_format: 'muted',
+        keep_dumps: 10,
+        gateway: gateway,
+        database: database
+      )
+    end
 
     before do
       allow(dump).to receive(:name).and_return('name')
@@ -42,6 +42,8 @@ describe PgExport do
     let(:dump) { Object.new }
 
     context 'with FTP gateway' do
+      let(:gateway) { :ftp }
+
       before(:each) do
         allow(Net::FTP).to receive(:new).and_return(FtpMock.new)
       end
@@ -75,10 +77,9 @@ describe PgExport do
     end
 
     context 'with SSH gateway' do
-      before(:each) do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with('GATEWAY').and_return('ssh')
+      let(:gateway) { :ssh }
 
+      before(:each) do
         allow(Net::SSH).to receive(:start).and_return(SshMock.new)
       end
 

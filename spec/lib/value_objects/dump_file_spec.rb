@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/value_objects/dump_file'
+require 'pg_export/value_objects/dump_file'
 
 describe PgExport::ValueObjects::DumpFile do
   subject { described_class.new }
@@ -10,6 +10,7 @@ describe PgExport::ValueObjects::DumpFile do
       subject.write { |f| f << 'abc' }
       subject.rewind
     end
+
     it { expect(subject.read).to eq('abc') }
   end
 

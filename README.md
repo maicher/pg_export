@@ -54,34 +54,48 @@ Or install it yourself as:
       pg_export DATABASE [OPTION..]
       pg_export --interactive DATABASE [OPTION..]
 
+    EXIT VALUES
+      0 - Success
+      1 - Error
+
     ARGUMENTS
       DATABASE - database name to export (when default mode)
-           - phrase to filter database dumps by (when interactive mode)
+               - phrase to filter database dumps by (when interactive mode)
 
     OPTIONS
-      -g, --gateway GATEWAY            Allowed values: ftp, ssh. Default: ftp. Credentials need to be set via ENVs
-      -s, --ssh                        Same as "--gateway ssh"
-      -f, --ftp                        Same as "--gateway ftp"
-      -d, --database DATABASE          Alternative way of specifying name of the database to export or phrase to filter by
-      -e, --encryption_key KEY         Dumps will be SSL encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env
-      -a, --algorithm ALGORITHM        Encryption cipher algorithm (default: AES-128-CBC). Overwrites PG_EXPORT_ENCRYPTION_ALGORITHM env. For available option see `$ openssl list -cipher-algorithms`
-      -k, --keep KEEP                  Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env
-      -t, --timestamped                Enables log messages with timestamps
-      -m, --muted                      Mutes log messages (overrides -t option)
-      -i, --interactive                Interactive mode, for importing dumps
-      -v, --version                    Show version
-      -h, --help                       Show this message
+      -g, --gateway GATEWAY      Allowed values: ftp, ssh. Default: ftp. Credentials need to be set via ENVs
+      -U, --user USER            Gateway (ftp or ssh) user
+      -H, --host HOST            Gateway (ftp or ssh) host
+      -P, --password PASSWORD    Gateway (ftp or ssh) password
+      -d, --database DATABASE    In plain mode: database name to export;
+                                 In interactive mode: phrase to filter by
+      -e, --encryption_key KEY   Dumps will be SSL encrypted using this key. Should have exactly 16 characters
+      -a, --algorithm ALGORITHM  Encryption cipher algorithm (default: AES-128-CBC);
+                                 For available option see `$ openssl list -cipher-algorithms`
+      -k, --keep KEEP            Number of dump files to keep on FTP (default: 10)
+      -s, --ssh                  Same as "--gateway ssh". When set, the --gateway option is ignored
+      -f, --ftp                  Same as "--gateway ftp". When set, the --gateway option is ignored
+      -t, --timestamped          Prepends log messages with timestamps
+      -m, --muted                Mutes log messages. When set, the -t option is ignored. Prints message only on error
+      -i, --interactive          Interactive mode, for importing dumps. Whan set, the -t and -m options are ignored
+      -w, --welcome              Try connecting to the gateway (FTP or SSH) to verify the connection and exit
+      -c, --configuration        Print the configuration and exit
+      -v, --version              Print version
+      -h, --help                 Print this message and exit
 
     ENV
-      PG_EXPORT_GATEWAY_HOST           required
-      PG_EXPORT_GATEWAY_USER           required
-      PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
-      PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
-      PG_EXPORT_ENCRYPTION_ALGORITHM   required or set by --algorithm)
+      Each of the above options can be also set using enviromental variables.
+      Use full option names prepending with PG_EXPORT_ phrase.
+      Command line options takes precedence over the ENVs.
 
-    TEST RUN
-      -c, --configuration              Print the configuration
-      -w, --welcome                    Try connecting to the gateway (FTP or SSH) to verify the connection
+      Eg. below two commands are equivalent:
+        pg_export -s -U user -H host database_name -k 10
+
+      Is equivalent to:
+        export PG_EXPORT_GATEWAY_USER=user
+        export PG_EXPORT_GATEWAY_HOST=host
+        export PG_EXPORT_KEEP=20
+        pg_export -s database_name -k 10
 
 ## How to start
 
@@ -96,21 +110,16 @@ __Step 1.__ Prepare ENV variables.
     /* Dumps will be SSL(AES-128-CBC) encrypted using this key. */
     PG_EXPORT_ENCRYPTION_KEY=1234567890abcdef
 
-    /* Dumps to be kept on FTP */
-    /* Optional, defaults to 10 */
-    KEEP_DUMPS=5
-
-Note, that variables cannot include `#` sign, [more info](http://serverfault.com/questions/539730/environment-variable-in-etc-environment-with-pound-hash-sign-in-the-value).
-
 __Step 2.__ Print the configuration to verify if env variables has been loaded properly.
 
     $ pg_export --configuration
     => encryption_key k4***
        gateway_host yourftp.example.com
        gateway_user your_gateway_user
-       gateway_password pass***
+       gateway_password
        logger_format plain
-       keep_dumps 2
+       keep_dumps 10
+       ....
 
 __Step 3.__ Try connecting to FTP to verify the connection.
 
@@ -119,18 +128,18 @@ __Step 3.__ Try connecting to FTP to verify the connection.
 
 __Step 4.__ Perform database export.
 
-    $ pg_export -d your_database [-k 5]
-    => Dump database your_database to your_database_20181016_121314 (1.36MB)
-       Encrypt your_database_20181016_121314 (1.34MB)
+    $ pg_export -d your_database -k 5
+    => Dump database your_database to database_name (1.36MB)
+       Encrypt database_name_20181016_121314 (1.34MB)
        Connect to yourftp.example.com
-       Upload your_database_20181016_121314 (1.34MB) to yourftp.example.com
+       Upload database_name_20181016_121314 (1.34MB) to yourftp.example.com
        Close FTP
 
 ## How to restore a dump?
 
 Run interactive mode and follow the instructions:
 
-    pg_export [-d your_database] -i
+    pg_export [-d database_name] -i
 
 ## Development
 

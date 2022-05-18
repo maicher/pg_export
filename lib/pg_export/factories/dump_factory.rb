@@ -3,7 +3,7 @@
 require 'open3'
 require 'tempfile'
 
-require 'pg_export/lib/pg_export/entities/dump'
+require 'pg_export/entities/dump'
 
 class PgExport
   module Factories

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'optparse'
+
 class PgExport
   class Configuration
     ATTRS = %i[
@@ -11,23 +13,11 @@ class PgExport
       logger_format
       keep_dumps
       gateway mode
+      database
+      command
     ].freeze
 
     attr_reader *ATTRS
-
-    def self.build(env)
-      new(
-        encryption_key: env['PG_EXPORT_ENCRYPTION_KEY'],
-        encryption_algorithm: env['PG_EXPORT_ENCRYPTION_ALGORITHM'],
-        gateway_host: env['PG_EXPORT_GATEWAY_HOST'],
-        gateway_user: env['PG_EXPORT_GATEWAY_USER'],
-        gateway_password: env['PG_EXPORT_GATEWAY_PASSWORD'],
-        logger_format: env['LOGGER_FORMAT'],
-        keep_dumps: env['KEEP_DUMPS'],
-        gateway: env['GATEWAY'],
-        mode: env['PG_EXPORT_MODE']
-      )
-    end
 
     def initialize(
       encryption_key: nil,
@@ -38,7 +28,9 @@ class PgExport
       logger_format: nil,
       keep_dumps: nil,
       gateway: nil,
-      mode: nil
+      mode: nil,
+      database: nil,
+      command: nil
     )
 
       @encryption_key = String(encryption_key)
@@ -57,7 +49,9 @@ class PgExport
 
       @logger_format = logger_format.to_s.to_sym
       @logger_format = :plain if @logger_format.empty?
-      raise ArgumentError, 'Logger format must be one of: plain, timestamped, muted' unless %i[plain timestamped muted].include?(@logger_format)
+      unless %i[plain timestamped muted].include?(@logger_format)
+        raise ArgumentError, 'Logger format must be one of: plain, timestamped, muted'
+      end
 
       @keep_dumps = Integer(keep_dumps || 10)
       raise ArgumentError, 'Keep dumps must greater or equal to 1' unless @keep_dumps >= 1
@@ -69,6 +63,11 @@ class PgExport
       @mode = mode.to_s.to_sym
       @mode = :plain if @mode.empty?
       raise ArgumentError, 'Mode must be one of: plain, interactive' unless %i[plain interactive].include?(@mode)
+
+      @database = String(database) unless database.nil?
+
+      @command = command.to_s.to_sym
+      @command = :export_dump if @command.empty?
     end
 
     def to_s

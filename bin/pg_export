@@ -4,143 +4,26 @@
 lib = File.expand_path('../lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'optparse'
 require 'pg_export'
 
-database = nil
-x = nil
-
-option_parser = OptionParser.new do |opts|
-  opts.banner = <<~TXT
-    NAME
-        pg_export - CLI for exporting/importing PostgreSQL dumps via FTP/SSH
-
-    SYNOPSIS
-        pg_export DATABASE [OPTION..]
-        pg_export --interactive DATABASE [OPTION..]
-
-    EXIT VALUES
-        0 - Success
-        1 - Error
-
-    ARGUMENTS
-        DATABASE - database name to export (when default mode)
-                 - phrase to filter database dumps by (when interactive mode)
-
-    OPTIONS
-  TXT
-
-  opts.program_name = 'pg_export'
-  opts.version = PgExport::VERSION
-
-  opts.on('-g', '--gateway GATEWAY', %w[ftp ssh], 'Allowed values: ftp, ssh. Default: ftp. Credentials need to be set via ENVs') do |g|
-    ENV['GATEWAY'] = g
-  end
-
-  opts.on('-s', '--ssh', 'Same as "--gateway ssh"') do
-    ENV['GATEWAY'] = 'ssh'
-  end
-
-  opts.on('-f', '--ftp', 'Same as "--gateway ftp"') do
-    ENV['GATEWAY'] = 'ftp'
-  end
-
-  opts.on('-d', '--database DATABASE', String, 'Alternative way of specifying name of the database to export or phrase to filter by') do |d|
-    database = d
-  end
-
-  opts.on('-e', '--encryption_key KEY', String, 'Dumps will be SSL encrypted using this key. Should have exactly 16 characters. Overwrites PG_EXPORT_ENCRYPTION_KEY env') do |key|
-    ENV['PG_EXPORT_ENCRYPTION_KEY'] = key
-  end
-
-  opts.on('-a', '--algorithm ALGORITHM', String, 'Encryption cipher algorithm (default: AES-128-CBC). Overwrites PG_EXPORT_ENCRYPTION_ALGORITHM env. For available option see `$ openssl list -cipher-algorithms`') do |key|
-    ENV['PG_EXPORT_ENCRYPTION_KEY'] = key
-  end
-
-  opts.on('-k', '--keep KEEP', String, 'Number of dump files to keep on FTP (default: 10). Overwrites KEEP_DUMPS env') do |keep|
-    ENV['KEEP_DUMPS'] = keep
-  end
-
-  opts.on('-t', '--timestamped', 'Enables log messages with timestamps') do
-    ENV['LOGGER_FORMAT'] = 'timestamped'
-  end
-
-  opts.on('-m', '--muted', 'Mutes log messages (overrides -t option)') do
-    ENV['LOGGER_FORMAT'] = 'muted'
-  end
-
-  opts.on('-i', '--interactive', 'Interactive mode, for importing dumps') do
-    ENV['PG_EXPORT_MODE'] = 'interactive'
-  end
-
-  opts.on('-v', '--version', 'Show version') do
-    puts PgExport::VERSION
-    exit
-  end
-
-  opts.on('-h', '--help', 'Show this message') do
-    puts opts
-    exit
-  end
-
-  opts.separator <<~TXT
-
-    ENV
-        PG_EXPORT_GATEWAY_HOST           required
-        PG_EXPORT_GATEWAY_USER           required
-        PG_EXPORT_GATEWAY_PASSWORD       optional when eg. authorized key is added
-        PG_EXPORT_ENCRYPTION_KEY         required or set by --encryption_key)
-        PG_EXPORT_ENCRYPTION_ALGORITHM   required or set by --algorithm)
-  TXT
-
-  opts.separator "\nTEST RUN"
-
-  opts.on('-c', '--configuration', 'Print the configuration') do
-    x = -> { puts PgExport.new.config }
-  end
-
-  opts.on('-w', '--welcome', 'Try connecting to the gateway (FTP or SSH) to verify the connection') do
-    x = -> { puts PgExport.new.gateway_welcome }
-  end
-
-  if ARGV.empty?
-    puts opts
-    exit
-  end
-end
-
 begin
-  option_parser.parse!
-  if x
-    x.call
-    exit
-  end
-  database = ARGV.first unless ARGV.empty?
-rescue OptionParser::ParseError => e
+  config = PgExport::ConfigurationParser.parse
+  pg_export = PgExport.new(config)
+  result = pg_export.call
+  result
+    .on_success { |outcome| puts outcome if outcome }
+    .on_failure { |outcome| warn outcome[:message]; exit 1 }
+rescue PgExport::ConfigurationParser::Error => e
   warn e.message.capitalize
-  warn 'Details:'
-  warn option_parser.to_s.split("\n").grep(/ #{e.args.first}/).join("\n")
-  warn 'Type "pg_export" for available options'
+
+  if e.reason == 'missing argument'
+    warn "\nHint for the #{e.args.first} option:"
+    warn PgExport::ConfigurationParser.help.to_s.split("\n").grep(/ #{e.args.first}/).join("\n")
+  end
+
+  warn 'Type "pg_export -h" to print options.'
   exit 1
-end
-
-begin
-  pg_export = PgExport.new
-rescue PgExport::InitializationError => e
-  warn 'Unable to initialize PgExport due to invalid configuration. Check you ENVs.'
-  warn "Detailed message: #{e.message}"
-  exit 1
-end
-
-begin
-  pg_export
-    .call(database)
-    .on_success { exit 0 }
-    .on_failure do |outcome|
-      warn outcome[:message]
-      exit 1
-    end
-
+rescue PgExport::Operation
 rescue Interrupt
   puts
 end

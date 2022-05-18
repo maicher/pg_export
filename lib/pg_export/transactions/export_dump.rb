@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/transactions/evaluator'
-require 'pg_export/lib/pg_export/value_objects/dump_file'
-require 'pg_export/lib/pg_export/value_objects/result'
+require 'pg_export/transactions/evaluator'
+require 'pg_export/value_objects/dump_file'
+require 'pg_export/adapters/shell_adapter'
+require 'pg_export/value_objects/result'
 
 class PgExport
   module Transactions
     class ExportDump
-      def initialize(dump_factory:, bash_adapter:, encrypt_dump:, open_connection:, remove_old_dumps:, listeners:)
+      def initialize(dump_factory:, shell_adapter:, encrypt_dump:, open_connection:, remove_old_dumps:, listeners:)
         @dump_factory = dump_factory
-        @bash_adapter = bash_adapter
+        @shell_adapter = shell_adapter
 
         @evaluator = Evaluator.new(listeners)
         @evaluator << method(:prepare_params)
@@ -27,8 +28,7 @@ class PgExport
 
       private
 
-      attr_reader :evaluator, :dump_factory, :bash_adapter
-
+      attr_reader :evaluator, :dump_factory, :shell_adapter
 
       def prepare_params(database_name:)
         database_name = database_name.to_s
@@ -41,10 +41,10 @@ class PgExport
       def build_dump(database_name:)
         dump = dump_factory.plain(
           database: database_name,
-          file: bash_adapter.pg_dump(ValueObjects::DumpFile.new, database_name)
+          file: shell_adapter.pg_dump(ValueObjects::DumpFile.new, database_name)
         )
         ValueObjects::Success.new(dump: dump)
-      rescue bash_adapter.class::PgDumpError => e
+      rescue Adapters::ShellAdapter::PgDumpError => e
         ValueObjects::Failure.new(message: 'Unable to dump database: ' + e.to_s)
       end
 
@@ -55,7 +55,7 @@ class PgExport
 
       def close_connection(removed_dumps:, gateway:)
         gateway.close
-        ValueObjects::Success.new(gateway: gateway)
+        ValueObjects::Success.new
       end
     end
   end

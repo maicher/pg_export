@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/gateways/ftp'
+require 'pg_export/gateways/ftp'
 
 class PgExport
   module Factories

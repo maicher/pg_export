@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
-require 'ostruct'
-require 'pg_export/lib/pg_export/factories/cipher_factory'
-require 'pg_export/lib/pg_export/value_objects/dump_file'
-require 'pg_export/lib/pg_export/entities/dump'
-require 'pg_export/lib/pg_export/operations/encrypt_dump'
+require 'pg_export/factories/cipher_factory'
+require 'pg_export/value_objects/dump_file'
+require 'pg_export/entities/dump'
+require 'pg_export/operations/encrypt_dump'
 
 RSpec.describe PgExport::Operations::EncryptDump do
   let(:encrypt_dump) { PgExport::Operations::EncryptDump.new(cipher_factory: cipher_factory) }
-  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(encryption_key: encryption_key, encryption_algorithm: encryption_algorithm) }
-  let(:encryption_key) { '1234567890abcdef' }
-  let(:encryption_algorithm) { 'AES-128-CBC' }
+  let(:cipher_factory) { PgExport::Factories::CipherFactory.new(encryption_key: key, encryption_algorithm: alg) }
+  let(:key) { '1234567890abcdef' }
+  let(:alg) { 'AES-128-CBC' }
 
   let(:plain_dump) do
     file = PgExport::ValueObjects::DumpFile.new
