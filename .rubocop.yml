@@ -2,8 +2,6 @@ AllCops:
   TargetRubyVersion: 2.3
 
 Metrics/BlockLength:
-  Exclude:
-    - 'bin/pg_export'
   ExcludedMethods: ['describe', 'context']
 
 Layout/LineLength:
@@ -32,6 +30,29 @@ Style/TrailingCommaInHashLiteral:
 
 Metrics/AbcSize:
   Max: 30
+  Exclude:
+    - 'lib/pg_export/configuration_parser.rb'
+    - 'lib/pg_export/configuration.rb'
 
 Metrics/PerceivedComplexity:
   Max: 30
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Metrics/ClassLength:
+  Max: 200
+
+Layout/ExtraSpacing:
+  Exclude:
+    - 'lib/pg_export/configuration_parser.rb'
+
+Metrics/ParameterLists:
+  Exclude:
+    - 'lib/pg_export/configuration.rb'
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Style/Semicolon:
+  Enabled: false

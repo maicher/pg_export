@@ -2,27 +2,25 @@
 
 require 'pg_export/version'
 require 'pg_export/configuration'
-require 'pg_export/factory'
+require 'pg_export/configuration_parser'
+require 'pg_export/commands_factory'
 
 class PgExport
-  class InitializationError < StandardError; end
+  def initialize(config)
+    raise ArgumentError, 'config is not a PgExport::Configuration' unless config.is_a?(PgExport::Configuration)
 
-  attr_reader :config
-
-  def initialize
-    @config = PgExport::Configuration.build(ENV)
-    @factory = PgExport::Factory.new(config: config)
+    @command_name = config.command
+    @database_name = config.database
+    @commands_factory = PgExport::CommandsFactory.new(config: config)
   end
 
-  def call(database_name, &block)
-    factory.transaction.call(database_name: database_name, &block)
-  end
-
-  def gateway_welcome
-    container.gateway_factory.gateway.welcome
+  def call
+    commands_factory
+      .public_send(command_name)
+      .call(database_name: database_name)
   end
 
   private
 
-  attr_reader :factory
+  attr_reader :command_name, :database_name, :commands_factory
 end

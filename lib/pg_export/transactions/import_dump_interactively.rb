@@ -1,16 +1,25 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/transactions/evaluator'
-require 'pg_export/lib/pg_export/value_objects/result'
+require 'pg_export/transactions/evaluator'
+require 'pg_export/adapters/shell_adapter'
+require 'pg_export/value_objects/result'
 
 class PgExport
   module Transactions
     class ImportDumpInteractively
-      def initialize(input:, bash_adapter:, gateway_dump_repository:, gateway_dump_file_repository:, open_connection:, decrypt_dump:, listeners:)
+      def initialize(
+        input:,
+        shell_adapter:,
+        gateway_dump_repository:,
+        gateway_dump_file_factory:,
+        open_connection:,
+        decrypt_dump:,
+        listeners:
+      )
         @input = input
-        @bash_adapter = bash_adapter
+        @shell_adapter = shell_adapter
         @gateway_dump_repository = gateway_dump_repository
-        @gateway_dump_file_repository = gateway_dump_file_repository
+        @gateway_dump_file_factory = gateway_dump_file_factory
 
         @evaluator = Evaluator.new(listeners)
         @evaluator << open_connection
@@ -29,7 +38,7 @@ class PgExport
 
       private
 
-      attr_reader :evaluator, :input, :bash_adapter, :gateway_dump_repository, :gateway_dump_file_repository
+      attr_reader :evaluator, :input, :shell_adapter, :gateway_dump_repository, :gateway_dump_file_factory
 
       def fetch_dumps(database_name:, gateway:)
         dumps = gateway_dump_repository.all(database_name: database_name, gateway: gateway)
@@ -44,7 +53,7 @@ class PgExport
       end
 
       def download_dump(dump:, gateway:)
-        dump.file = gateway_dump_file_repository.by_name(name: dump.name, gateway: gateway)
+        dump.file = gateway_dump_file_factory.by_name(name: dump.name, gateway: gateway)
         ValueObjects::Success.new(dump: dump, gateway: gateway)
       end
 
@@ -59,9 +68,9 @@ class PgExport
       end
 
       def restore(dump:, database:)
-        bash_adapter.pg_restore(dump.file, database)
-        ValueObjects::Success.new({})
-      rescue bash_adapter.class::PgRestoreError => e
+        shell_adapter.pg_restore(dump.file, database)
+        ValueObjects::Success.new(nil)
+      rescue Adapters::ShellAdapter::PgRestoreError => e
         ValueObjects::Failure.new(message: e.to_s)
       end
     end

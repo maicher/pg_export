@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg_export/lib/pg_export/gateways/ssh'
+require 'pg_export/gateways/ssh'
 
 class PgExport
   module Factories
