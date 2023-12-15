@@ -62,7 +62,7 @@ class PgExport
           Use full option names prepending with PG_EXPORT_ phrase.
           Command line options takes precedence over the ENVs.
 
-          Eg. below two commands are equivalent:
+          Eg. commands:
             pg_export -s -U user -H host database_name -k 10
 
           Is equivalent to:
@@ -82,7 +82,7 @@ class PgExport
         d: "In plain mode: database name to export;#{N}In interactive mode: phrase to filter by",
         e: 'Dumps will be SSL encrypted using this key. Should have exactly 16 characters',
         a: "Encryption cipher algorithm (default: AES-128-CBC);#{N}For available option see `$ openssl list -cipher-algorithms`",
-        k: 'Number of dump files to keep on FTP (default: 10)',
+        k: 'Number of dump files to keep on FTP/SSH (default: 10)',
         s: 'Same as "--gateway ssh". When set, the --gateway option is ignored',
         f: 'Same as "--gateway ftp". When set, the --gateway option is ignored',
         t: 'Prepends log messages with timestamps',

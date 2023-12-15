@@ -1,4 +1,4 @@
-### 1.0.0 - 2022.05.18
+### 1.0.0 - 2023.12.15
 - Make it compatible with Ruby 3.0
 - Change configuration envs:
   - BACKUP_FTP_HOST -> PG_EXPORT_GATEWAY_HOST
